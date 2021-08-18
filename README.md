@@ -5,5 +5,5 @@ Repositório das análises estatísticas da pesquisa "Características dos surdo
 
 Estatísticos responsáveis pelas análises:
 
-- Janaina Barreto
+- Janaina de Rezende Barreto
 - Rafael Rodrigues de Moraes
