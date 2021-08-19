@@ -32,7 +32,7 @@
    library(readr)      # read_csv
    library(dplyr)      # %>%
    library(tidyr)      # pivot_longer
-   library(stringr)    # str_split
+   library(stringr)    # str_sub
    library(xtable)     # xtable
    #+END_SRC
 
@@ -128,14 +128,13 @@
 ** Tratamento dos dados
 
    #+BEGIN_SRC R :exports code :results silent :session 
-
    ## renomeia as duas primeiras colunas para nomes mais curtos
    names(raw)[ c(1,2) ] <- c('data_preenchimento', 'consentimento')
 
    ## tabela de reclassificação dos nomes de coluna
    headers <- data.frame(
 	 orig = names(raw)                        # nomes originais
-	,codes = sprintf( 'V%03d', 1:ncol(raw) )  # novos nomes: V000 até V028
+	,codes = sprintf( 'V%03d', 1:ncol(raw) )  # novos nomes: V001 até V028
 	,stringsAsFactors = FALSE
    ) 
 
@@ -432,6 +431,80 @@
 	   )
 	 )
    #+END_SRC
+
+** Exporta dados tratados no formato apropriado ao SPSS
+
+   #+BEGIN_SRC R :exports code :results silent :session 
+
+   spss <- dat %>%
+	 transmute(
+	   ## Data e hora de preenchimento do questionário
+	   V001 
+	   ## consentimento livre e esclarecido
+	  ,V002
+	   ## Você se comunica por LIBRAS, tem 18 anos ou mais e mora em alguma das cidades do mapa?
+	  ,V003 = as.numeric( V003 )
+	   ## Qual é a sua data de nascimento?
+	  ,V004 
+	   ## idade na data de preenchimento do questionário
+	  ,V004_idade 
+	   ## Qual é o seu sexo?
+	  ,V005 = as.numeric( V005 )
+	   ## Qual é a sua escolaridade?
+	  ,V006 = as.numeric( V006 )
+	   ## Você trabalha?
+	  ,V007 = as.numeric( V007 )
+	   ## Qual é a sua cor (ou raça)?
+	  ,V008 = as.numeric( V008 )
+	   ## Qual sua religião?
+	  ,V009
+	   ## Qual cidade você mora?
+	  ,V010
+	   ## Qual bairro você mora?
+	  ,V011
+	   ## Qual número do seu CEP?
+	  ,V012
+	   ## Você tem diabetes?
+	  ,V013 = as.numeric( V013 )
+	   ## Você tem pressão alta?
+	  ,V014 = as.numeric( V014 )
+	   ## Qual é a sua opinião sobre sua saúde?
+	  ,V015 = as.numeric( V015 )
+	   ## Você fuma?
+	  ,V016 = as.numeric( V016 )
+	   ## Você toma bebidas alcoólicas?
+	  ,V017 = as.numeric( V017 )
+	   ## Você usa os serviços de saúde do SUS, por exemplo, centros de saúde, hospitais, exames e vários outros serviços de saúde?
+	  ,V018 = as.numeric( V018 )
+	   ## Quando você vai aos serviços de saúde do SUS como você avalia a comunicação com médicos, enfermeiros e diversos profissionais nestes serviços?
+	  ,V019 = as.numeric( V019 )
+	   ## O intérprete da Central de Interpretação de Libras (CIL) vai no atendimento com você no serviço público de saúde SUS?
+	  ,V020 = as.numeric( V020 )
+	   ## Você usa a rede particular de saúde? Exemplo: hospital, médico, convênio
+	  ,V021 = as.numeric( V021 )
+	   ## Como você avalia a comunicação entre você e o profissional de saúde do convênio ou na rede particular, com médicos, enfermeiros e diversos outros profissionais, como é a comunicação?
+	  ,V022 = as.numeric( V022 )
+	   ## Você usa aparelho auditivo?
+	  ,V023 = as.numeric( V023 )
+	   ## Você conseguiu seu aparelho auditivo pelo SUS?
+	  ,V024 = as.numeric( V024 )
+	   ## Como você avalia a comunicação entre você e o médico, a fonoaudióloga e os diversos outros profissionais do centro do SUS onde conseguiu o aparelho auditivo?
+	  ,V025 = as.numeric( V025 )
+	   ## Você usa implante coclear?
+	  ,V026 = as.numeric( V026 )
+	   ## Você conseguiu seu implante coclear pelo SUS?
+	  ,V027 = as.numeric( V027 )
+	   ## Como você avalia a comunicação entre você e o médico, a fonoaudióloga e os diversos outros profissionais do centro do SUS onde conseguiu o implante coclear?
+	  ,V028 = as.numeric( V028 )
+	 ) 
+
+
+   write_csv(
+	 spss
+	 ,file = './spss/dados_tratados.csv'
+   )
+   #+END_SRC
+   
 
 * Análise exploratória de dados
 

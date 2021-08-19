@@ -1,6 +1,9 @@
 # raw data
 raw/*
 
+# spss data
+spss/*
+
 # History files
 .Rhistory
 .Rapp.history
