@@ -34,6 +34,7 @@
    library(tidyr)      # pivot_longer
    library(stringr)    # str_sub
    library(xtable)     # xtable
+   library(haven)      # write_sav
    #+END_SRC
 
 ** Ambiente de computação
@@ -503,6 +504,12 @@
 	 spss
 	 ,file = './spss/dados_tratados.csv'
    )
+
+   write_sav(
+	 data = dat
+	 ,path = './spss/dados_spss.sav'
+   )
+
    #+END_SRC
    
 
