@@ -1,0 +1,440 @@
+#+TITLE: Características dos surdos de Campinas e região e o acesso à saúde
+#+SUBTITLE: Análise estatística das respostas do questionário online
+#+AUTHOR: Janaina de Rezende Barreto e Rafael Rodrigues de Moraes
+#+DATE: 18.08.2021
+#+STARTUP: inlineimages showall
+#+LANGUAGE: pt
+#+OPTIONS: H:3 num:t toc:t @:t \n:nil ::t |:t ':t ^:nil f:t *:t TeX:t LaTeX:t
+#+OPTIONS: date:t author:t
+
+#+BEGIN_SRC elisp :results silent :exports none
+;; exporta html como um arquivo só
+;; Fonte: https://www.reddit.com/r/orgmode/comments/7dyywu/creating_a_selfcontained_html/
+(defun org-html--format-image (source attributes info)
+  (format "<img src=\"data:image/%s;base64,%s\"%s />"
+		  (or (file-name-extension source) "")
+		  (base64-encode-string
+		   (with-temp-buffer
+			 (insert-file-contents-literally source)
+			 (buffer-string)))
+		  (file-name-nondirectory source)))
+
+#+END_SRC
+
+* Configurações
+
+** Pacotes do GNU R necessários para as análises
+
+   Os seguintes pacotes do GNU R são necessários para executar as análises estatísticas presentes nas seções seguintes.
+
+   #+BEGIN_SRC R :exports code :results silent :session 
+   library(ggplot2)    # ggplot, geom_dotplot, geom_line ...
+   library(readr)      # read_csv
+   library(dplyr)      # %>%
+   library(tidyr)      # pivot_longer
+   library(stringr)    # str_split
+   library(xtable)     # xtable
+   #+END_SRC
+
+** Ambiente de computação
+   
+   Com o intuito de facilitar a reproducibilidade dos resultados presentes no TCC, exibimos a seguir as versões do 
+
+   Sistema Operacional
+   #+begin_src sh :exports both :results output
+   hostnamectl | tail -3
+   #+end_src
+
+   #+RESULTS:
+   :   Operating System: Linux Mint 20.2
+   :             Kernel: Linux 5.4.0-81-generic
+   :       Architecture: x86-64
+   
+   e do software estatístico primário 
+   #+begin_src R :exports both :results output :session
+   sessionInfo()
+   #+end_src
+
+   #+RESULTS:
+   #+begin_example
+   R version 3.6.3 (2020-02-29)
+   Platform: x86_64-pc-linux-gnu (64-bit)
+   Running under: Linux Mint 20.2
+
+   Matrix products: default
+   BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+   LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+
+   locale:
+	[1] LC_CTYPE=pt_BR.UTF-8       LC_NUMERIC=C              
+	[3] LC_TIME=pt_BR.UTF-8        LC_COLLATE=pt_BR.UTF-8    
+	[5] LC_MONETARY=pt_BR.UTF-8    LC_MESSAGES=pt_BR.UTF-8   
+	[7] LC_PAPER=pt_BR.UTF-8       LC_NAME=C                 
+	[9] LC_ADDRESS=C               LC_TELEPHONE=C            
+   [11] LC_MEASUREMENT=pt_BR.UTF-8 LC_IDENTIFICATION=C       
+
+   attached base packages:
+   [1] stats     graphics  grDevices utils     datasets  methods   base     
+
+   other attached packages:
+   [1] xtable_1.8-4  stringr_1.4.0 tidyr_1.1.2   dplyr_1.0.3   ggplot2_3.3.3
+
+   loaded via a namespace (and not attached):
+	[1] magrittr_2.0.1   tidyselect_1.1.0 munsell_0.5.0    colorspace_2.0-0
+	[5] R6_2.5.0         rlang_0.4.11     fansi_0.4.2      blob_1.2.1      
+	[9] tools_3.6.3      grid_3.6.3       gtable_0.3.0     utf8_1.2.1      
+   [13] DBI_1.1.1.9000   withr_2.4.2      ellipsis_0.3.2   assertthat_0.2.1
+   [17] tibble_3.1.1     lifecycle_1.0.0  crayon_1.4.1     purrr_0.3.4     
+   [21] vctrs_0.3.8      glue_1.4.2       stringi_1.5.3    compiler_3.6.3  
+   [25] pillar_1.6.0     generics_0.1.0   scales_1.1.1     pkgconfig_2.0.3
+   #+end_example
+
+   no qual as análises foram efetuadas.
+   
+   Todas as análises foram programadas e executadas no editor
+   #+begin_src emacs-lisp :exports results :results drawer
+   (print (emacs-version))
+   #+end_src
+
+   #+RESULTS:
+   :results:
+   GNU Emacs 26.3 (build 2, x86_64-pc-linux-gnu, GTK+ Version 3.24.14)
+	of 2020-03-26, modified by Debian
+   :end:
+   , fazendo uso do Org-mode, versão
+   #+begin_src emacs-lisp :exports results :results drawer
+   (print (org-version))
+   #+end_src
+
+   #+RESULTS:
+   :results:
+   9.4.4
+   :end:
+   .
+   
+** Dados brutos
+
+   Os dados brutos são disponibilizados pelas pesquisadoras responsáveis pelo estudo, sendo as únicas com acesso às respostas.
+
+   #+BEGIN_SRC R :exports code :results silent :session 
+   raw <- read_csv(
+	 file = './raw/[Piloto] Pesquisa Unicamp Surdos RMC 2021 (respostas) - Respostas ao formulário 1.csv'
+   ) %>%
+	 select(         # anonimização da base de dados
+	   -c(3,5,6)     # ignora 'nome', 'celular' e 'email'
+	 )
+   #+END_SRC
+
+** Tratamento dos dados
+
+   #+BEGIN_SRC R :exports code :results silent :session 
+
+   ## renomeia as duas primeiras colunas para nomes mais curtos
+   names(raw)[ c(1,2) ] <- c('data_preenchimento', 'consentimento')
+
+   ## tabela de reclassificação dos nomes de coluna
+   headers <- data.frame(
+	 orig = names(raw)                        # nomes originais
+	,codes = sprintf( 'V%03d', 1:ncol(raw) )  # novos nomes: V000 até V028
+	,stringsAsFactors = FALSE
+   ) 
+
+   ## novos nomes de coluna
+   names(raw) <- headers$codes
+
+   ## tabela tratada
+   dat <- raw %>%
+	 transmute(
+	   ## Data e hora de preenchimento do questionário
+	   V001 = strptime( V001, format = '%d/%m/%Y %H:%M:%S' )
+	   ## consentimento livre e esclarecido
+	  ,V002
+	   ## Você se comunica por LIBRAS, tem 18 anos ou mais e mora em alguma das cidades do mapa?
+	  ,V003 = factor(
+		 str_sub( string = V003, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim'
+			,'B - Não'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Qual é a sua data de nascimento?
+	  ,V004 = strptime( V004, format = '%d/%m/%Y' )
+	   ## idade na data de preenchimento do questionário
+	  ,V004_idade = as.numeric( round( ( V001 - V004 ) / 365.25, 0 ) )
+	   ## Qual é o seu sexo?
+	  ,V005 = factor(
+		 str_sub( string = V005, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Feminino'
+			,'B - Masculino'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Qual é a sua escolaridade?
+	  ,V006 = factor(
+		 str_sub( string = V006, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Nunca estudei'
+			,'B - Fundamental (ou 1º grau)'
+			,'C - Médio (ou 2º grau)'
+			,'D - Superior (ou 3º grau)'
+			,'E - Pós-graduação (especialização, mestrado, doutorado)'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Você trabalha?
+	  ,V007 = factor(
+		 str_sub( string = V007, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim, trabalho'
+			,'B - Não trabalho e recebo benefício BPC/INSS'
+			,'C - Não, porque sou aposentado'
+			,'D - Não, porque sou estudante'
+			,'E - Não, estou desempregado'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Qual é a sua cor (ou raça)?
+	  ,V008 = factor(
+		 str_sub( string = V008, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Preta'
+			,'B - Branca'
+			,'C - Parda'
+			,'D - Indígena'
+			,'E - Amarela'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Qual sua religião?
+	  ,V009 = ifelse(
+		 grepl( ' - ', V009, ignore.case = TRUE)
+		,str_sub( string = V009, start = 5 )
+		,V009
+	   )
+	   ## Qual cidade você mora?
+	  ,V010
+	   ## Qual bairro você mora?
+	  ,V011
+	   ## Qual número do seu CEP?
+	  ,V012 = gsub('[[:blank:]]+','', gsub('[[:punct:]]+',' ',V012) )
+	   ## Você tem diabetes?
+	  ,V013 = factor(
+		 str_sub( string = V013, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim e faço tratamento com remédios'
+			,'B - Sim, mas não faço tratamento com remédios'
+			,'C - Não tenho'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Você tem pressão alta?
+	  ,V014 = factor(
+		 str_sub( string = V014, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim e faço tratamento com remédios'
+			,'B - Sim, mas não faço tratamento com remédios'
+			,'C - Não tenho'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Qual é a sua opinião sobre sua saúde?
+	  ,V015 = factor(
+		 str_sub( string = V015, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Muito boa'
+			,'B - Boa'
+			,'C - Regular'
+			,'D - Ruim'
+			,'E - Muito ruim'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Você fuma?
+	  ,V016 = factor(
+		 str_sub( string = V016, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim, todos os dias'
+			,'B - Sim, às vezes'
+			,'C - Não'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Você toma bebidas alcoólicas?
+	  ,V017 = factor(
+		 str_sub( string = V017, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim, todos os dias'
+			,'B - Sim, às vezes'
+			,'C - Não'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Você usa os serviços de saúde do SUS, por exemplo, centros de saúde, hospitais, exames e vários outros serviços de saúde?
+	  ,V018 = factor(
+		 str_sub( string = V018, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim'
+			,'B - Não'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Quando você vai aos serviços de saúde do SUS como você avalia a comunicação com médicos, enfermeiros e diversos profissionais nestes serviços?
+	  ,V019 = factor(
+		 str_sub( string = V019, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Ruim, não sabem LIBRAS e sou obrigado a oralizar'
+			,'B - Ruim, não sabem LIBRAS e preciso escrever português'
+			,'C - Ruim, não consigo comunicação'
+			,'D - Boa, tem intérprete que me ajuda'
+			,'E - Boa, porque familiar me ajuda'
+			,'F - Boa, o profissional de saúde sabe LIBRAS'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## O intérprete da Central de Interpretação de Libras (CIL) vai no atendimento com você no serviço público de saúde SUS?
+	  ,V020 = factor(
+		 str_sub( string = V020, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim'
+			,'B - Não, porque eu esqueço de pedir'
+			,'C - Não, porque não tem intérprete livre nunca'
+			,'D - Não, porque não tem na minha cidade'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Você usa a rede particular de saúde? Exemplo: hospital, médico, convênio
+	  ,V021 = factor(
+		 str_sub( string = V021, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim'
+			,'B - Não'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Como você avalia a comunicação entre você e o profissional de saúde do convênio ou na rede particular, com médicos, enfermeiros e diversos outros profissionais, como é a comunicação?
+	  ,V022 = factor(
+		 str_sub( string = V022, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Ruim, não sabem LIBRAS e sou obrigado a oralizar'
+			,'B - Ruim, não sabem LIBRAS e preciso escrever português'
+			,'C - Ruim, não consigo comunicação'
+			,'D - Boa, tem intérprete que me ajuda'
+			,'E - Boa, porque familiar me ajuda'
+			,'F - Boa, o profissional de saúde sabe LIBRAS'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Você usa aparelho auditivo?
+	  ,V023 = factor(
+		 str_sub( string = V023, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim'
+			,'B - Não'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Você conseguiu seu aparelho auditivo pelo SUS?
+	  ,V024 = factor(
+		 str_sub( string = V024, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim'
+			,'B - Não'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Como você avalia a comunicação entre você e o médico, a fonoaudióloga e os diversos outros profissionais do centro do SUS onde conseguiu o aparelho auditivo?
+	  ,V025 = factor(
+		 str_sub( string = V025, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Ruim, não sabe LIBRAS e sou obrigado a oralizar'
+			,'B - Ruim, não sabe LIBRAS e preciso escrever português'
+			,'C - Ruim, não consigo comunicação'
+			,'D - Boa, tem intérprete que me ajuda'
+			,'E - Boa, porque familiar me ajuda'
+			,'F - Boa, o profissional de saúde sabe LIBRAS'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Você usa implante coclear?
+	  ,V026 = factor(
+		 str_sub( string = V026, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim'
+			,'B - Não'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Você conseguiu seu implante coclear pelo SUS?
+	  ,V027 = factor(
+		 str_sub( string = V027, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Sim'
+			,'B - Não'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	   ## Como você avalia a comunicação entre você e o médico, a fonoaudióloga e os diversos outros profissionais do centro do SUS onde conseguiu o implante coclear?
+	  ,V028 = factor(
+		 str_sub( string = V028, start = 5 )
+		,levels = str_sub(
+		   c(
+			 'A - Ruim, não sabe LIBRAS e sou obrigado a oralizar'
+			,'B - Ruim, não sabe LIBRAS e preciso escrever português'
+			,'C - Ruim, não consigo comunicação'
+			,'D - Boa, tem intérprete que me ajuda'
+			,'E - Boa, porque familiar me ajuda'
+			,'F - Boa, o profissional de saúde sabe LIBRAS'
+		   )
+		  ,start = 5
+		 ) 
+	   )
+	 )
+   #+END_SRC
+
+* Análise exploratória de dados
+
+  No total src_R[:session :results replace ]{ nrow(dat)} {{{results(=30=)}}} pessoas participaram da pesquisa.
+
+
