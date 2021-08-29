@@ -449,6 +449,60 @@
    
 * Análise exploratória de dados
 
-  No total src_R[:session :results replace ]{ nrow(dat)} {{{results(=80=)}}} pessoas participaram da pesquisa.
+  Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=80=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
+
+  #+BEGIN_SRC R :exports results :results table :colnames yes :session 
+  ## cidade
+  dat %>% count( V010, sort = TRUE) %>% mutate( p = n/sum(n) )
+  #+END_SRC
+
+  #+RESULTS:
+  | V010                  |  n |      p |
+  |-----------------------+----+--------|
+  | CAMPINAS              | 35 | 0.4375 |
+  | HORTOLANDIA           |  9 | 0.1125 |
+  | PAULINIA              |  6 |  0.075 |
+  | SUMARE                |  6 |  0.075 |
+  | VALINHOS              |  4 |   0.05 |
+  | nil                   |  4 |   0.05 |
+  | JAGUARIUNA            |  3 | 0.0375 |
+  | INDAIATUBA            |  2 |  0.025 |
+  | SANTA BARBARA D OESTE |  2 |  0.025 |
+  | AMERICANA             |  1 | 0.0125 |
+  | CAPIVARI              |  1 | 0.0125 |
+  | COSMOPOLIS            |  1 | 0.0125 |
+  | IRACEMAPOLIS          |  1 | 0.0125 |
+  | JUNDIAI               |  1 | 0.0125 |
+  | NOVA ODESSA           |  1 | 0.0125 |
+  | POCOS DE CALDAS       |  1 | 0.0125 |
+  | SALTO                 |  1 | 0.0125 |
+  | SAO JOSE DO RIO PARDO |  1 | 0.0125 |
+  
+
+  #+BEGIN_SRC R :exports none :results silent :session 
+  ## Perfil dos respondentes
+
+  ## idade média
+  v004 <- dat %>% summarize( avg = mean(V004_idade, na.rm = TRUE) )
+  ## sexo
+  v005 <- dat %>% count( V005, sort = TRUE) %>% mutate( p = n/sum(n) )
+  ## escolaridade
+  v006 <- dat %>% count( V006) %>% mutate( p = round( n/sum(n), 3) )
+  ## auto-avaliação do estado de saúde
+  v015 <- dat %>% count( V015) %>% mutate( p = round( n/sum(n), 3) )
+  #+END_SRC
+
+  
+  Perfil dos participantes:
+
+  - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.6=)}}} anos
+  - src_R[:session :results replace ]{ v005[1,3]*100 } {{{results(=53.75=)}}}% do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+  - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=63.8=)}}}% com ensino superior ou pós-graduação
+  - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=75=)}}}% avaliam seu estado de saúde como bom ou muito bom
+
+
+
+
+
 
 
