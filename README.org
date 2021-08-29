@@ -224,7 +224,12 @@
 		,V009
 	   )
 	   ## Qual cidade você mora?
-	  ,V010
+	  ,V010 = toupper( iconv(V010, from = "UTF-8", "ASCII//TRANSLIT") )
+	  ,V010 = gsub( '/',' ', V010)
+	  ,V010 = gsub( ' - ',' ', V010)
+	  ,V010 = gsub( '-',' ', V010)
+	  ,V010 = gsub( "'",' ', V010)
+	  ,V010 = gsub( ' SP','', V010)
 	   ## Qual bairro você mora?
 	  ,V011
 	   ## Qual número do seu CEP?

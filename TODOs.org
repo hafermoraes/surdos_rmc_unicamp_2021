@@ -1,0 +1,23 @@
+#+startup: inlineimages align contents
+
+* Ideias de análises
+
+- soma cumulativa do número de respostas por dia, contendo anotações no gráfico de datas importantes (lançamento na mídia, multiplicadores, etc...)
+- bar-plot do número de respostas por cidade
+- perfil dos respondentes (idade média de N, x% são mulheres, y% tem escolaridade superior, z% auto-avaliam seu estado de saúde como bom, etc...)
+- obter com Nubia/Giovana a lista dos estabelecimentos do SUS nas redondezas dos CEPs informados
+  - se disponíveis, podemos fazer uma matriz de distâncias de cada CEP para cada UBS e identificar as UBS com maior necessidade de intérpretes de LIBRAS
+- comparar dificuldade de contato no SUS e na rede privada com testes não-paramétricos em dois cenários
+  - dados pareados (para quem usa ambas as redes)
+  - dados não pareados (fazendo pleno uso de todas as informações disponíveis
+- 
+
+* Lições aprendidas
+
+- vídeos editados com legenda, audio e surdos no papel principal de comunicação
+- rede de contatos da associação de surdos
+- divulgação constante e organizada
+- planejamento da pesquisa e trâmite com Comitê de Ética em Pesquisa
+- Vários pilotos para ajustar questionário e corrigir inconsistências
+- linguagem simplificada do português para não atrapalhar a pesquisa
+
