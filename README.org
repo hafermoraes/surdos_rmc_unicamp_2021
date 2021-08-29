@@ -447,9 +447,8 @@
    )
    #+END_SRC
    
-
 * Análise exploratória de dados
 
-  No total src_R[:session :results replace ]{ nrow(dat)} {{{results(=30=)}}} pessoas participaram da pesquisa.
+  No total src_R[:session :results replace ]{ nrow(dat)} {{{results(=80=)}}} pessoas participaram da pesquisa.
 
 
