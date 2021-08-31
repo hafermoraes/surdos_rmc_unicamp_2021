@@ -449,65 +449,126 @@
    
 * Análise exploratória de dados
 
-  Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=80=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
+** Evolução do número de repostas
 
-  #+BEGIN_SRC R :exports results :results table :colnames yes :session 
-  ## cidade
-  dat %>%
-	count( V010, sort = TRUE) %>%
-	mutate( p = n/sum(n) ) %>% 
-	{
-	  bind_rows(
-		.
-		,data.frame( V010 = 'RESPOSTAS', n=nrow(dat), p=1 )
-	  )
-	}
-  #+END_SRC
+   #+BEGIN_SRC R :exports none :results silent :session 
+   ## evolução cumulativa do número de respostas
+   evol <- data.frame(
+	 V001 = seq(
+	   from = as.Date( min(dat$V001) )
+	  ,to = Sys.Date()
+	  ,by = 'days'
+	 )
+   ) %>%
+	 left_join( dat %>% mutate( V001 = as.Date(V001) ) %>% count(V001) ) %>%
+	 replace( is.na(.), 0 ) %>%   # https://stackoverflow.com/a/60941799
+	 mutate( c = cumsum(n) )
 
-  #+RESULTS:
-  | V010                  |  n |      p |
-  |-----------------------+----+--------|
-  | CAMPINAS              | 35 | 0.4375 |
-  | HORTOLANDIA           |  9 | 0.1125 |
-  | PAULINIA              |  6 |  0.075 |
-  | SUMARE                |  6 |  0.075 |
-  | VALINHOS              |  4 |   0.05 |
-  | nil                   |  4 |   0.05 |
-  | JAGUARIUNA            |  3 | 0.0375 |
-  | INDAIATUBA            |  2 |  0.025 |
-  | SANTA BARBARA D OESTE |  2 |  0.025 |
-  | AMERICANA             |  1 | 0.0125 |
-  | CAPIVARI              |  1 | 0.0125 |
-  | COSMOPOLIS            |  1 | 0.0125 |
-  | IRACEMAPOLIS          |  1 | 0.0125 |
-  | JUNDIAI               |  1 | 0.0125 |
-  | NOVA ODESSA           |  1 | 0.0125 |
-  | POCOS DE CALDAS       |  1 | 0.0125 |
-  | SALTO                 |  1 | 0.0125 |
-  | SAO JOSE DO RIO PARDO |  1 | 0.0125 |
-  | RESPOSTAS             | 80 |      1 |
+   ## Gráfico da evolução do número de respostas
+   alvo <- 400
+   evol_plot <- evol %>%
+	 ggplot( aes( x = V001, y = c) ) +
+	 geom_line() +
+	 geom_point() +
+	 ylim(0, alvo * 1.1 ) +
+	 xlim( evol[1,1], as.Date( '2021-10-01') ) + 
+	 geom_hline( yintercept = alvo, linetype = 'longdash', col='red') +
+	 geom_text(
+	   x = evol[1,1]
+	  ,y = alvo + 15
+	  ,label = 'Expectativa do número de respostas'
+	  ,col = 'red'
+	  ,hjust = 0
+	 ) +
+	 geom_text(
+	   x = evol[ nrow(evol), 1]
+	  ,y = evol[ nrow(evol), 3]
+	  ,fontface = 'italic'
+	  ,hjust = -0.1
+	  ,label = paste0(
+		 evol[ nrow(evol), 3]
+		,' respostas até '
+		,format( max(dat$V001), '%d.%m.%Y' )
+	   )
+	 ) + 
+	 theme_bw() +
+	 labs(
+	   x = 'dia'
+	  ,y = 'número acumulado de respostas'
+	  ,title = 'Pesquisa Unicamp Surdos RMC 2021'
+	  ,subtitle = 'Evolução do número acumulado de respostas por dia'
+	  ,caption = paste(
+		 'Obs.: Dados atualizados até'
+		,format( max(dat$V001), '%d.%m.%Y %H:%M:%S' )
+	   )
+	 )
+
+   ggsave( plot = evol_plot, filename = './img/evol_plot.png', width=6, height=4)
+   #+END_SRC
+
+   #+CAPTION: Evolução do número acumulado de respostas por dia
+   #+ATTR_ORG: :width 600
+   [[./img/evol_plot.png]]
+   
+** Perfil dos participantes
+   
+   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=81=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
+
+   #+BEGIN_SRC R :exports results :results table :colnames yes :session 
+   ## cidade
+   dat %>%
+	 count( V010, sort = TRUE) %>%
+	 mutate( p = round( n/sum(n), digits = 3) ) %>% 
+	 {
+	   bind_rows(
+		 .
+		 ,data.frame( V010 = 'RESPOSTAS', n=nrow(dat), p=1 )
+	   )
+	 }
+   #+END_SRC
+
+   #+RESULTS:
+   | V010                  |  n |     p |
+   |-----------------------+----+-------|
+   | CAMPINAS              | 35 | 0.432 |
+   | HORTOLANDIA           |  9 | 0.111 |
+   | SUMARE                |  7 | 0.086 |
+   | PAULINIA              |  6 | 0.074 |
+   | VALINHOS              |  4 | 0.049 |
+   | nil                   |  4 | 0.049 |
+   | JAGUARIUNA            |  3 | 0.037 |
+   | INDAIATUBA            |  2 | 0.025 |
+   | SANTA BARBARA D OESTE |  2 | 0.025 |
+   | AMERICANA             |  1 | 0.012 |
+   | CAPIVARI              |  1 | 0.012 |
+   | COSMOPOLIS            |  1 | 0.012 |
+   | IRACEMAPOLIS          |  1 | 0.012 |
+   | JUNDIAI               |  1 | 0.012 |
+   | NOVA ODESSA           |  1 | 0.012 |
+   | POCOS DE CALDAS       |  1 | 0.012 |
+   | SALTO                 |  1 | 0.012 |
+   | SAO JOSE DO RIO PARDO |  1 | 0.012 |
+   | RESPOSTAS             | 81 |     1 |
   
+   #+BEGIN_SRC R :exports none :results silent :session 
+   ## Perfil dos respondentes
 
-  #+BEGIN_SRC R :exports none :results silent :session 
-  ## Perfil dos respondentes
+   ## idade média
+   v004 <- dat %>% summarize( avg = mean(V004_idade, na.rm = TRUE) )
+   ## sexo
+   v005 <- dat %>% count( V005, sort = TRUE) %>% mutate( p = n/sum(n) )
+   ## escolaridade
+   v006 <- dat %>% count( V006) %>% mutate( p = round( n/sum(n), 3) )
+   ## auto-avaliação do estado de saúde
+   v015 <- dat %>% count( V015) %>% mutate( p = round( n/sum(n), 3) )
+   #+END_SRC
 
-  ## idade média
-  v004 <- dat %>% summarize( avg = mean(V004_idade, na.rm = TRUE) )
-  ## sexo
-  v005 <- dat %>% count( V005, sort = TRUE) %>% mutate( p = n/sum(n) )
-  ## escolaridade
-  v006 <- dat %>% count( V006) %>% mutate( p = round( n/sum(n), 3) )
-  ## auto-avaliação do estado de saúde
-  v015 <- dat %>% count( V015) %>% mutate( p = round( n/sum(n), 3) )
-  #+END_SRC
+   Perfil dos participantes:
 
-  
-  Perfil dos participantes:
-
-  - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.6=)}}} anos
-  - src_R[:session :results replace ]{ v005[1,3]*100 } {{{results(=53.75=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
-  - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=63.8=)}}} % com ensino superior ou pós-graduação
-  - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=75=)}}} % avaliam seu estado de saúde como bom ou muito bom
+   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.5=)}}} anos
+   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=54.3=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=64.2=)}}} % com ensino superior ou pós-graduação
+   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=74.1=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
 
 * Matriz de distâncias

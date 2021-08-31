@@ -2,7 +2,7 @@
 
 * Ideias de análises
 
-- soma cumulativa do número de respostas por dia, contendo anotações no gráfico de datas importantes (lançamento na mídia, multiplicadores, etc...)
+- +soma cumulativa do número de respostas por dia, contendo anotações no gráfico de datas importantes (lançamento na mídia, multiplicadores, etc...)+
 - bar-plot do número de respostas por cidade
 - +perfil dos respondentes (idade média de N, x% são mulheres, y% tem escolaridade superior, z% auto-avaliam seu estado de saúde como bom, etc...)+
 - +obter com Nubia/Giovana a lista dos estabelecimentos do SUS nas redondezas dos CEPs informados+
