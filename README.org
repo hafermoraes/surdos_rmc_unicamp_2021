@@ -77,17 +77,8 @@
    attached base packages:
    [1] stats     graphics  grDevices utils     datasets  methods   base     
 
-   other attached packages:
-   [1] xtable_1.8-4  stringr_1.4.0 tidyr_1.1.2   dplyr_1.0.3   ggplot2_3.3.3
-
    loaded via a namespace (and not attached):
-	[1] magrittr_2.0.1   tidyselect_1.1.0 munsell_0.5.0    colorspace_2.0-0
-	[5] R6_2.5.0         rlang_0.4.11     fansi_0.4.2      blob_1.2.1      
-	[9] tools_3.6.3      grid_3.6.3       gtable_0.3.0     utf8_1.2.1      
-   [13] DBI_1.1.1.9000   withr_2.4.2      ellipsis_0.3.2   assertthat_0.2.1
-   [17] tibble_3.1.1     lifecycle_1.0.0  crayon_1.4.1     purrr_0.3.4     
-   [21] vctrs_0.3.8      glue_1.4.2       stringi_1.5.3    compiler_3.6.3  
-   [25] pillar_1.6.0     generics_0.1.0   scales_1.1.1     pkgconfig_2.0.3
+   [1] compiler_3.6.3
    #+end_example
 
    no qual as análises foram efetuadas.
@@ -100,7 +91,7 @@
    #+RESULTS:
    :results:
    GNU Emacs 26.3 (build 2, x86_64-pc-linux-gnu, GTK+ Version 3.24.14)
-   of 2020-03-26, modified by Debian
+	of 2020-03-26, modified by Debian
    :end:
    , fazendo uso do Org-mode, versão
    #+begin_src emacs-lisp :exports results :results drawer
@@ -128,7 +119,7 @@
 
    Municípios da Região Metropolitana de Campinas
 
-   #+BEGIN_SRC R :exports none :results silent :session 
+   #+BEGIN_SRC R :exports code :results silent :session 
    ## Códigos de municípios do IBGE para as cidades da RMC
    rmc <- tribble(
 	 ~municipio,                 ~codigo,
@@ -638,16 +629,17 @@
    #+RESULTS:
    | V010                  |  n |     f |
    |-----------------------+----+-------|
-   | CAMPINAS              | 36 | 0.439 |
-   | HORTOLANDIA           |  9 |  0.11 |
-   | SUMARE                |  7 | 0.085 |
-   | PAULINIA              |  6 | 0.073 |
-   | VALINHOS              |  4 | 0.049 |
-   | nil                   |  4 | 0.049 |
-   | JAGUARIUNA            |  3 | 0.037 |
+   | CAMPINAS              | 36 | 0.429 |
+   | HORTOLANDIA           | 10 | 0.119 |
+   | SUMARE                |  7 | 0.083 |
+   | PAULINIA              |  6 | 0.071 |
+   | VALINHOS              |  4 | 0.048 |
+   | nil                   |  4 | 0.048 |
+   | JAGUARIUNA            |  3 | 0.036 |
    | INDAIATUBA            |  2 | 0.024 |
    | SANTA BARBARA D OESTE |  2 | 0.024 |
    | AMERICANA             |  1 | 0.012 |
+   | CAMPINAA              |  1 | 0.012 |
    | CAPIVARI              |  1 | 0.012 |
    | COSMOPOLIS            |  1 | 0.012 |
    | IRACEMAPOLIS          |  1 | 0.012 |
@@ -656,28 +648,45 @@
    | POCOS DE CALDAS       |  1 | 0.012 |
    | SALTO                 |  1 | 0.012 |
    | SAO JOSE DO RIO PARDO |  1 | 0.012 |
-   | RESPOSTAS             | 82 |     1 |
+   | RESPOSTAS             | 84 |     1 |
 
-  
+   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( !is.na(VALIDA)))} {{{results(=73=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
+
+   #+BEGIN_SRC R :exports results :results table :colnames yes :session 
+   ## cidade
+   dat %>%
+	 filter( !is.na(VALIDA) ) %>%
+	 count( V010, sort = TRUE) %>%
+	 mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	 bind_rows(
+	   .
+	  ,data.frame(
+		 V010 = 'RESPOSTAS'
+		,n = nrow( dat %>% filter(!is.na(VALIDA)) )
+		,f=1
+	   )
+	 )
+   #+END_SRC
+
    #+BEGIN_SRC R :exports none :results silent :session 
-   ## Perfil dos respondentes
+   ## Perfil dos respondentes válidos
 
    ## idade média
-   v004 <- dat %>% summarize( avg = mean(V004_idade, na.rm = TRUE) )
+   v004 <- dat %>% filter(!is.na(VALIDA)) %>% summarize( avg = mean(V004_idade, na.rm = TRUE) )
    ## sexo
-   v005 <- dat %>% count( V005, sort = TRUE) %>% mutate( p = n/sum(n) )
+   v005 <- dat %>% filter(!is.na(VALIDA)) %>% count( V005, sort = TRUE) %>% mutate( p = n/sum(n) )
    ## escolaridade
-   v006 <- dat %>% count( V006) %>% mutate( p = round( n/sum(n), 3) )
+   v006 <- dat %>% filter(!is.na(VALIDA)) %>% count( V006) %>% mutate( p = round( n/sum(n), 3) )
    ## auto-avaliação do estado de saúde
-   v015 <- dat %>% count( V015) %>% mutate( p = round( n/sum(n), 3) )
+   v015 <- dat %>% filter(!is.na(VALIDA)) %>% count( V015) %>% mutate( p = round( n/sum(n), 3) )
    #+END_SRC
 
    Perfil dos participantes:
 
-   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.4=)}}} anos
-   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=53.7=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
-   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=64.7=)}}} % com ensino superior ou pós-graduação
-   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=73.2=)}}} % avaliam seu estado de saúde como bom ou muito bom
+   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.9=)}}} anos
+   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=54.8=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=63=)}}} % com ensino superior ou pós-graduação
+   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=75.4=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
 
 * Matriz de distâncias
@@ -742,7 +751,7 @@
   - =CO_CNES=, o código CNES do estabelecimento do SUS
   - =CO_CEP=, o CEP do estabelecimento para ser utilizado no cálculo da matriz de distâncias
   - =CO_ATIVIDADE=, tipo de atividade, a ser relacionado com a tabela =tbAtividade202107.csv=
-  - =TP_UNIDADE=, tipo de unidade, a ser relacionado com a tabela =tbTipoUnidade202107.csv=
+  - =CO_TIPO_ESTABELECIMENTO=, tipo de estabelecimento, a ser relacionado com a tabela =tbTipoEstabelecimento202107.csv=
   - =CO_MUNICIPIO_GESTOR=, o código do município do IBGE
   - =NU_LATITUDE=, latitude (em graus) para gráfico/georeferenciamento
   - e =NU_LONGITUDE=, longitude (em graus) para gráfico/georeferenciamento
