@@ -100,7 +100,7 @@
    #+RESULTS:
    :results:
    GNU Emacs 26.3 (build 2, x86_64-pc-linux-gnu, GTK+ Version 3.24.14)
-	of 2020-03-26, modified by Debian
+   of 2020-03-26, modified by Debian
    :end:
    , fazendo uso do Org-mode, versão
    #+begin_src emacs-lisp :exports results :results drawer
@@ -126,6 +126,36 @@
 	 )
    #+END_SRC
 
+   Municípios da Região Metropolitana de Campinas
+
+   #+BEGIN_SRC R :exports none :results silent :session 
+   ## Códigos de municípios do IBGE para as cidades da RMC
+   rmc <- tribble(
+	 ~municipio,                 ~codigo,
+	 'AMERICANA',                3501608,
+	 'AMPARO',                   3501905, # adesão ainda não oficial pela ALESP
+	 'ARTUR NOGUEIRA',           3503802,
+	 'CAMPINAS',                 3509502,
+	 'COSMOPOLIS',               3512803,
+	 'ENGENHEIRO COELHO',        3515152,
+	 'HOLAMBRA',                 3519055,
+	 'HORTOLANDIA',              3519071,
+	 'INDAIATUBA',               3520509,
+	 'ITATIBA',                  3523404,
+	 'JAGUARIUNA',               3524709,
+	 'MONTE MOR',                3531803,
+	 'MORUNGABA',                3532009,
+	 'NOVA ODESSA',              3533403,
+	 'PAULINIA',                 3536505,
+	 'PEDREIRA',                 3537107,
+	 'SANTA BARBARA D OESTE',    3545803,
+	 'SANTO ANTONIO DE POSSE',   3548005,
+	 'SUMARE',                   3552403,
+	 'VALINHOS',                 3556206,
+	 'VINHEDO',                  3556701
+   )
+   #+END_SRC  
+   
 ** Tratamento dos dados
 
    #+BEGIN_SRC R :exports code :results silent :session 
@@ -230,6 +260,7 @@
 	  ,V010 = gsub( '-',' ', V010)
 	  ,V010 = gsub( "'",' ', V010)
 	  ,V010 = gsub( ' SP','', V010)
+	  ,V010_rmc = ifelse( V010 %in% rmc$municipio, TRUE, FALSE)
 	   ## Qual bairro você mora?
 	  ,V011
 	   ## Qual número do seu CEP?
@@ -435,7 +466,23 @@
 		  ,start = 5
 		 ) 
 	   )
+	   ## flag de respostas válidas
+	  ,VALIDA = case_when(
+		 ## Preenchimento   correto para 'Consentimento' e   correto para 'Público Alvo'
+		 str_sub( V002, end = 3) == 'Sim' & V003 == 'Sim' & V004_idade >= 18 & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
+		 ## Preenchimento   correto para 'Consentimento' e incorreto para 'Público Alvo'
+		,str_sub( V002, end = 3) == 'Sim' & V003 != 'Sim' & V004_idade >= 18 & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
+		 ## Preenchimento incorreto para 'Consentimento' e   correto para 'Público Alvo'
+		,str_sub( V002, end = 3) != 'Sim' & V003 == 'Sim' & V004_idade >= 18 & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
+		 ## Preenchimento incorreto para 'Consentimento' e incorreto para 'Público Alvo'
+		,str_sub( V002, end = 3) != 'Sim' & V003 != 'Sim' & V004_idade >= 18 & ( V010_rmc == TRUE               ) ~ TRUE
+	   )
 	 )
+
+
+   dat %>% str
+   dat %>% select( V002, V003, V004_idade, V010_rmc, V010, VALIDA) %>% View
+   str_sub( dat[1,'V002'], end=3)
    #+END_SRC
 
 ** Exporta dados tratados no formato apropriado ao SPSS
@@ -443,7 +490,7 @@
    #+BEGIN_SRC R :exports code :results silent :session 
    write_sav(
 	 data = dat
-	 ,path = './spss/dados_spss.sav'
+	,path = './spss/dados_spss.sav'
    )
    #+END_SRC
    
@@ -488,7 +535,7 @@
 	  ,label = paste0(
 		 evol[ nrow(evol), 3]
 		,' respostas até '
-		,format( max(dat$V001), '%d.%m.%Y' )
+		,format( evol[ nrow(evol), 1], '%d.%m.%Y' )
 	   )
 	 ) + 
 	 theme_bw() +
@@ -499,7 +546,7 @@
 	  ,subtitle = 'Evolução do número acumulado de respostas por dia'
 	  ,caption = paste(
 		 'Obs.: Dados atualizados até'
-		,format( max(dat$V001), '%d.%m.%Y %H:%M:%S' )
+		,format( Sys.time(), '%d.%m.%Y %H:%M:%S' )
 	   )
 	 )
 
@@ -518,27 +565,25 @@
    ## cidade
    dat %>%
 	 count( V010, sort = TRUE) %>%
-	 mutate( p = round( n/sum(n), digits = 3) ) %>% 
-	 {
-	   bind_rows(
-		 .
-		 ,data.frame( V010 = 'RESPOSTAS', n=nrow(dat), p=1 )
-	   )
-	 }
+	 mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	 bind_rows(
+	   .
+	  ,data.frame( V010 = 'RESPOSTAS', n=nrow(dat), f=1 )
+	 )
    #+END_SRC
 
    #+RESULTS:
-   | V010                  |  n |     p |
+   | V010                  |  n |     f |
    |-----------------------+----+-------|
-   | CAMPINAS              | 35 | 0.432 |
-   | HORTOLANDIA           |  9 | 0.111 |
-   | SUMARE                |  7 | 0.086 |
-   | PAULINIA              |  6 | 0.074 |
+   | CAMPINAS              | 36 | 0.439 |
+   | HORTOLANDIA           |  9 |  0.11 |
+   | SUMARE                |  7 | 0.085 |
+   | PAULINIA              |  6 | 0.073 |
    | VALINHOS              |  4 | 0.049 |
    | nil                   |  4 | 0.049 |
    | JAGUARIUNA            |  3 | 0.037 |
-   | INDAIATUBA            |  2 | 0.025 |
-   | SANTA BARBARA D OESTE |  2 | 0.025 |
+   | INDAIATUBA            |  2 | 0.024 |
+   | SANTA BARBARA D OESTE |  2 | 0.024 |
    | AMERICANA             |  1 | 0.012 |
    | CAPIVARI              |  1 | 0.012 |
    | COSMOPOLIS            |  1 | 0.012 |
@@ -548,7 +593,8 @@
    | POCOS DE CALDAS       |  1 | 0.012 |
    | SALTO                 |  1 | 0.012 |
    | SAO JOSE DO RIO PARDO |  1 | 0.012 |
-   | RESPOSTAS             | 81 |     1 |
+   | RESPOSTAS             | 82 |     1 |
+
   
    #+BEGIN_SRC R :exports none :results silent :session 
    ## Perfil dos respondentes
@@ -565,42 +611,13 @@
 
    Perfil dos participantes:
 
-   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.5=)}}} anos
-   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=54.3=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
-   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=64.2=)}}} % com ensino superior ou pós-graduação
-   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=74.1=)}}} % avaliam seu estado de saúde como bom ou muito bom
+   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.4=)}}} anos
+   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=53.7=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=64.7=)}}} % com ensino superior ou pós-graduação
+   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=73.2=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
 
 * Matriz de distâncias
-
-  #+BEGIN_SRC R :exports none :results silent :session 
-  ## Códigos de municípios do IBGE para as cidades da RMC
-  rmc <- tribble(
-	~municipio,                 ~codigo,
-	'AMERICANA',                3501608,
-	'AMPARO',                   3501905, # adesão ainda não oficial pela ALESP
-	'ARTUR NOGUEIRA',           3503802,
-	'CAMPINAS',                 3509502,
-	'COSMOPOLIS',               3512803,
-	'ENGENHEIRO COELHO',        3515152,
-	'HOLAMBRA',                 3519055,
-	'HORTOLANDIA',              3519071,
-	'INDAIATUBA',               3520509,
-	'ITATIBA',                  3523404,
-	'JAGUARIUNA',               3524709,
-	'MONTE MOR',                3531803,
-	'MORUNGABA',                3532009,
-	'NOVA ODESSA',              3533403,
-	'PAULINIA',                 3536505,
-	'PEDREIRA',                 3537107,
-	'SANTA BARBARA D OESTE',    3545803,
-	'SANTO ANTONIO DE POSSE',   3548005,
-	'SUMARE',                   3552403,
-	'VALINHOS',                 3556206,
-	'VINHEDO',                  3556701
-  )
-  #+END_SRC  
-
   
   #+BEGIN_SRC R :exports none :results silent :session 
   ## Download dos estabelecimentos do SUS
@@ -656,7 +673,7 @@
   Os estabelecimentos do SUS estão disponíveis no link ftp://ftp.datasus.gov.br/cnes/BASE_DE_DADOS_CNES_202107.ZIP, do qual serão utilizados somente os arquivos
   - =tbEstabelecimento202107.csv=
   - =tbAtividade202107.csv= e
-  - =tbTipoUnidade202107.csv=.
+  - =tbTipoEstabelecimento202107.csv=.
 
 	A tabela =tbEstabelecimento202107= contém a listagem do CNES referente a Julho de 2021; dela serão utilizados, para fins da pesquisa da Unicamp Surdos RMC 2021, os campos
   - =CO_CNES=, o código CNES do estabelecimento do SUS
@@ -668,5 +685,3 @@
   - e =NU_LONGITUDE=, longitude (em graus) para gráfico/georeferenciamento
 
   
-
-
