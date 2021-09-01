@@ -469,20 +469,21 @@
 	   ## flag de respostas válidas
 	  ,VALIDA = case_when(
 		 ## Preenchimento   correto para 'Consentimento' e   correto para 'Público Alvo'
-		 str_sub( V002, end = 3) == 'Sim' & V003 == 'Sim' & V004_idade >= 18 & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
+		 !is.na(V002) & V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
 		 ## Preenchimento   correto para 'Consentimento' e incorreto para 'Público Alvo'
-		,str_sub( V002, end = 3) == 'Sim' & V003 != 'Sim' & V004_idade >= 18 & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
+		,!is.na(V002) & V003 != 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
 		 ## Preenchimento incorreto para 'Consentimento' e   correto para 'Público Alvo'
-		,str_sub( V002, end = 3) != 'Sim' & V003 == 'Sim' & V004_idade >= 18 & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
+		,is.na(V002)  & V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
 		 ## Preenchimento incorreto para 'Consentimento' e incorreto para 'Público Alvo'
-		,str_sub( V002, end = 3) != 'Sim' & V003 != 'Sim' & V004_idade >= 18 & ( V010_rmc == TRUE               ) ~ TRUE
+		,is.na(V002)  & V003 != 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE               ) ~ TRUE
 	   )
 	 )
 
+   ## validação da lógica...
+   ## dat %>% select( V002, V003, V004_idade, V010_rmc, V010, VALIDA) %>% View
+   ## dat %>% select( V002, V003, V004_idade, V010_rmc, V010, VALIDA) %>% filter( is.na(VALIDA) ) %>% View
 
-   dat %>% str
-   dat %>% select( V002, V003, V004_idade, V010_rmc, V010, VALIDA) %>% View
-   str_sub( dat[1,'V002'], end=3)
+   ## dat %>% filter( is.na(V002), !is.na(VALIDA) ) %>% select( V002, V003, V004_idade, V010_rmc, V010, VALIDA) %>% View
    #+END_SRC
 
 ** Exporta dados tratados no formato apropriado ao SPSS
@@ -497,66 +498,128 @@
 * Análise exploratória de dados
 
 ** Evolução do número de repostas
-
-   #+BEGIN_SRC R :exports none :results silent :session 
-   ## evolução cumulativa do número de respostas
-   evol <- data.frame(
-	 V001 = seq(
-	   from = as.Date( min(dat$V001) )
-	  ,to = Sys.Date()
-	  ,by = 'days'
-	 )
-   ) %>%
-	 left_join( dat %>% mutate( V001 = as.Date(V001) ) %>% count(V001) ) %>%
-	 replace( is.na(.), 0 ) %>%   # https://stackoverflow.com/a/60941799
-	 mutate( c = cumsum(n) )
-
-   ## Gráfico da evolução do número de respostas
-   alvo <- 400
-   evol_plot <- evol %>%
-	 ggplot( aes( x = V001, y = c) ) +
-	 geom_line() +
-	 geom_point() +
-	 ylim(0, alvo * 1.1 ) +
-	 xlim( evol[1,1], as.Date( '2021-10-01') ) + 
-	 geom_hline( yintercept = alvo, linetype = 'longdash', col='red') +
-	 geom_text(
-	   x = evol[1,1]
-	  ,y = alvo + 15
-	  ,label = 'Expectativa do número de respostas'
-	  ,col = 'red'
-	  ,hjust = 0
-	 ) +
-	 geom_text(
-	   x = evol[ nrow(evol), 1]
-	  ,y = evol[ nrow(evol), 3]
-	  ,fontface = 'italic'
-	  ,hjust = -0.1
-	  ,label = paste0(
-		 evol[ nrow(evol), 3]
-		,' respostas até '
-		,format( evol[ nrow(evol), 1], '%d.%m.%Y' )
-	   )
-	 ) + 
-	 theme_bw() +
-	 labs(
-	   x = 'dia'
-	  ,y = 'número acumulado de respostas'
-	  ,title = 'Pesquisa Unicamp Surdos RMC 2021'
-	  ,subtitle = 'Evolução do número acumulado de respostas por dia'
-	  ,caption = paste(
-		 'Obs.: Dados atualizados até'
-		,format( Sys.time(), '%d.%m.%Y %H:%M:%S' )
-	   )
-	 )
-
-   ggsave( plot = evol_plot, filename = './img/evol_plot.png', width=6, height=4)
-   #+END_SRC
-
-   #+CAPTION: Evolução do número acumulado de respostas por dia
-   #+ATTR_ORG: :width 600
-   [[./img/evol_plot.png]]
    
+*** Totais
+	#+BEGIN_SRC R :exports none :results silent :session 
+	## evolução cumulativa do número de respostas
+	evol <- data.frame(
+	  V001 = seq(
+		from = as.Date( min(dat$V001) )
+	   ,to = Sys.Date()
+	   ,by = 'days'
+	  )
+	) %>%
+	  left_join( dat %>% mutate( V001 = as.Date(V001) ) %>% count(V001) ) %>%
+	  replace( is.na(.), 0 ) %>%   # https://stackoverflow.com/a/60941799
+	  mutate( c = cumsum(n) )
+
+	## Gráfico da evolução do número de respostas
+	alvo <- 400
+	evol_plot <- evol %>%
+	  ggplot( aes( x = V001, y = c) ) +
+	  geom_line() +
+	  geom_point() +
+	  ylim(0, alvo * 1.1 ) +
+	  xlim( evol[1,1], as.Date( '2021-10-01') ) + 
+	  geom_hline( yintercept = alvo, linetype = 'longdash', col='red') +
+	  geom_text(
+		x = evol[1,1]
+	   ,y = alvo + 15
+	   ,label = 'Expectativa do número de respostas'
+	   ,col = 'red'
+	   ,hjust = 0
+	  ) +
+	  geom_text(
+		x = evol[ nrow(evol), 1]
+	   ,y = evol[ nrow(evol), 3]
+	   ,fontface = 'italic'
+	   ,hjust = -0.1
+	   ,label = paste0(
+		  evol[ nrow(evol), 3]
+		 ,' respostas até '
+		 ,format( evol[ nrow(evol), 1], '%d.%m.%Y' )
+		)
+	  ) + 
+	  theme_bw() +
+	  labs(
+		x = 'dia'
+	   ,y = 'número acumulado de respostas'
+	   ,title = 'Pesquisa Unicamp Surdos RMC 2021'
+	   ,subtitle = 'Evolução do número acumulado de respostas por dia'
+	   ,caption = paste(
+		  'Obs.: Dados atualizados até'
+		 ,format( Sys.time(), '%d.%m.%Y %H:%M:%S' )
+		)
+	  )
+
+	ggsave( plot = evol_plot, filename = './img/evol_plot.png', width=6, height=4)
+	#+END_SRC
+
+	#+CAPTION: Evolução do número acumulado de respostas por dia
+	#+ATTR_ORG: :width 600
+	[[./img/evol_plot.png]]
+
+*** Válidas
+	#+BEGIN_SRC R :exports none :results silent :session 
+	## evolução cumulativa do número de respostas
+	valid <- data.frame(
+	  V001 = seq(
+		from = as.Date( min(dat$V001) )
+	   ,to = Sys.Date()
+	   ,by = 'days'
+	  )
+	) %>%
+	  left_join( dat %>% filter( !is.na(VALIDA) ) %>% mutate( V001 = as.Date(V001) ) %>% count(V001) ) %>%
+	  replace( is.na(.), 0 ) %>%   # https://stackoverflow.com/a/60941799
+	  mutate( c = cumsum(n) )
+
+	## Gráfico da evolução do número de respostas
+	alvo <- 400
+	valid_plot <- valid %>%
+	  ggplot( aes( x = V001, y = c) ) +
+	  geom_line() +
+	  geom_point() +
+	  ylim(0, alvo * 1.1 ) +
+	  xlim( valid[1,1], as.Date( '2021-10-01') ) + 
+	  geom_hline( yintercept = alvo, linetype = 'longdash', col='red') +
+	  geom_text(
+		x = valid[1,1]
+	   ,y = alvo + 15
+	   ,label = 'Expectativa do número de respostas válidas'
+	   ,col = 'red'
+	   ,hjust = 0
+	  ) +
+	  geom_text(
+		x = valid[ nrow(valid), 1]
+	   ,y = valid[ nrow(valid), 3]
+	   ,fontface = 'italic'
+	   ,hjust = -0.1
+	   ,label = paste0(
+		  valid[ nrow(valid), 3]
+		 ,' respostas válidas até '
+		 ,format( valid[ nrow(valid), 1], '%d.%m.%Y' )
+		)
+	  ) + 
+	  theme_bw() +
+	  labs(
+		x = 'dia'
+	   ,y = 'número acumulado de respostas válidas'
+	   ,title = 'Pesquisa Unicamp Surdos RMC 2021'
+	   ,subtitle = 'Validução do número acumulado de respostas válidas por dia'
+	   ,caption = paste(
+		  'Obs.: Dados atualizados até'
+		 ,format( Sys.time(), '%d.%m.%Y %H:%M:%S' )
+		)
+	  )
+
+	ggsave( plot = valid_plot, filename = './img/valid_plot.png', width=6, height=4)
+	#+END_SRC
+
+	#+CAPTION: Evolução do número acumulado de respostas por dia
+	#+ATTR_ORG: :width 600
+	[[./img/valid_plot.png]]
+
+	
 ** Perfil dos participantes
    
    Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=81=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
