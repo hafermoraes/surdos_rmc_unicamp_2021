@@ -774,6 +774,14 @@
 	left_join(
 	  natjur
 	) %>% 
+	mutate(
+	  pub_priv = case_when(
+		grepl( 'AUTARQ', DS_NATUREZA_JUR, ignore.case = TRUE) ~ 'PÚBLICO'
+	   ,grepl( 'MUNICI', DS_NATUREZA_JUR, ignore.case = TRUE) ~ 'PÚBLICO'
+	   ,grepl( 'ESTADU', DS_NATUREZA_JUR, ignore.case = TRUE) ~ 'PÚBLICO'
+	   ,TRUE ~ 'PRIVADO'
+	  )
+	) %>%
 	select( -CO_NATUREZA_JUR, -CO_TIPO_ESTABELECIMENTO)
 
   write_csv2(
@@ -800,13 +808,17 @@
   ##   ) %>% View
 
   ## estab_lista %>%
-  ## count( MUNICIPIO, DS_NATUREZA_JUR, DS_TIPO_ESTABELECIMENTO) %>% 
+  ## count( MUNICIPIO, pub_priv, DS_TIPO_ESTABELECIMENTO) %>% 
   ##   pivot_wider(
-  ## 	id_cols = c(MUNICIPIO, DS_NATUREZA_JUR)
+  ## 	id_cols = c(MUNICIPIO, pub_priv)
   ##    ,names_from = DS_TIPO_ESTABELECIMENTO
   ##    ,values_from = n
   ##    ,values_fill = 0
-  ##   ) %>% View
+  ##   ) %>%
+  ##   filter(
+  ##     MUNICIPIO == 'CAMPINAS'
+  ##   ) %>%
+  ##   View
   #+END_SRC  
 
   Os estabelecimentos do SUS estão disponíveis no link ftp://ftp.datasus.gov.br/cnes/BASE_DE_DADOS_CNES_202107.ZIP, do qual serão utilizados somente os arquivos
