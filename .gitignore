@@ -4,6 +4,9 @@ raw/*
 # spss data
 spss/*
 
+# cleaned data
+data/*
+
 # History files
 .Rhistory
 .Rapp.history

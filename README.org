@@ -77,8 +77,19 @@
    attached base packages:
    [1] stats     graphics  grDevices utils     datasets  methods   base     
 
+   other attached packages:
+   [1] haven_2.4.0   xtable_1.8-4  stringr_1.4.0 tidyr_1.1.2   dplyr_1.0.3  
+   [6] readr_1.4.0   ggplot2_3.3.3
+
    loaded via a namespace (and not attached):
-   [1] compiler_3.6.3
+	[1] magrittr_2.0.1   hms_1.0.0        tidyselect_1.1.0 munsell_0.5.0   
+	[5] colorspace_2.0-0 R6_2.5.0         rlang_0.4.11     fansi_0.4.2     
+	[9] blob_1.2.1       tools_3.6.3      grid_3.6.3       gtable_0.3.0    
+   [13] utf8_1.2.1       DBI_1.1.1.9000   withr_2.4.2      ellipsis_0.3.2  
+   [17] assertthat_0.2.1 tibble_3.1.1     lifecycle_1.0.0  crayon_1.4.1    
+   [21] purrr_0.3.4      vctrs_0.3.8      glue_1.4.2       stringi_1.5.3   
+   [25] compiler_3.6.3   pillar_1.6.0     forcats_0.5.1    generics_0.1.0  
+   [29] scales_1.1.1     pkgconfig_2.0.3
    #+end_example
 
    no qual as análises foram efetuadas.
@@ -475,6 +486,12 @@
    ## dat %>% select( V002, V003, V004_idade, V010_rmc, V010, VALIDA) %>% filter( is.na(VALIDA) ) %>% View
 
    ## dat %>% filter( is.na(V002), !is.na(VALIDA) ) %>% select( V002, V003, V004_idade, V010_rmc, V010, VALIDA) %>% View
+
+   write_csv2(
+	 dat
+	,file = './data/respostas_tratadas.csv'
+   )
+
    #+END_SRC
 
 ** Exporta dados tratados no formato apropriado ao SPSS
@@ -486,6 +503,7 @@
    )
    #+END_SRC
    
+
 * Análise exploratória de dados
 
 ** Evolução do número de repostas
@@ -613,7 +631,7 @@
 	
 ** Perfil dos participantes
    
-   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=81=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
+   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=88=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -629,28 +647,30 @@
    #+RESULTS:
    | V010                  |  n |     f |
    |-----------------------+----+-------|
-   | CAMPINAS              | 36 | 0.429 |
-   | HORTOLANDIA           | 10 | 0.119 |
-   | SUMARE                |  7 | 0.083 |
-   | PAULINIA              |  6 | 0.071 |
-   | VALINHOS              |  4 | 0.048 |
-   | nil                   |  4 | 0.048 |
-   | JAGUARIUNA            |  3 | 0.036 |
-   | INDAIATUBA            |  2 | 0.024 |
-   | SANTA BARBARA D OESTE |  2 | 0.024 |
-   | AMERICANA             |  1 | 0.012 |
-   | CAMPINAA              |  1 | 0.012 |
-   | CAPIVARI              |  1 | 0.012 |
-   | COSMOPOLIS            |  1 | 0.012 |
-   | IRACEMAPOLIS          |  1 | 0.012 |
-   | JUNDIAI               |  1 | 0.012 |
-   | NOVA ODESSA           |  1 | 0.012 |
-   | POCOS DE CALDAS       |  1 | 0.012 |
-   | SALTO                 |  1 | 0.012 |
-   | SAO JOSE DO RIO PARDO |  1 | 0.012 |
-   | RESPOSTAS             | 84 |     1 |
+   | CAMPINAS              | 36 | 0.409 |
+   | HORTOLANDIA           | 10 | 0.114 |
+   | SUMARE                |  7 |  0.08 |
+   | PAULINIA              |  6 | 0.068 |
+   | VALINHOS              |  5 | 0.057 |
+   | nil                   |  4 | 0.045 |
+   | JAGUARIUNA            |  3 | 0.034 |
+   | INDAIATUBA            |  2 | 0.023 |
+   | NOVA ODESSA           |  2 | 0.023 |
+   | SANTA BARBARA D OESTE |  2 | 0.023 |
+   | AMERICANA             |  1 | 0.011 |
+   | AMPARO                |  1 | 0.011 |
+   | CACHOEIRA DE MINAS MG |  1 | 0.011 |
+   | CAMPINAA              |  1 | 0.011 |
+   | CAPIVARI              |  1 | 0.011 |
+   | COSMOPOLIS            |  1 | 0.011 |
+   | IRACEMAPOLIS          |  1 | 0.011 |
+   | JUNDIAI               |  1 | 0.011 |
+   | POCOS DE CALDAS       |  1 | 0.011 |
+   | SALTO                 |  1 | 0.011 |
+   | SAO JOSE DO RIO PARDO |  1 | 0.011 |
+   | RESPOSTAS             | 88 |     1 |
 
-   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( !is.na(VALIDA)))} {{{results(=73=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
+   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( !is.na(VALIDA)))} {{{results(=76=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -668,6 +688,24 @@
 	 )
    #+END_SRC
 
+   #+RESULTS:
+   | V010                  |  n |     f |
+   |-----------------------+----+-------|
+   | CAMPINAS              | 35 | 0.461 |
+   | HORTOLANDIA           |  9 | 0.118 |
+   | SUMARE                |  7 | 0.092 |
+   | PAULINIA              |  6 | 0.079 |
+   | VALINHOS              |  5 | 0.066 |
+   | JAGUARIUNA            |  3 | 0.039 |
+   | INDAIATUBA            |  2 | 0.026 |
+   | NOVA ODESSA           |  2 | 0.026 |
+   | SANTA BARBARA D OESTE |  2 | 0.026 |
+   | nil                   |  2 | 0.026 |
+   | AMERICANA             |  1 | 0.013 |
+   | AMPARO                |  1 | 0.013 |
+   | COSMOPOLIS            |  1 | 0.013 |
+   | RESPOSTAS             | 76 |     1 |
+
    #+BEGIN_SRC R :exports none :results silent :session 
    ## Perfil dos respondentes válidos
 
@@ -683,37 +721,37 @@
 
    Perfil dos participantes:
 
-   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.9=)}}} anos
-   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=54.8=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
-   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=63=)}}} % com ensino superior ou pós-graduação
-   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=75.4=)}}} % avaliam seu estado de saúde como bom ou muito bom
+   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.8=)}}} anos
+   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=55.3=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=61.9=)}}} % com ensino superior ou pós-graduação
+   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=76.3=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
 
 * Matriz de distâncias
   
   #+BEGIN_SRC R :exports none :results silent :session 
   ## Download dos estabelecimentos do SUS
-  download.file(url = 'ftp.datasus.gov.br/cnes/BASE_DE_DADOS_CNES_202107.ZIP', destfile = '/tmp/BASE_DE_DADOS_CNES_202107.ZIP', method = 'curl')
+  ##download.file(url = 'ftp.datasus.gov.br/cnes/BASE_DE_DADOS_CNES_202107.ZIP', destfile = '/tmp/BASE_DE_DADOS_CNES_202107.ZIP', method = 'curl')
 
   unzip(
 	zipfile = '/tmp/BASE_DE_DADOS_CNES_202107.ZIP'
    ,files = c(
 	  'tbEstabelecimento202107.csv'
-	 ,'tbAtividade202107.csv'
+	 ,'tbNaturezaJuridica202107.csv'
 	 ,'tbTipoEstabelecimento202107.csv'
 	)
    ,exdir = '/tmp/'
   )
 
-  cnes  <- read_csv2(file = '/tmp/tbEstabelecimento202107.csv')
-  ativ  <- read_csv2(file = '/tmp/tbAtividade202107.csv')
-  estab <- read_csv2(file = '/tmp/tbTipoEstabelecimento202107.csv')
+  cnes    <- read_csv2(file = '/tmp/tbEstabelecimento202107.csv')
+  natjur  <- read_csv2(file = '/tmp/tbNaturezaJuridica202107.csv')
+  estab   <- read_csv2(file = '/tmp/tbTipoEstabelecimento202107.csv')
 
-  cnes %>%
+  estab_lista <- cnes %>%
 	transmute(
 	  CO_CNES
 	 ,CO_CEP
-	 ,CO_ATIVIDADE
+	 ,CO_NATUREZA_JUR
 	 ,CO_TIPO_ESTABELECIMENTO
 	 ,CO_MUNICIPIO_GESTOR
 	 ,NU_LATITUDE
@@ -727,30 +765,59 @@
 	  )
 	) %>%
 	na.omit() %>%
-	left_join(
+	left_join( 
 	  estab %>%
 	  select(CO_TIPO_ESTABELECIMENTO, DS_TIPO_ESTABELECIMENTO) %>%
 	  filter( CO_TIPO_ESTABELECIMENTO %in% c('001','006') ) # UBS e Hospitais somente...
 	) %>% 
-	na.omit() %>% 
-	count( MUNICIPIO, DS_TIPO_ESTABELECIMENTO) %>% 
-	pivot_wider(
-	  id_cols = MUNICIPIO
-	 ,names_from = DS_TIPO_ESTABELECIMENTO
-	 ,values_from = n
-	 ,values_fill = 0
-	) %>% View
+	na.omit() %>%
+	left_join(
+	  natjur
+	) %>% 
+	select( -CO_NATUREZA_JUR, -CO_TIPO_ESTABELECIMENTO)
+
+  write_csv2(
+	estab_lista
+   ,file = './data/estab_lista.csv'
+  )
+
+  ## estab_lista %>%
+  ## count( MUNICIPIO, DS_TIPO_ESTABELECIMENTO) %>% 
+  ##   pivot_wider(
+  ## 	id_cols = MUNICIPIO
+  ##    ,names_from = DS_TIPO_ESTABELECIMENTO
+  ##    ,values_from = n
+  ##    ,values_fill = 0
+  ##   ) %>% View
+
+  ## estab_lista %>%
+  ## count( DS_TIPO_ESTABELECIMENTO, DS_NATUREZA_JUR) %>% 
+  ##   pivot_wider(
+  ## 	id_cols = DS_NATUREZA_JUR
+  ##    ,names_from = DS_TIPO_ESTABELECIMENTO
+  ##    ,values_from = n
+  ##    ,values_fill = 0
+  ##   ) %>% View
+
+  ## estab_lista %>%
+  ## count( MUNICIPIO, DS_NATUREZA_JUR, DS_TIPO_ESTABELECIMENTO) %>% 
+  ##   pivot_wider(
+  ## 	id_cols = c(MUNICIPIO, DS_NATUREZA_JUR)
+  ##    ,names_from = DS_TIPO_ESTABELECIMENTO
+  ##    ,values_from = n
+  ##    ,values_fill = 0
+  ##   ) %>% View
   #+END_SRC  
 
   Os estabelecimentos do SUS estão disponíveis no link ftp://ftp.datasus.gov.br/cnes/BASE_DE_DADOS_CNES_202107.ZIP, do qual serão utilizados somente os arquivos
   - =tbEstabelecimento202107.csv=
-  - =tbAtividade202107.csv= e
+  - =tbNaturezaJuridica202107.csv= e
   - =tbTipoEstabelecimento202107.csv=.
 
 	A tabela =tbEstabelecimento202107= contém a listagem do CNES referente a Julho de 2021; dela serão utilizados, para fins da pesquisa da Unicamp Surdos RMC 2021, os campos
   - =CO_CNES=, o código CNES do estabelecimento do SUS
   - =CO_CEP=, o CEP do estabelecimento para ser utilizado no cálculo da matriz de distâncias
-  - =CO_ATIVIDADE=, tipo de atividade, a ser relacionado com a tabela =tbAtividade202107.csv=
+  - =CO_NATUREZA_JUR=, código da natureza jurídica, a ser relacionado com a tabela =tbNaturezaJuridica202107.csv=
   - =CO_TIPO_ESTABELECIMENTO=, tipo de estabelecimento, a ser relacionado com a tabela =tbTipoEstabelecimento202107.csv=
   - =CO_MUNICIPIO_GESTOR=, o código do município do IBGE
   - =NU_LATITUDE=, latitude (em graus) para gráfico/georeferenciamento

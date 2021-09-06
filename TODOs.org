@@ -16,6 +16,7 @@
 
 - vídeos editados com legenda, audio e surdos no papel principal de comunicação
 - rede de contatos da associação de surdos
+- preparar o release da pesquisa e envolver a imprensa com muito mais antecedência
 - divulgação constante e organizada
 - planejamento da pesquisa e trâmite com Comitê de Ética em Pesquisa
 - Vários pilotos para ajustar questionário e corrigir inconsistências
