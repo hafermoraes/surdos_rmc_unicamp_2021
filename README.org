@@ -750,6 +750,8 @@
   estab_lista <- cnes %>%
 	transmute(
 	  CO_CNES
+	 ,NO_RAZAO_SOCIAL   # nome para identificação do estabelecimento
+	 ,NO_FANTASIA       # nome para identificação do estabelecimento
 	 ,CO_CEP
 	 ,CO_NATUREZA_JUR
 	 ,CO_TIPO_ESTABELECIMENTO
@@ -819,6 +821,15 @@
   ##     MUNICIPIO == 'CAMPINAS'
   ##   ) %>%
   ##   View
+
+  ## estab_lista %>%
+  ##   filter(
+  ##     MUNICIPIO == 'CAMPINAS'
+  ##    ,pub_priv == 'PÚBLICO'
+  ##    ,DS_TIPO_ESTABELECIMENTO == 'HOSPITAL'
+  ##   ) %>%
+  ##   select( 1,2,3) %>%
+  ##   View
   #+END_SRC  
 
   Os estabelecimentos do SUS estão disponíveis no link ftp://ftp.datasus.gov.br/cnes/BASE_DE_DADOS_CNES_202107.ZIP, do qual serão utilizados somente os arquivos
@@ -835,4 +846,5 @@
   - =NU_LATITUDE=, latitude (em graus) para gráfico/georeferenciamento
   - e =NU_LONGITUDE=, longitude (em graus) para gráfico/georeferenciamento
 
+  
   
