@@ -1,7 +1,7 @@
 #+startup: inlineimages align contents
 
 
-* Pendências
+* Pendências constantes até a finalização da pesquisa
 
   - email TCLE participantes
 	
@@ -16,11 +16,12 @@
 	- +03.09.2021 Live Facebook Assucamp+
 	- +22.08.2021 Envio dos releases à imprensa de campinas+
 	- dd.mm.2021 Multiplicadores
-	- 
+  - matriz de distâncias
+	- consultar permissões de raspagem de dados no maps.google.com
+	- scripts em python no repositório da pesquisa
   - comparar dificuldade de contato no SUS e na rede privada com testes não-paramétricos em dois cenários
 	- dados pareados (para quem usa ambas as redes)
 	- dados não pareados (fazendo pleno uso de todas as informações disponíveis
-  - 
 
 * Lições aprendidas
 
