@@ -48,7 +48,7 @@
 
    #+RESULTS:
    :   Operating System: Linux Mint 20.2
-   :             Kernel: Linux 5.4.0-81-generic
+   :             Kernel: Linux 5.4.0-84-generic
    :       Architecture: x86-64
    
    e do software estatístico primário 
@@ -697,7 +697,7 @@
 	
 ** Perfil dos participantes
    
-   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=89=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
+   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=92=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -713,13 +713,13 @@
    #+RESULTS:
    | V010                  |  n |     f |
    |-----------------------+----+-------|
-   | CAMPINAS              | 37 | 0.416 |
-   | HORTOLANDIA           | 10 | 0.112 |
-   | SUMARE                |  7 | 0.079 |
-   | PAULINIA              |  6 | 0.067 |
-   | VALINHOS              |  5 | 0.056 |
-   | nil                   |  4 | 0.045 |
-   | JAGUARIUNA            |  3 | 0.034 |
+   | CAMPINAS              | 39 | 0.424 |
+   | HORTOLANDIA           | 11 |  0.12 |
+   | SUMARE                |  7 | 0.076 |
+   | PAULINIA              |  6 | 0.065 |
+   | VALINHOS              |  5 | 0.054 |
+   | nil                   |  4 | 0.043 |
+   | JAGUARIUNA            |  3 | 0.033 |
    | INDAIATUBA            |  2 | 0.022 |
    | NOVA ODESSA           |  2 | 0.022 |
    | SANTA BARBARA D OESTE |  2 | 0.022 |
@@ -734,9 +734,9 @@
    | POCOS DE CALDAS       |  1 | 0.011 |
    | SALTO                 |  1 | 0.011 |
    | SAO JOSE DO RIO PARDO |  1 | 0.011 |
-   | RESPOSTAS             | 89 |     1 |
+   | RESPOSTAS             | 92 |     1 |
 
-   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( !is.na(VALIDA)))} {{{results(=77=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
+   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( !is.na(VALIDA)))} {{{results(=80=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -757,20 +757,20 @@
    #+RESULTS:
    | V010                  |  n |     f |
    |-----------------------+----+-------|
-   | CAMPINAS              | 36 | 0.468 |
-   | HORTOLANDIA           |  9 | 0.117 |
-   | SUMARE                |  7 | 0.091 |
-   | PAULINIA              |  6 | 0.078 |
-   | VALINHOS              |  5 | 0.065 |
-   | JAGUARIUNA            |  3 | 0.039 |
-   | INDAIATUBA            |  2 | 0.026 |
-   | NOVA ODESSA           |  2 | 0.026 |
-   | SANTA BARBARA D OESTE |  2 | 0.026 |
-   | nil                   |  2 | 0.026 |
-   | AMERICANA             |  1 | 0.013 |
-   | AMPARO                |  1 | 0.013 |
-   | COSMOPOLIS            |  1 | 0.013 |
-   | RESPOSTAS             | 77 |     1 |
+   | CAMPINAS              | 38 | 0.475 |
+   | HORTOLANDIA           | 10 | 0.125 |
+   | SUMARE                |  7 | 0.088 |
+   | PAULINIA              |  6 | 0.075 |
+   | VALINHOS              |  5 | 0.062 |
+   | JAGUARIUNA            |  3 | 0.038 |
+   | INDAIATUBA            |  2 | 0.025 |
+   | NOVA ODESSA           |  2 | 0.025 |
+   | SANTA BARBARA D OESTE |  2 | 0.025 |
+   | nil                   |  2 | 0.025 |
+   | AMERICANA             |  1 | 0.012 |
+   | AMPARO                |  1 | 0.012 |
+   | COSMOPOLIS            |  1 | 0.012 |
+   | RESPOSTAS             | 80 |     1 |
 
    #+BEGIN_SRC R :exports none :results silent :session 
    ## Perfil dos respondentes válidos
@@ -787,10 +787,10 @@
 
    Perfil dos participantes:
 
-   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.6=)}}} anos
-   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=54.5=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
-   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=62.4=)}}} % com ensino superior ou pós-graduação
-   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=76.6=)}}} % avaliam seu estado de saúde como bom ou muito bom
+   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.4=)}}} anos
+   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=56.2=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=60=)}}} % com ensino superior ou pós-graduação
+   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=75=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
 
 * Matriz de distâncias

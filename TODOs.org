@@ -17,11 +17,15 @@
 	- +22.08.2021 Envio dos releases à imprensa de campinas+
 	- dd.mm.2021 Multiplicadores
   - matriz de distâncias
-	- consultar permissões de raspagem de dados no maps.google.com
+	- +consultar permissões de raspagem de dados no maps.google.com+
 	- scripts em python no repositório da pesquisa
   - comparar dificuldade de contato no SUS e na rede privada com testes não-paramétricos em dois cenários
 	- dados pareados (para quem usa ambas as redes)
 	- dados não pareados (fazendo pleno uso de todas as informações disponíveis
+  - PNAD tem dados de deficiência? (Jana pesquisa)
+  - mencionar viés da nossa pesquisa e usar o argumento que se mesmo pros muito educados imagina para o publico conhecido da pesquisa
+  - incluir seções no README.org com as análises simples baseadas nas hipóteses de pesquisa
+  - microdados do censo, abrindo o perfil de sexo, religião, escolaridade, entre outros, para cada tipo de resposta à pergunta da deficiência do censo
 
 * Lições aprendidas
 
