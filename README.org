@@ -48,7 +48,7 @@
 
    #+RESULTS:
    :   Operating System: Linux Mint 20.2
-   :             Kernel: Linux 5.4.0-84-generic
+   :             Kernel: Linux 5.4.0-88-generic
    :       Architecture: x86-64
    
    e do software estatístico primário 
@@ -526,16 +526,27 @@
 	evol_anot <- evol %>%
 	  transmute(
 		x_from = V001 + 1
-	   ,y_from = c - 40
+	   ,y_from = c
 	   ,x_to = V001
 	   ,y_to = c - 7
 	   ,anot = case_when( 
 		  V001 == '2021-09-03' ~ '03/09 Live FB Assucamp'
 		 ,V001 == '2021-08-22' ~ '22/08 Releases Imprensa'
+		 ,V001 == '2021-09-08' ~ '08/09 Matéria TV Câmara'
+		 ,V001 == '2021-09-25' ~ '25/09 Caminhada Taquaral'
+		 ,V001 == '2021-09-28' ~ '28/09 Mundo Animal'
+		 ,V001 == '2021-10-06' ~ '06/10 Vídeos dos multiplicadores'
 		 ,TRUE ~ ''
 		)
 	  ) %>%
 	  filter( anot != '' )
+
+	evol_anot[1,2] <- 0
+	evol_anot[2,2] <- 20
+	evol_anot[3,2] <- 40
+	evol_anot[4,2] <- 60
+	evol_anot[5,2] <- 80
+	evol_anot[6,2] <- 100
 
 	## Gráfico da evolução do número de respostas
 	alvo <- 400
@@ -544,7 +555,7 @@
 	  geom_line() +
 	  geom_point() +
 	  ylim(0, alvo * 1.1 ) +
-	  xlim( evol[1,1], as.Date( '2021-10-01') ) + 
+	  xlim( evol[1,1], as.Date( '2021-12-01') ) + 
 	  geom_hline( yintercept = alvo, linetype = 'longdash', col='red') +
 	  geom_text(
 		x = evol[1,1]
@@ -619,16 +630,28 @@
 	valid_anot <- valid %>%
 	  transmute(
 		x_from = V001 + 1
-	   ,y_from = c - 40
+	   ,y_from = c
 	   ,x_to = V001
 	   ,y_to = c - 7
 	   ,anot = case_when( 
 		  V001 == '2021-09-03' ~ '03/09 Live FB Assucamp'
 		 ,V001 == '2021-08-22' ~ '22/08 Releases Imprensa'
+		 ,V001 == '2021-09-08' ~ '08/09 Matéria TV Câmara'
+		 ,V001 == '2021-09-25' ~ '25/09 Caminhada Taquaral'
+		 ,V001 == '2021-09-28' ~ '28/09 Mundo Animal'
+		 ,V001 == '2021-10-06' ~ '06/10 Vídeos dos multiplicadores'
 		 ,TRUE ~ ''
 		)
 	  ) %>%
 	  filter( anot != '' )
+
+	valid_anot[1,2] <- 0
+	valid_anot[2,2] <- 20
+	valid_anot[3,2] <- 40
+	valid_anot[4,2] <- 60
+	valid_anot[5,2] <- 80
+	valid_anot[6,2] <- 100
+
 
 	## Gráfico da evolução do número de respostas
 	alvo <- 400
@@ -637,7 +660,7 @@
 	  geom_line() +
 	  geom_point() +
 	  ylim(0, alvo * 1.1 ) +
-	  xlim( valid[1,1], as.Date( '2021-10-01') ) + 
+	  xlim( valid[1,1], as.Date( '2021-12-01') ) + 
 	  geom_hline( yintercept = alvo, linetype = 'longdash', col='red') +
 	  geom_text(
 		x = valid[1,1]
@@ -697,7 +720,7 @@
 	
 ** Perfil dos participantes
    
-   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=92=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
+   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=219=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -711,32 +734,45 @@
    #+END_SRC
 
    #+RESULTS:
-   | V010                  |  n |     f |
-   |-----------------------+----+-------|
-   | CAMPINAS              | 39 | 0.424 |
-   | HORTOLANDIA           | 11 |  0.12 |
-   | SUMARE                |  7 | 0.076 |
-   | PAULINIA              |  6 | 0.065 |
-   | VALINHOS              |  5 | 0.054 |
-   | nil                   |  4 | 0.043 |
-   | JAGUARIUNA            |  3 | 0.033 |
-   | INDAIATUBA            |  2 | 0.022 |
-   | NOVA ODESSA           |  2 | 0.022 |
-   | SANTA BARBARA D OESTE |  2 | 0.022 |
-   | AMERICANA             |  1 | 0.011 |
-   | AMPARO                |  1 | 0.011 |
-   | CACHOEIRA DE MINAS MG |  1 | 0.011 |
-   | CAMPINAA              |  1 | 0.011 |
-   | CAPIVARI              |  1 | 0.011 |
-   | COSMOPOLIS            |  1 | 0.011 |
-   | IRACEMAPOLIS          |  1 | 0.011 |
-   | JUNDIAI               |  1 | 0.011 |
-   | POCOS DE CALDAS       |  1 | 0.011 |
-   | SALTO                 |  1 | 0.011 |
-   | SAO JOSE DO RIO PARDO |  1 | 0.011 |
-   | RESPOSTAS             | 92 |     1 |
+   | V010                   |   n |     f |
+   |------------------------+-----+-------|
+   | CAMPINAS               |  99 | 0.452 |
+   | HORTOLANDIA            |  34 | 0.155 |
+   | SUMARE                 |  21 | 0.096 |
+   | VALINHOS               |   9 | 0.041 |
+   | PAULINIA               |   7 | 0.032 |
+   | nil                    |   5 | 0.023 |
+   | AMERICANA              |   4 | 0.018 |
+   | JAGUARIUNA             |   4 | 0.018 |
+   | AMPARO                 |   3 | 0.014 |
+   | INDAIATUBA             |   3 | 0.014 |
+   | NOVA ODESSA            |   3 | 0.014 |
+   | SANTA BARBARA D OESTE  |   3 | 0.014 |
+   | CAMPINAS               |   2 | 0.009 |
+   | MONTE MOR              |   2 | 0.009 |
+   | CACHOEIRA DE MINAS MG  |   1 | 0.005 |
+   | CAMPINA                |   1 | 0.005 |
+   | CAMPINAA               |   1 | 0.005 |
+   | CAMPINAS.              |   1 | 0.005 |
+   | CAMPINAS.SP            |   1 | 0.005 |
+   | CAPIVARI               |   1 | 0.005 |
+   | COSMOPOLIS             |   1 | 0.005 |
+   | GOIANIA GOIAS          |   1 | 0.005 |
+   | HORTOLANDIA            |   1 | 0.005 |
+   | HORTOLANDIA E CAMPINAS |   1 | 0.005 |
+   | IRACEMAPOLIS           |   1 | 0.005 |
+   | JUNDIAI                |   1 | 0.005 |
+   | LIMEIRA                |   1 | 0.005 |
+   | MEDINA MG              |   1 | 0.005 |
+   | OSASCO                 |   1 | 0.005 |
+   | POCOS DE CALDAS        |   1 | 0.005 |
+   | SALTO                  |   1 | 0.005 |
+   | SAO JOSE DO RIO PARDO  |   1 | 0.005 |
+   | SAO PAULO S            |   1 | 0.005 |
+   | SAO VICENTE            |   1 | 0.005 |
+   | RESPOSTAS              | 219 |     1 |
 
-   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( !is.na(VALIDA)))} {{{results(=80=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
+   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( !is.na(VALIDA)))} {{{results(=185=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -755,22 +791,23 @@
    #+END_SRC
 
    #+RESULTS:
-   | V010                  |  n |     f |
-   |-----------------------+----+-------|
-   | CAMPINAS              | 38 | 0.475 |
-   | HORTOLANDIA           | 10 | 0.125 |
-   | SUMARE                |  7 | 0.088 |
-   | PAULINIA              |  6 | 0.075 |
-   | VALINHOS              |  5 | 0.062 |
-   | JAGUARIUNA            |  3 | 0.038 |
-   | INDAIATUBA            |  2 | 0.025 |
-   | NOVA ODESSA           |  2 | 0.025 |
-   | SANTA BARBARA D OESTE |  2 | 0.025 |
-   | nil                   |  2 | 0.025 |
-   | AMERICANA             |  1 | 0.012 |
-   | AMPARO                |  1 | 0.012 |
-   | COSMOPOLIS            |  1 | 0.012 |
-   | RESPOSTAS             | 80 |     1 |
+   | V010                  |   n |     f |
+   |-----------------------+-----+-------|
+   | CAMPINAS              |  93 | 0.503 |
+   | HORTOLANDIA           |  32 | 0.173 |
+   | SUMARE                |  20 | 0.108 |
+   | VALINHOS              |   9 | 0.049 |
+   | PAULINIA              |   7 | 0.038 |
+   | AMERICANA             |   4 | 0.022 |
+   | JAGUARIUNA            |   4 | 0.022 |
+   | NOVA ODESSA           |   3 | 0.016 |
+   | SANTA BARBARA D OESTE |   3 | 0.016 |
+   | nil                   |   3 | 0.016 |
+   | AMPARO                |   2 | 0.011 |
+   | INDAIATUBA            |   2 | 0.011 |
+   | MONTE MOR             |   2 | 0.011 |
+   | COSMOPOLIS            |   1 | 0.005 |
+   | RESPOSTAS             | 185 |     1 |
 
    #+BEGIN_SRC R :exports none :results silent :session 
    ## Perfil dos respondentes válidos
@@ -787,10 +824,10 @@
 
    Perfil dos participantes:
 
-   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.4=)}}} anos
-   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=56.2=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
-   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=60=)}}} % com ensino superior ou pós-graduação
-   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=75=)}}} % avaliam seu estado de saúde como bom ou muito bom
+   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.9=)}}} anos
+   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=54.1=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=45.4=)}}} % com ensino superior ou pós-graduação
+   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=76.7=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
 
 * Matriz de distâncias
