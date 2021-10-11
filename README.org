@@ -82,14 +82,15 @@
    [6] readr_1.4.0   ggplot2_3.3.3
 
    loaded via a namespace (and not attached):
-	[1] magrittr_2.0.1   hms_1.0.0        tidyselect_1.1.0 munsell_0.5.0   
-	[5] colorspace_2.0-0 R6_2.5.0         rlang_0.4.11     fansi_0.4.2     
-	[9] blob_1.2.1       tools_3.6.3      grid_3.6.3       gtable_0.3.0    
-   [13] utf8_1.2.1       DBI_1.1.1.9000   withr_2.4.2      ellipsis_0.3.2  
-   [17] assertthat_0.2.1 tibble_3.1.1     lifecycle_1.0.0  crayon_1.4.1    
-   [21] purrr_0.3.4      vctrs_0.3.8      glue_1.4.2       stringi_1.5.3   
-   [25] compiler_3.6.3   pillar_1.6.0     forcats_0.5.1    generics_0.1.0  
-   [29] scales_1.1.1     pkgconfig_2.0.3
+	[1] pillar_1.6.0     compiler_3.6.3   forcats_0.5.1    tools_3.6.3     
+	[5] digest_0.6.27    lifecycle_1.0.0  tibble_3.1.1     gtable_0.3.0    
+	[9] pkgconfig_2.0.3  rlang_0.4.11     DBI_1.1.1.9000   cli_2.4.0       
+   [13] rstudioapi_0.13  withr_2.4.2      generics_0.1.0   vctrs_0.3.8     
+   [17] hms_1.0.0        grid_3.6.3       tidyselect_1.1.0 glue_1.4.2      
+   [21] R6_2.5.0         fansi_0.4.2      farver_2.1.0     purrr_0.3.4     
+   [25] blob_1.2.1       magrittr_2.0.1   scales_1.1.1     ps_1.6.0        
+   [29] ellipsis_0.3.2   assertthat_0.2.1 colorspace_2.0-0 labeling_0.4.2  
+   [33] utf8_1.2.1       stringi_1.5.3    munsell_0.5.0    crayon_1.4.1
    #+end_example
 
    no qual as análises foram efetuadas.
@@ -260,8 +261,18 @@
 	  ,V010 = gsub( '/',' ', V010)
 	  ,V010 = gsub( ' - ',' ', V010)
 	  ,V010 = gsub( '-',' ', V010)
+	  ,V010 = gsub( '\\.',' ', V010)
 	  ,V010 = gsub( "'",' ', V010)
 	  ,V010 = gsub( ' SP','', V010)
+	  ,V010 = case_when(
+		 V010 == 'CAMPINA'  ~ 'CAMPINAS'
+		,V010 == 'CAMPINAA' ~ 'CAMPINAS'
+		,V010 == 'EU MORO EM CAMPINAS' ~ 'CAMPINAS'
+		,V010 == 'HORTOLANDIA E CAMPINAS' ~ 'CAMPINAS'
+		,V010 == 'HOTOLANDIA' ~ 'HORTOLANDIA'
+		,TRUE ~ as.character(V010)
+	   )
+	  ,V010 = str_trim(V010)
 	  ,V010_rmc = ifelse( V010 %in% rmc$municipio, TRUE, FALSE)
 	   ## Qual bairro você mora?
 	  ,V011
@@ -720,7 +731,7 @@
 	
 ** Perfil dos participantes
    
-   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=235=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
+   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=239=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -734,47 +745,39 @@
    #+END_SRC
 
    #+RESULTS:
-   | V010                   |   n |     f |
-   |------------------------+-----+-------|
-   | CAMPINAS               | 111 | 0.472 |
-   | HORTOLANDIA            |  35 | 0.149 |
-   | SUMARE                 |  21 | 0.089 |
-   | VALINHOS               |   9 | 0.038 |
-   | PAULINIA               |   7 |  0.03 |
-   | nil                    |   6 | 0.026 |
-   | AMERICANA              |   4 | 0.017 |
-   | JAGUARIUNA             |   4 | 0.017 |
-   | AMPARO                 |   3 | 0.013 |
-   | INDAIATUBA             |   3 | 0.013 |
-   | NOVA ODESSA            |   3 | 0.013 |
-   | SANTA BARBARA D OESTE  |   3 | 0.013 |
-   | CAMPINAS               |   2 | 0.009 |
-   | MONTE MOR              |   2 | 0.009 |
-   | CACHOEIRA DE MINAS MG  |   1 | 0.004 |
-   | CAMPINA                |   1 | 0.004 |
-   | CAMPINAA               |   1 | 0.004 |
-   | CAMPINAS.              |   1 | 0.004 |
-   | CAMPINAS.SP            |   1 | 0.004 |
-   | CAPIVARI               |   1 | 0.004 |
-   | COSMOPOLIS             |   1 | 0.004 |
-   | GOIANIA GOIAS          |   1 | 0.004 |
-   | HORTOLANDIA            |   1 | 0.004 |
-   | HORTOLANDIA E CAMPINAS |   1 | 0.004 |
-   | HOTOLANDIA             |   1 | 0.004 |
-   | IRACEMAPOLIS           |   1 | 0.004 |
-   | JUNDIAI                |   1 | 0.004 |
-   | LIMEIRA                |   1 | 0.004 |
-   | MARILIA                |   1 | 0.004 |
-   | MEDINA MG              |   1 | 0.004 |
-   | OSASCO                 |   1 | 0.004 |
-   | POCOS DE CALDAS        |   1 | 0.004 |
-   | SALTO                  |   1 | 0.004 |
-   | SAO JOSE DO RIO PARDO  |   1 | 0.004 |
-   | SAO PAULO S            |   1 | 0.004 |
-   | SAO VICENTE            |   1 | 0.004 |
-   | RESPOSTAS              | 235 |     1 |
+   | V010                  |   n |     f |
+   |-----------------------+-----+-------|
+   | CAMPINAS              | 119 | 0.498 |
+   | HORTOLANDIA           |  37 | 0.155 |
+   | SUMARE                |  21 | 0.088 |
+   | VALINHOS              |   9 | 0.038 |
+   | PAULINIA              |   7 | 0.029 |
+   | nil                   |   7 | 0.029 |
+   | AMERICANA             |   6 | 0.025 |
+   | JAGUARIUNA            |   4 | 0.017 |
+   | AMPARO                |   3 | 0.013 |
+   | INDAIATUBA            |   3 | 0.013 |
+   | NOVA ODESSA           |   3 | 0.013 |
+   | SANTA BARBARA D OESTE |   3 | 0.013 |
+   | MONTE MOR             |   2 | 0.008 |
+   | CACHOEIRA DE MINAS MG |   1 | 0.004 |
+   | CAPIVARI              |   1 | 0.004 |
+   | COSMOPOLIS            |   1 | 0.004 |
+   | GOIANIA GOIAS         |   1 | 0.004 |
+   | IRACEMAPOLIS          |   1 | 0.004 |
+   | JUNDIAI               |   1 | 0.004 |
+   | LIMEIRA               |   1 | 0.004 |
+   | MARILIA               |   1 | 0.004 |
+   | MEDINA MG             |   1 | 0.004 |
+   | OSASCO                |   1 | 0.004 |
+   | POCOS DE CALDAS       |   1 | 0.004 |
+   | SALTO                 |   1 | 0.004 |
+   | SAO JOSE DO RIO PARDO |   1 | 0.004 |
+   | SAO PAULO S           |   1 | 0.004 |
+   | SAO VICENTE           |   1 | 0.004 |
+   | RESPOSTAS             | 239 |     1 |
 
-   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( !is.na(VALIDA)))} {{{results(=197=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
+   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( !is.na(VALIDA)))} {{{results(=209=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -795,21 +798,21 @@
    #+RESULTS:
    | V010                  |   n |     f |
    |-----------------------+-----+-------|
-   | CAMPINAS              | 104 | 0.528 |
-   | HORTOLANDIA           |  33 | 0.168 |
-   | SUMARE                |  20 | 0.102 |
-   | VALINHOS              |   9 | 0.046 |
-   | PAULINIA              |   7 | 0.036 |
-   | AMERICANA             |   4 |  0.02 |
-   | JAGUARIUNA            |   4 |  0.02 |
-   | NOVA ODESSA           |   3 | 0.015 |
-   | SANTA BARBARA D OESTE |   3 | 0.015 |
-   | nil                   |   3 | 0.015 |
+   | CAMPINAS              | 111 | 0.531 |
+   | HORTOLANDIA           |  35 | 0.167 |
+   | SUMARE                |  20 | 0.096 |
+   | VALINHOS              |   9 | 0.043 |
+   | PAULINIA              |   7 | 0.033 |
+   | AMERICANA             |   6 | 0.029 |
+   | JAGUARIUNA            |   4 | 0.019 |
+   | nil                   |   4 | 0.019 |
+   | NOVA ODESSA           |   3 | 0.014 |
+   | SANTA BARBARA D OESTE |   3 | 0.014 |
    | AMPARO                |   2 |  0.01 |
    | INDAIATUBA            |   2 |  0.01 |
    | MONTE MOR             |   2 |  0.01 |
    | COSMOPOLIS            |   1 | 0.005 |
-   | RESPOSTAS             | 197 |     1 |
+   | RESPOSTAS             | 209 |     1 |
 
    #+BEGIN_SRC R :exports none :results silent :session 
    ## Perfil dos respondentes válidos
@@ -826,10 +829,10 @@
 
    Perfil dos participantes:
 
-   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=49.5=)}}} anos
-   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=54.3=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
-   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=43.7=)}}} % com ensino superior ou pós-graduação
-   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=74.6=)}}} % avaliam seu estado de saúde como bom ou muito bom
+   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=48.8=)}}} anos
+   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=55=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=42.1=)}}} % com ensino superior ou pós-graduação
+   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=74.2=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
 
 * Matriz de distâncias
