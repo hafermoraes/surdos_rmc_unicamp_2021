@@ -82,15 +82,15 @@
    [6] readr_1.4.0   ggplot2_3.3.3
 
    loaded via a namespace (and not attached):
-	[1] pillar_1.6.0     compiler_3.6.3   forcats_0.5.1    tools_3.6.3     
-	[5] digest_0.6.27    lifecycle_1.0.0  tibble_3.1.1     gtable_0.3.0    
-	[9] pkgconfig_2.0.3  rlang_0.4.11     DBI_1.1.1.9000   cli_2.4.0       
-   [13] rstudioapi_0.13  withr_2.4.2      generics_0.1.0   vctrs_0.3.8     
-   [17] hms_1.0.0        grid_3.6.3       tidyselect_1.1.0 glue_1.4.2      
-   [21] R6_2.5.0         fansi_0.4.2      farver_2.1.0     purrr_0.3.4     
-   [25] blob_1.2.1       magrittr_2.0.1   scales_1.1.1     ps_1.6.0        
-   [29] ellipsis_0.3.2   assertthat_0.2.1 colorspace_2.0-0 labeling_0.4.2  
-   [33] utf8_1.2.1       stringi_1.5.3    munsell_0.5.0    crayon_1.4.1
+	[1] rstudioapi_0.13  magrittr_2.0.1   hms_1.0.0        tidyselect_1.1.0
+	[5] munsell_0.5.0    colorspace_2.0-0 R6_2.5.0         rlang_0.4.11    
+	[9] fansi_0.4.2      blob_1.2.1       tools_3.6.3      grid_3.6.3      
+   [13] gtable_0.3.0     utf8_1.2.1       cli_2.4.0        DBI_1.1.1.9000  
+   [17] withr_2.4.2      ellipsis_0.3.2   assertthat_0.2.1 tibble_3.1.1    
+   [21] lifecycle_1.0.0  crayon_1.4.1     purrr_0.3.4      ps_1.6.0        
+   [25] vctrs_0.3.8      glue_1.4.2       stringi_1.5.3    compiler_3.6.3  
+   [29] pillar_1.6.0     forcats_0.5.1    generics_0.1.0   scales_1.1.1    
+   [33] pkgconfig_2.0.3
    #+end_example
 
    no qual as análises foram efetuadas.
@@ -260,21 +260,36 @@
 		,str_sub( string = V009, start = 5 )
 		,V009
 	   )
+	  ,V009_agrp = case_when(
+		 V009 == 'Evangélica' ~ 'Evangélica'
+		,V009 == 'Católica' ~ 'Católica'
+		,V009 == 'Batista' ~ 'Evangélica'
+		,V009 == 'Umbanda / Candomblé' ~ 'Umbanda / Candomblé'
+		,V009 == 'Espírita' ~ 'Espírita'
+		,grepl('adventi',V009,ignore.case=TRUE)  ~ 'Adventista'
+		,grepl('azaren',V009,ignore.case=TRUE)  ~ 'Evangélica'
+		,grepl('congrega',V009,ignore.case=TRUE)  ~ 'Evangélica'
+		,grepl('jeov',V009,ignore.case=TRUE)  ~ 'Testemunha de Jeová'
+		,grepl('etodist',V009,ignore.case=TRUE)  ~ 'Metodista'
+		,V009 == 'Não tenho religião' ~ 'Sem religião'
+		 ,is.na(V009) ~ 'Não informada'
+		,TRUE ~ 'Outra'
+	   )
 	   ## Qual cidade você mora?
 	  ,V010 = toupper( iconv(V010, from = "UTF-8", "ASCII//TRANSLIT") )
-	  ,V010 = gsub( '/',' ', V010)
-	  ,V010 = gsub( ' - ',' ', V010)
-	  ,V010 = gsub( '-',' ', V010)
-	  ,V010 = gsub( '\\.',' ', V010)
-	  ,V010 = gsub( "'",' ', V010)
-	  ,V010 = gsub( ' SP','', V010)
+	  ,V010 = gsub( '/'   ,' ' , V010)
+	  ,V010 = gsub( ' - ' ,' ' , V010)
+	  ,V010 = gsub( '-'   ,' ' , V010)
+	  ,V010 = gsub( '\\.' ,' ' , V010)
+	  ,V010 = gsub( "'"   ,' ' , V010)
+	  ,V010 = gsub( ' SP' ,''  , V010)
 	  ,V010 = case_when(
-		 V010 == 'CAMPINA'  ~ 'CAMPINAS'
-		,V010 == 'CAMPINAA' ~ 'CAMPINAS'
-		,V010 == 'EU MORO EM CAMPINAS' ~ 'CAMPINAS'
-		,V010 == 'HORTOLANDIA E CAMPINAS' ~ 'CAMPINAS'
-		,V010 == 'HOTOLANDIA' ~ 'HORTOLANDIA'
-		,TRUE ~ as.character(V010)
+		 V010 == 'CAMPINA'                    ~ 'CAMPINAS'
+		,V010 == 'CAMPINAA'                   ~ 'CAMPINAS'
+		,V010 == 'EU MORO EM CAMPINAS'        ~ 'CAMPINAS'
+		,V010 == 'HORTOLANDIA E CAMPINAS'     ~ 'CAMPINAS'
+		,V010 == 'HOTOLANDIA'                 ~ 'HORTOLANDIA'
+		,TRUE                                 ~ as.character(V010)
 	   )
 	  ,V010 = str_trim(V010)
 	   ## Faixas de CEP, caso seja necessário inferir cidade a partir do CEP
@@ -286,13 +301,13 @@
 	  ,V010_rmc = FALSE
 	  ,V010_rmc = case_when(
 		 ## Cidade NA mas CEP iniciando com 13 pertencem à RMC
-		 is.na(V010) & str_sub( V012 ,1,2) ) == 13  ~ TRUE  
-		,V010 %in% rmc$municipio                    ~ TRUE
+		 is.na(V010) & str_sub( V012 ,1,2 ) == 13  ~ TRUE  
+		,V010 %in% rmc$municipio                   ~ TRUE
 	   )
 	   ## Qual bairro você mora?
 	  ,V011
 	   ## Qual número do seu CEP?
-	  ,V012 = V012
+	  ,V012
 	   ## Você tem diabetes?
 	  ,V013 = factor(
 		 str_sub( string = V013, start = 5 )
@@ -691,7 +706,7 @@
 	  geom_text(
 		x = valid[1,1]
 	   ,y = alvo + 15
-	   ,label = 'Expectativa do número de respostas válidas'
+	   ,label = 'Expectativa do número de respostas'
 	   ,col = 'red'
 	   ,hjust = 0
 	  ) +
@@ -702,7 +717,7 @@
 	   ,hjust = -0.1
 	   ,label = paste0(
 		  valid[ nrow(valid), 3]
-		 ,' respostas válidas até '
+		 ,' válidas até '
 		 ,format( valid[ nrow(valid), 1], '%d.%m.%Y' )
 		)
 	  ) + 
@@ -792,12 +807,12 @@
    | SAO VICENTE           |   1 | 0.004 |
    | RESPOSTAS             | 239 |     1 |
 
-   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( !is.na(VALIDA)))} {{{results(=209=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
+   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( VALIDA == TRUE ))} {{{results(=209=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
    dat %>%
-	 filter( !is.na(VALIDA) ) %>%
+	 filter( VALIDA == TRUE ) %>%
 	 count( V010, sort = TRUE) %>%
 	 mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	 bind_rows(
@@ -833,14 +848,252 @@
    ## Perfil dos respondentes válidos
 
    ## idade média
-   v004 <- dat %>% filter(!is.na(VALIDA)) %>% summarize( avg = mean(V004_idade, na.rm = TRUE) )
+   v004 <- dat %>% filter(VALIDA == TRUE) %>% summarize( avg = mean(V004_idade, na.rm = TRUE) )
    ## sexo
-   v005 <- dat %>% filter(!is.na(VALIDA)) %>% count( V005, sort = TRUE) %>% mutate( p = n/sum(n) )
+   v005 <- dat %>% filter(VALIDA == TRUE) %>% count( V005, sort = TRUE) %>% mutate( p = n/sum(n) )
    ## escolaridade
-   v006 <- dat %>% filter(!is.na(VALIDA)) %>% count( V006) %>% mutate( p = round( n/sum(n), 3) )
+   v006 <- dat %>% filter(VALIDA == TRUE) %>% count( V006) %>% mutate( p = round( n/sum(n), 3) )
    ## auto-avaliação do estado de saúde
-   v015 <- dat %>% filter(!is.na(VALIDA)) %>% count( V015) %>% mutate( p = round( n/sum(n), 3) )
+   v015 <- dat %>% filter(VALIDA == TRUE) %>% count( V015) %>% mutate( p = round( n/sum(n), 3) )
+
+   ## cidades não informadas
+   v010 <- dat %>% filter(VALIDA == TRUE, is.na(V010) )
+
+   ## busca livre...
+   if( FALSE ) {
+
+	 fill.color <- 'black'
+	 y.lim <- c(0,1)
+  
+	 ## religião
+	 dat %>%
+	   filter(VALIDA == TRUE) %>%
+	   count( V009_agrp, sort = TRUE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = reorder(q, -p) ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   coord_flip() +
+	   geom_text(aes(label=n), hjust=-1, color="black", size=3.5) + 
+	   ylim( y.lim ) +
+	   theme_classic()
+
+	 ## trabalha
+	 dat %>%
+	   filter(VALIDA == TRUE) %>%
+	   count( V007, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = reorder(q, -p) ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## raça
+	 dat %>%
+	   filter(VALIDA == TRUE) %>%
+	   count( V008, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = reorder(q, -p) ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## diabetes
+	 dat %>%
+	   filter(VALIDA == TRUE) %>%
+	   count( V013, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = reorder(q, -p) ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## pressão alta
+	 dat %>%
+	   filter(VALIDA == TRUE) %>%
+	   count( V014, sort = TRUE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = reorder(q, -p) ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## tabagismo
+	 dat %>%
+	   filter(VALIDA == TRUE) %>%
+	   count( V016, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = q ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## consumo álcool
+	 dat %>%
+	   filter(VALIDA == TRUE) %>%
+	   count( V017, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = q ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## usa SUS
+	 dat %>%
+	   filter(VALIDA == TRUE) %>%
+	   count( V018, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = reorder(q, -p) ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## dos que usam SUS, avaliação da comunicação
+	 dat %>%
+	   filter(VALIDA == TRUE, V018 == 'Sim') %>%
+	   count( V019, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = q ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   coord_flip() + 
+	   geom_text(aes(label=n), hjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## dos que usam SUS, CIL acompanha?
+	 dat %>%
+	   filter(VALIDA == TRUE, V018 == 'Sim') %>%
+	   count( V020, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = q ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   coord_flip() + 
+	   geom_text(aes(label=n), hjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+
+	 ## usa rede privada
+	 dat %>%
+	   filter(VALIDA == TRUE) %>%
+	   count( V021, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = q ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## dos que usam rede privada, avaliação da comunicação
+	 dat %>%
+	   filter(VALIDA == TRUE, V021 == 'Sim') %>%
+	   count( V022, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = q ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   coord_flip() + 
+	   geom_text(aes(label=n), hjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+
+	 ## aparelho auditivo
+	 dat %>%
+	   filter(VALIDA == TRUE) %>%
+	   count( V023, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = q ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## dos que usam aparelho auditivo, quantos conseguiram pelo SUS?
+	 dat %>%
+	   filter(VALIDA == TRUE, V023 == 'Sim') %>%
+	   count( V024, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = q ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## dos que usam aparelho auditivo conseguidos pelo SUS, avaliação da comunicação
+	 dat %>%
+	   filter(VALIDA == TRUE, V023 == 'Sim', V024 == 'Sim') %>%
+	   count( V025, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = q ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   coord_flip() + 
+	   geom_text(aes(label=n), hjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+
+	 ## implante coclear
+	 dat %>%
+	   filter(VALIDA == TRUE) %>%
+	   count( V026, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = q ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## dos que usam aparelho auditivo, quantos conseguiram pelo SUS?
+	 dat %>%
+	   filter(VALIDA == TRUE, V026 == 'Sim') %>%
+	   count( V027, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = n, x = q, fill=p ) ) +
+	   geom_bar(stat = 'identity') +
+	   geom_text(aes(label=n), vjust=1.6, color="white", size=3.5)
+
+	 ## dos que usam aparelho auditivo conseguidos pelo SUS, avaliação da comunicação
+	 dat %>%
+	   filter(VALIDA == TRUE, V026 == 'Sim', V027 == 'Sim') %>%
+	   count( V028, sort = FALSE ) %>%
+	   rename( q = 1) %>%
+	   mutate( p = round( n/sum(n), 3) ) %>%
+	   ggplot( aes( y = p, x = q ) ) +
+	   geom_bar(stat = 'identity', fill = fill.color) +
+	   ylim( y.lim ) +
+	   coord_flip() + 
+	   geom_text(aes(label=n), hjust = -1, color=fill.color, size=3.5) +
+	   theme_classic()
+
+	 ## aparelho auditivo e implante coclear
+	 dat %>% filter(VALIDA == TRUE, V023 == 'Sim', V026 == 'Sim') %>% nrow
+   }
    #+END_SRC
+
+   Embora tenham consentido ao TCLE e confirmado residir na RMC, src_R[:session :results replace ]{ nrow(v010) } {{{results(=4=)}}} respondentes não informaram o município no qual moram; destes, src_R[:session :results replace ]{ v010 %>% filter( !is.na(V012) ) %>% nrow } {{{results(=2=)}}} informaram o CEP, do qual é possível confirmar que de fato residem na RMC. Consideramos todos eles como respostas válidas à pesquisa.
 
    Perfil dos participantes:
 

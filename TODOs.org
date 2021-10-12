@@ -21,7 +21,7 @@
 	- scripts em python no repositório da pesquisa
   - comparar dificuldade de contato no SUS e na rede privada com testes não-paramétricos em dois cenários
 	- dados pareados (para quem usa ambas as redes)
-	- dados não pareados (fazendo pleno uso de todas as informações disponíveis
+	- dados não pareados (fazendo pleno uso de todas as informações disponíveis)
   - PNAD tem dados de deficiência? (Jana pesquisa)
   - mencionar viés da nossa pesquisa e usar o argumento que se mesmo pros muito educados imagina para o publico conhecido da pesquisa
   - incluir seções no README.org com as análises simples baseadas nas hipóteses de pesquisa
