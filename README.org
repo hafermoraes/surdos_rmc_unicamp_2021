@@ -82,15 +82,14 @@
    [6] readr_1.4.0   ggplot2_3.3.3
 
    loaded via a namespace (and not attached):
-	[1] pillar_1.6.0     compiler_3.6.3   forcats_0.5.1    tools_3.6.3     
-	[5] digest_0.6.27    lifecycle_1.0.0  tibble_3.1.1     gtable_0.3.0    
-	[9] pkgconfig_2.0.3  rlang_0.4.11     DBI_1.1.1.9000   cli_2.4.0       
-   [13] rstudioapi_0.13  withr_2.4.2      generics_0.1.0   vctrs_0.3.8     
-   [17] hms_1.0.0        grid_3.6.3       tidyselect_1.1.0 glue_1.4.2      
-   [21] R6_2.5.0         fansi_0.4.2      farver_2.1.0     purrr_0.3.4     
-   [25] blob_1.2.1       magrittr_2.0.1   scales_1.1.1     ps_1.6.0        
-   [29] ellipsis_0.3.2   assertthat_0.2.1 colorspace_2.0-0 labeling_0.4.2  
-   [33] utf8_1.2.1       stringi_1.5.3    munsell_0.5.0    crayon_1.4.1
+	[1] magrittr_2.0.1   hms_1.0.0        tidyselect_1.1.0 munsell_0.5.0   
+	[5] colorspace_2.0-0 R6_2.5.0         rlang_0.4.11     fansi_0.4.2     
+	[9] blob_1.2.1       tools_3.6.3      grid_3.6.3       gtable_0.3.0    
+   [13] utf8_1.2.1       DBI_1.1.1.9000   withr_2.4.2      ellipsis_0.3.2  
+   [17] assertthat_0.2.1 tibble_3.1.1     lifecycle_1.0.0  crayon_1.4.1    
+   [21] purrr_0.3.4      vctrs_0.3.8      glue_1.4.2       stringi_1.5.3   
+   [25] compiler_3.6.3   pillar_1.6.0     forcats_0.5.1    generics_0.1.0  
+   [29] scales_1.1.1     pkgconfig_2.0.3
    #+end_example
 
    no qual as análises foram efetuadas.
@@ -273,7 +272,12 @@
 		,TRUE ~ as.character(V010)
 	   )
 	  ,V010 = str_trim(V010)
-	  ,V010_rmc = ifelse( V010 %in% rmc$municipio, TRUE, FALSE)
+	  ,V010_rmc = FALSE
+	  ,V010_rmc = case_when(
+		 ## Cidade NA mas CEP iniciando com 13 pertencem à RMC
+		 is.na(V010) & str_sub( gsub('[[:blank:]]+','', gsub('[[:punct:]]+',' ',V012) ) ,1,2) == 13  ~ TRUE  
+		,V010 %in% rmc$municipio                ~ TRUE
+	   )
 	   ## Qual bairro você mora?
 	  ,V011
 	   ## Qual número do seu CEP?
@@ -480,6 +484,7 @@
 		 ) 
 	   )
 	   ## flag de respostas válidas
+	  ,VALIDA = FALSE
 	  ,VALIDA = case_when(
 		 ## Preenchimento   correto para 'Consentimento' e   correto para 'Público Alvo'
 		 !is.na(V002) & V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
@@ -502,7 +507,6 @@
 	 dat
 	,file = './data/respostas_tratadas.csv'
    )
-
    #+END_SRC
 
 ** Exporta dados tratados no formato apropriado ao SPSS
