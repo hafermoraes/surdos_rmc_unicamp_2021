@@ -35,6 +35,7 @@
    library(stringr)    # str_sub
    library(xtable)     # xtable
    library(haven)      # write_sav
+   library(gtsummary)  # tbl_summary
    #+END_SRC
 
 ** Ambiente de computação
@@ -78,19 +79,27 @@
    [1] stats     graphics  grDevices utils     datasets  methods   base     
 
    other attached packages:
-   [1] haven_2.4.0   xtable_1.8-4  stringr_1.4.0 tidyr_1.1.2   dplyr_1.0.3  
-   [6] readr_1.4.0   ggplot2_3.3.3
+   [1] gtsummary_1.4.2 haven_2.4.0     xtable_1.8-4    stringr_1.4.0  
+   [5] tidyr_1.1.2     dplyr_1.0.3     readr_1.4.0     ggplot2_3.3.3  
 
    loaded via a namespace (and not attached):
-	[1] rstudioapi_0.13  magrittr_2.0.1   hms_1.0.0        tidyselect_1.1.0
-	[5] munsell_0.5.0    colorspace_2.0-0 R6_2.5.0         rlang_0.4.11    
-	[9] fansi_0.4.2      blob_1.2.1       tools_3.6.3      grid_3.6.3      
-   [13] gtable_0.3.0     utf8_1.2.1       cli_2.4.0        DBI_1.1.1.9000  
-   [17] withr_2.4.2      ellipsis_0.3.2   assertthat_0.2.1 tibble_3.1.1    
-   [21] lifecycle_1.0.0  crayon_1.4.1     purrr_0.3.4      ps_1.6.0        
-   [25] vctrs_0.3.8      glue_1.4.2       stringi_1.5.3    compiler_3.6.3  
-   [29] pillar_1.6.0     forcats_0.5.1    generics_0.1.0   scales_1.1.1    
-   [33] pkgconfig_2.0.3
+	[1] pillar_1.6.0        compiler_3.6.3      forcats_0.5.1      
+	[4] tools_3.6.3         digest_0.6.27       checkmate_2.0.0    
+	[7] lattice_0.20-41     lifecycle_1.0.0     tibble_3.1.1       
+   [10] gtable_0.3.0        pkgconfig_2.0.3     rlang_0.4.11       
+   [13] Matrix_1.2-18       DBI_1.1.1.9000      cli_2.4.0          
+   [16] rstudioapi_0.13     commonmark_1.7      xfun_0.26          
+   [19] knitr_1.32          withr_2.4.2         rappdirs_0.3.1     
+   [22] sass_0.4.0          generics_0.1.0      vctrs_0.3.8        
+   [25] hms_1.0.0           grid_3.6.3          tidyselect_1.1.0   
+   [28] glue_1.4.2          R6_2.5.0            fansi_0.4.2        
+   [31] survival_3.2-3      farver_2.1.0        purrr_0.3.4        
+   [34] blob_1.2.1          magrittr_2.0.1      backports_1.2.1    
+   [37] splines_3.6.3       htmltools_0.5.1.1   broom.helpers_1.4.0
+   [40] scales_1.1.1        ps_1.6.0            ellipsis_0.3.2     
+   [43] gt_0.3.1            assertthat_0.2.1    colorspace_2.0-0   
+   [46] labeling_0.4.2      utf8_1.2.1          stringi_1.5.3      
+   [49] munsell_0.5.0       broom_0.7.9         crayon_1.4.1
    #+end_example
 
    no qual as análises foram efetuadas.
@@ -761,7 +770,7 @@
 	
 ** Perfil dos participantes
    
-   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=239=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
+   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=254=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -775,39 +784,41 @@
    #+END_SRC
 
    #+RESULTS:
-   | V010                  |   n |     f |
-   |-----------------------+-----+-------|
-   | CAMPINAS              | 119 | 0.498 |
-   | HORTOLANDIA           |  37 | 0.155 |
-   | SUMARE                |  21 | 0.088 |
-   | VALINHOS              |   9 | 0.038 |
-   | PAULINIA              |   7 | 0.029 |
-   | nil                   |   7 | 0.029 |
-   | AMERICANA             |   6 | 0.025 |
-   | JAGUARIUNA            |   4 | 0.017 |
-   | AMPARO                |   3 | 0.013 |
-   | INDAIATUBA            |   3 | 0.013 |
-   | NOVA ODESSA           |   3 | 0.013 |
-   | SANTA BARBARA D OESTE |   3 | 0.013 |
-   | MONTE MOR             |   2 | 0.008 |
-   | CACHOEIRA DE MINAS MG |   1 | 0.004 |
-   | CAPIVARI              |   1 | 0.004 |
-   | COSMOPOLIS            |   1 | 0.004 |
-   | GOIANIA GOIAS         |   1 | 0.004 |
-   | IRACEMAPOLIS          |   1 | 0.004 |
-   | JUNDIAI               |   1 | 0.004 |
-   | LIMEIRA               |   1 | 0.004 |
-   | MARILIA               |   1 | 0.004 |
-   | MEDINA MG             |   1 | 0.004 |
-   | OSASCO                |   1 | 0.004 |
-   | POCOS DE CALDAS       |   1 | 0.004 |
-   | SALTO                 |   1 | 0.004 |
-   | SAO JOSE DO RIO PARDO |   1 | 0.004 |
-   | SAO PAULO S           |   1 | 0.004 |
-   | SAO VICENTE           |   1 | 0.004 |
-   | RESPOSTAS             | 239 |     1 |
+   | V010                      |   n |     f |
+   |---------------------------+-----+-------|
+   | CAMPINAS                  | 125 | 0.492 |
+   | HORTOLANDIA               |  41 | 0.161 |
+   | SUMARE                    |  22 | 0.087 |
+   | PAULINIA                  |   9 | 0.035 |
+   | VALINHOS                  |   9 | 0.035 |
+   | nil                       |   7 | 0.028 |
+   | AMERICANA                 |   6 | 0.024 |
+   | JAGUARIUNA                |   4 | 0.016 |
+   | AMPARO                    |   3 | 0.012 |
+   | INDAIATUBA                |   3 | 0.012 |
+   | NOVA ODESSA               |   3 | 0.012 |
+   | SANTA BARBARA D OESTE     |   3 | 0.012 |
+   | MONTE MOR                 |   2 | 0.008 |
+   | BRASILIA, MORAVA CAMPINAS |   1 | 0.004 |
+   | CACHOEIRA DE MINAS MG     |   1 | 0.004 |
+   | CAPIVARI                  |   1 | 0.004 |
+   | COSMOPOLIS                |   1 | 0.004 |
+   | GOIANIA GOIAS             |   1 | 0.004 |
+   | IRACEMAPOLIS              |   1 | 0.004 |
+   | JUNDIAI                   |   1 | 0.004 |
+   | LIMEIRA                   |   1 | 0.004 |
+   | MARILIA                   |   1 | 0.004 |
+   | MEDINA MG                 |   1 | 0.004 |
+   | OSASCO                    |   1 | 0.004 |
+   | POCOS DE CALDAS           |   1 | 0.004 |
+   | SALTO                     |   1 | 0.004 |
+   | SANTANA                   |   1 | 0.004 |
+   | SAO JOSE DO RIO PARDO     |   1 | 0.004 |
+   | SAO PAULO S               |   1 | 0.004 |
+   | SAO VICENTE               |   1 | 0.004 |
+   | RESPOSTAS                 | 254 |     1 |
 
-   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( VALIDA == TRUE ))} {{{results(=209=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
+   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( VALIDA == TRUE ))} {{{results(=221=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -828,21 +839,21 @@
    #+RESULTS:
    | V010                  |   n |     f |
    |-----------------------+-----+-------|
-   | CAMPINAS              | 111 | 0.531 |
-   | HORTOLANDIA           |  35 | 0.167 |
-   | SUMARE                |  20 | 0.096 |
-   | VALINHOS              |   9 | 0.043 |
-   | PAULINIA              |   7 | 0.033 |
-   | AMERICANA             |   6 | 0.029 |
-   | JAGUARIUNA            |   4 | 0.019 |
-   | nil                   |   4 | 0.019 |
+   | CAMPINAS              | 117 | 0.529 |
+   | HORTOLANDIA           |  39 | 0.176 |
+   | SUMARE                |  21 | 0.095 |
+   | VALINHOS              |   9 | 0.041 |
+   | PAULINIA              |   8 | 0.036 |
+   | AMERICANA             |   6 | 0.027 |
+   | JAGUARIUNA            |   4 | 0.018 |
+   | nil                   |   4 | 0.018 |
    | NOVA ODESSA           |   3 | 0.014 |
    | SANTA BARBARA D OESTE |   3 | 0.014 |
-   | AMPARO                |   2 |  0.01 |
-   | INDAIATUBA            |   2 |  0.01 |
-   | MONTE MOR             |   2 |  0.01 |
+   | AMPARO                |   2 | 0.009 |
+   | INDAIATUBA            |   2 | 0.009 |
+   | MONTE MOR             |   2 | 0.009 |
    | COSMOPOLIS            |   1 | 0.005 |
-   | RESPOSTAS             | 209 |     1 |
+   | RESPOSTAS             | 221 |     1 |
 
    #+BEGIN_SRC R :exports none :results silent :session 
    ## Perfil dos respondentes válidos
@@ -1097,15 +1108,101 @@
 
    Perfil dos participantes:
 
-   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=48.8=)}}} anos
-   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=55=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
-   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=42.1=)}}} % com ensino superior ou pós-graduação
-   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=74.2=)}}} % avaliam seu estado de saúde como bom ou muito bom
+   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=48.2=)}}} anos
+   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=54.8=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=41.2=)}}} % com ensino superior ou pós-graduação
+   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=73.7=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
+
+** Resumo das variáveis
+
+   #+BEGIN_SRC R :exports results :results table :colnames yes :session :eval no
+   ## descritivo das variáveis
+
+   ## sem segmentar
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 select( -c(V001, V002, V003, V004, V009, V010_rmc, V011, V012, VALIDA) ) %>%
+	 tbl_summary(
+	   missing_text = 'Não informado'
+	  ,statistic = all_continuous() ~ c('{mean} ( {min} : {max} )')
+	  ,label = list(
+		 V004_idade ~ 'Idade'
+		,V006 ~ 'Escolaridade'
+		,V007 ~ 'Emprego'
+		,V008 ~ 'Raça'
+		,V009_agrp ~ 'Religião'
+		,V010 ~ 'Município de residência'
+		,V013 ~ 'Diabetes'
+		,V014 ~ 'Hipertensão arterial'
+		,V015 ~ 'Auto-avaliação sobre estado de saúde'
+		,V016 ~ 'Tagabismo'
+		,V017 ~ 'Consumo de álcool'
+		,V018 ~ 'Utiliza serviços de saúde do SUS'
+		,V019 ~ 'Comunicação com profissionais no SUS'
+		,V020 ~ 'Acompanhamento do intérprete da Central de Interpretação de Libras (CIL)'
+		,V021 ~ 'Utiliza rede particular de saúde'
+		,V022 ~ 'Comunicação com profissionais na rede particular'
+		,V023 ~ 'Utiliza aparelho auditivo'
+		,V024 ~ 'Obteve aparelho pelo SUS'
+		,V025 ~ 'Comunicação com profissionais no SUS com quem obteve aparelho'
+		,V026 ~ 'Utiliza implante coclear'
+		,V027 ~ 'Obteve implante coclear pelo SUS'
+		,V028 ~ 'Comunicação com profissionais no SUS com quem obteve implante coclear'
+	   )
+	 ) %>%
+	 add_n() %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/summary.html')
+
+
+   ## por sexo (V005)
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 select( -c(V001, V002, V003, V004, V009, V010_rmc, V011, V012, VALIDA) ) %>%
+	 tbl_summary(
+	   by = V005
+	  ,missing_text = 'Não informado'
+	  ,statistic = all_continuous() ~ c('{mean} ( {min} : {max} )')
+	  ,label = list(
+		 V004_idade ~ 'Idade'
+		,V006 ~ 'Escolaridade'
+		,V007 ~ 'Emprego'
+		,V008 ~ 'Raça'
+		,V009_agrp ~ 'Religião'
+		,V010 ~ 'Município de residência'
+		,V013 ~ 'Diabetes'
+		,V014 ~ 'Hipertensão arterial'
+		,V015 ~ 'Auto-avaliação sobre estado de saúde'
+		,V016 ~ 'Tagabismo'
+		,V017 ~ 'Consumo de álcool'
+		,V018 ~ 'Utiliza serviços de saúde do SUS'
+		,V019 ~ 'Comunicação com profissionais no SUS'
+		,V020 ~ 'Acompanhamento do intérprete da Central de Interpretação de Libras (CIL)'
+		,V021 ~ 'Utiliza rede particular de saúde'
+		,V022 ~ 'Comunicação com profissionais na rede particular'
+		,V023 ~ 'Utiliza aparelho auditivo'
+		,V024 ~ 'Obteve aparelho pelo SUS'
+		,V025 ~ 'Comunicação com profissionais no SUS com quem obteve aparelho'
+		,V026 ~ 'Utiliza implante coclear'
+		,V027 ~ 'Obteve implante coclear pelo SUS'
+		,V028 ~ 'Comunicação com profissionais no SUS com quem obteve implante coclear'
+	   )
+	 ) %>%
+	 add_n() %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/summary_by_gender.html')
+   #+END_SRC
 
 * Matriz de distâncias
   
-  #+BEGIN_SRC R :exports none :results silent :session 
+  #+BEGIN_SRC R :exports none :results silent :session :eval no
   ## Download dos estabelecimentos do SUS
   ##download.file(url = 'ftp.datasus.gov.br/cnes/BASE_DE_DADOS_CNES_202107.ZIP', destfile = '/tmp/BASE_DE_DADOS_CNES_202107.ZIP', method = 'curl')
 

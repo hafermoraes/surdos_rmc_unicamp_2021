@@ -7,25 +7,20 @@
 	
 * Ideias de análises
 
-  - +soma cumulativa do número de respostas por dia, contendo anotações no gráfico de datas importantes (lançamento na mídia, multiplicadores, etc...)+
-  - +bar-plot do número de respostas por cidade+
-  - +perfil dos respondentes (idade média de N, x% são mulheres, y% tem escolaridade superior, z% auto-avaliam seu estado de saúde como bom, etc...)+
-  - +obter com Nubia/Giovana a lista dos estabelecimentos do SUS nas redondezas dos CEPs informados+
-	- +se disponíveis, podemos fazer uma matriz de distâncias de cada CEP para cada UBS e identificar as UBS com maior necessidade de intérpretes de LIBRAS+
-  - +anotar os gráficos de evolução das respostas com as datas importantes+
-	- +03.09.2021 Live Facebook Assucamp+
-	- +22.08.2021 Envio dos releases à imprensa de campinas+
-	- dd.mm.2021 Multiplicadores
   - matriz de distâncias
-	- +consultar permissões de raspagem de dados no maps.google.com+
 	- scripts em python no repositório da pesquisa
   - comparar dificuldade de contato no SUS e na rede privada com testes não-paramétricos em dois cenários
 	- dados pareados (para quem usa ambas as redes)
 	- dados não pareados (fazendo pleno uso de todas as informações disponíveis)
-  - PNAD tem dados de deficiência? (Jana pesquisa)
   - mencionar viés da nossa pesquisa e usar o argumento que se mesmo pros muito educados imagina para o publico conhecido da pesquisa
   - incluir seções no README.org com as análises simples baseadas nas hipóteses de pesquisa
   - microdados do censo, abrindo o perfil de sexo, religião, escolaridade, entre outros, para cada tipo de resposta à pergunta da deficiência do censo
+  - resumo tabular de todas as variáves
+	- summarytools - [[https://dabblingwithdata.wordpress.com/2018/01/02/my-favourite-r-package-for-summarising-data/][neste link]]
+	- tangram (grammar of tables) - [[https://htmlpreview.github.io/?https://raw.githubusercontent.com/spgarbet/tangram-vignettes/master/example.html][neste link]]
+	- gtsummary - [[https://www.r-bloggers.com/2021/01/creating-beautiful-and-flexible-summary-statistics-tables-in-r-with-gtsummary/][neste link]] e [[https://thatdatatho.com/creating-beautiful-and-flexible-summary-statistics-tables-in-r-with-gtsummary/][melhor neste link]]
+	- 
+	- 
 
 * Lições aprendidas
 
