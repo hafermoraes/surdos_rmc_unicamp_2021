@@ -3,6 +3,7 @@
 #+AUTHOR: Janaina de Rezende Barreto e Rafael Rodrigues de Moraes
 #+DATE: Setembro/2021
 #+STARTUP: inlineimages showall
+#+setupfile: https://raw.githubusercontent.com/fniessen/org-html-themes/master/org/theme-readtheorg.setup
 #+LANGUAGE: pt
 #+OPTIONS: H:3 num:t toc:t @:t \n:nil ::t |:t ':t ^:nil f:t *:t TeX:t LaTeX:t
 #+OPTIONS: date:t author:t
@@ -21,7 +22,7 @@
 
 #+END_SRC
 
-* Configurações
+* Configurações                                                    :noexport:
 
 ** Pacotes do GNU R necessários para as análises
 
@@ -87,19 +88,20 @@
 	[4] tools_3.6.3         digest_0.6.27       checkmate_2.0.0    
 	[7] lattice_0.20-41     lifecycle_1.0.0     tibble_3.1.1       
    [10] gtable_0.3.0        pkgconfig_2.0.3     rlang_0.4.11       
-   [13] Matrix_1.2-18       DBI_1.1.1.9000      cli_2.4.0          
-   [16] rstudioapi_0.13     commonmark_1.7      xfun_0.26          
+   [13] Matrix_1.2-18       rstudioapi_0.13     DBI_1.1.1.9000     
+   [16] cli_2.4.0           commonmark_1.7      xfun_0.26          
    [19] knitr_1.32          withr_2.4.2         rappdirs_0.3.1     
-   [22] sass_0.4.0          generics_0.1.0      vctrs_0.3.8        
-   [25] hms_1.0.0           grid_3.6.3          tidyselect_1.1.0   
-   [28] glue_1.4.2          R6_2.5.0            fansi_0.4.2        
-   [31] survival_3.2-3      farver_2.1.0        purrr_0.3.4        
-   [34] blob_1.2.1          magrittr_2.0.1      backports_1.2.1    
-   [37] splines_3.6.3       htmltools_0.5.1.1   broom.helpers_1.4.0
-   [40] scales_1.1.1        ps_1.6.0            ellipsis_0.3.2     
-   [43] gt_0.3.1            assertthat_0.2.1    colorspace_2.0-0   
-   [46] labeling_0.4.2      utf8_1.2.1          stringi_1.5.3      
-   [49] munsell_0.5.0       broom_0.7.9         crayon_1.4.1
+   [22] sass_0.4.0          fs_1.5.0            generics_0.1.0     
+   [25] vctrs_0.3.8         hms_1.0.0           grid_3.6.3         
+   [28] tidyselect_1.1.0    glue_1.4.2          R6_2.5.0           
+   [31] fansi_0.4.2         survival_3.2-3      farver_2.1.0       
+   [34] purrr_0.3.4         blob_1.2.1          magrittr_2.0.1     
+   [37] backports_1.2.1     ps_1.6.0            splines_3.6.3      
+   [40] htmltools_0.5.1.1   scales_1.1.1        ellipsis_0.3.2     
+   [43] broom.helpers_1.4.0 assertthat_0.2.1    gt_0.3.1           
+   [46] colorspace_2.0-0    labeling_0.4.2      utf8_1.2.1         
+   [49] stringi_1.5.3       munsell_0.5.0       broom_0.7.9        
+   [52] crayon_1.4.1
    #+end_example
 
    no qual as análises foram efetuadas.
@@ -207,6 +209,10 @@
 		 ) 
 	   )
 	   ## Qual é a sua data de nascimento?
+	  ,V004 = case_when(
+		 V004 == '05/08/0081' ~ '05/08/1981'  # correção de data
+		,TRUE ~ as.character(V004)
+	   )
 	  ,V004 = strptime( V004, format = '%d/%m/%Y' )
 	   ## idade na data de preenchimento do questionário
 	  ,V004_idade = as.numeric( round( ( V001 - V004 ) / 365.25, 0 ) )
@@ -542,6 +548,12 @@
 	 dat
 	,file = './data/respostas_tratadas.csv'
    )
+
+
+   write_csv2(
+	 headers
+	,file = './data/headers.csv'
+   )
    #+END_SRC
 
 ** Exporta dados tratados no formato apropriado ao SPSS
@@ -770,7 +782,7 @@
 	
 ** Perfil dos participantes
    
-   Até o momento src_R[:session :results replace ]{ nrow(dat)} {{{results(=254=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
+   Até o momento da confecção deste relatório src_R[:session :results replace ]{ nrow(dat)} {{{results(=261=)}}}  pessoas participaram da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -786,18 +798,18 @@
    #+RESULTS:
    | V010                      |   n |     f |
    |---------------------------+-----+-------|
-   | CAMPINAS                  | 125 | 0.492 |
-   | HORTOLANDIA               |  41 | 0.161 |
-   | SUMARE                    |  22 | 0.087 |
-   | PAULINIA                  |   9 | 0.035 |
-   | VALINHOS                  |   9 | 0.035 |
-   | nil                       |   7 | 0.028 |
-   | AMERICANA                 |   6 | 0.024 |
-   | JAGUARIUNA                |   4 | 0.016 |
-   | AMPARO                    |   3 | 0.012 |
-   | INDAIATUBA                |   3 | 0.012 |
-   | NOVA ODESSA               |   3 | 0.012 |
-   | SANTA BARBARA D OESTE     |   3 | 0.012 |
+   | CAMPINAS                  | 129 | 0.494 |
+   | HORTOLANDIA               |  41 | 0.157 |
+   | SUMARE                    |  24 | 0.092 |
+   | PAULINIA                  |   9 | 0.034 |
+   | VALINHOS                  |   9 | 0.034 |
+   | nil                       |   7 | 0.027 |
+   | AMERICANA                 |   6 | 0.023 |
+   | AMPARO                    |   4 | 0.015 |
+   | JAGUARIUNA                |   4 | 0.015 |
+   | INDAIATUBA                |   3 | 0.011 |
+   | NOVA ODESSA               |   3 | 0.011 |
+   | SANTA BARBARA D OESTE     |   3 | 0.011 |
    | MONTE MOR                 |   2 | 0.008 |
    | BRASILIA, MORAVA CAMPINAS |   1 | 0.004 |
    | CACHOEIRA DE MINAS MG     |   1 | 0.004 |
@@ -816,9 +828,9 @@
    | SAO JOSE DO RIO PARDO     |   1 | 0.004 |
    | SAO PAULO S               |   1 | 0.004 |
    | SAO VICENTE               |   1 | 0.004 |
-   | RESPOSTAS                 | 254 |     1 |
+   | RESPOSTAS                 | 261 |     1 |
 
-   Dos quais até o momento src_R[:session :results replace ]{ nrow(dat %>% filter( VALIDA == TRUE ))} {{{results(=221=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
+   Destes, src_R[:session :results replace ]{ nrow(dat %>% filter( VALIDA == TRUE ))} {{{results(=228=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -839,21 +851,21 @@
    #+RESULTS:
    | V010                  |   n |     f |
    |-----------------------+-----+-------|
-   | CAMPINAS              | 117 | 0.529 |
-   | HORTOLANDIA           |  39 | 0.176 |
-   | SUMARE                |  21 | 0.095 |
-   | VALINHOS              |   9 | 0.041 |
-   | PAULINIA              |   8 | 0.036 |
-   | AMERICANA             |   6 | 0.027 |
+   | CAMPINAS              | 121 | 0.531 |
+   | HORTOLANDIA           |  39 | 0.171 |
+   | SUMARE                |  23 | 0.101 |
+   | VALINHOS              |   9 | 0.039 |
+   | PAULINIA              |   8 | 0.035 |
+   | AMERICANA             |   6 | 0.026 |
    | JAGUARIUNA            |   4 | 0.018 |
    | nil                   |   4 | 0.018 |
-   | NOVA ODESSA           |   3 | 0.014 |
-   | SANTA BARBARA D OESTE |   3 | 0.014 |
-   | AMPARO                |   2 | 0.009 |
+   | AMPARO                |   3 | 0.013 |
+   | NOVA ODESSA           |   3 | 0.013 |
+   | SANTA BARBARA D OESTE |   3 | 0.013 |
    | INDAIATUBA            |   2 | 0.009 |
    | MONTE MOR             |   2 | 0.009 |
-   | COSMOPOLIS            |   1 | 0.005 |
-   | RESPOSTAS             | 221 |     1 |
+   | COSMOPOLIS            |   1 | 0.004 |
+   | RESPOSTAS             | 228 |     1 |
 
    #+BEGIN_SRC R :exports none :results silent :session 
    ## Perfil dos respondentes válidos
@@ -875,7 +887,7 @@
 
 	 fill.color <- 'black'
 	 y.lim <- c(0,1)
-  
+
 	 ## religião
 	 dat %>%
 	   filter(VALIDA == TRUE) %>%
@@ -1108,15 +1120,370 @@
 
    Perfil dos participantes:
 
-   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=48.2=)}}} anos
-   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=54.8=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
-   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=41.2=)}}} % com ensino superior ou pós-graduação
+   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.2=)}}} anos
+   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=55.3=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=40.7=)}}} % com ensino superior ou pós-graduação
    - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=73.7=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
 
-** Resumo das variáveis
+** Hipóteses da pesquisa
 
-   #+BEGIN_SRC R :exports results :results table :colnames yes :session :eval no
+   As seguintes hipóteses foram formuladas antes do início da coleta dos dados.
+
+   Todas as análises nesta seção referem-se aos dados coletados até *15/10/2021*.
+
+*** Quanto ao sexo
+
+	#+begin_quote
+	Hipótese: há uma maior prevalência da surdez entre pessoas do sexo masculino.
+	#+end_quote
+
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## sexo (V005)
+	dat %>%
+	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  count( V005, sort = TRUE) %>%
+	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	  bind_rows(
+		.
+	   ,data.frame(
+		  V005 = 'Total de respostas válidas'
+		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,f=1
+		)
+	  )
+
+	#+END_SRC
+
+	#+RESULTS:
+	| V005                       |   n |     f |
+	|----------------------------+-----+-------|
+	| Feminino                   | 125 | 0.551 |
+	| Masculino                  | 102 | 0.449 |
+	| Total de respostas válidas | 227 |     1 |
+
+*** Quanto à escolaridade
+
+	#+begin_quote
+	Hipótese: surdos usuários de Libras possuem baixa escolaridade.
+	#+end_quote
+
+	Embora src_R[:session :results replace]{  round(100*sum( v006[1:3,3] ),1)  } {{{results(=58.8=)}}} % dos respondentes tenham escolaridade até o ensino médio, o que confirma a hipótese prévia da pesquisa, ressalta-se também o alto número de surdos com alta escolaridade (src_R[:session :results replace]{ round( 100 - 100*sum( v006[1:3,3] ), 1)} {{{results(=41.2=)}}} %).
+
+	Em nosso ponto de vista isto se constitui em um viés da amostra, decorrente também da elevada idade média dos respondentes (src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.2=)}}} anos), sugerindo que a amostra não conseguiu 'furar a bolha' dos surdos próximos à universidade.
+	
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## escolaridade (V006)
+	dat %>%
+	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  count( V006 ) %>%
+	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	  bind_rows(
+		.
+	   ,data.frame(
+		  V006 = 'Total de respostas válidas'
+		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,f=1
+		)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V006                                                |   n |     f |
+	|-----------------------------------------------------+-----+-------|
+	| Nunca estudei                                       |   5 | 0.022 |
+	| Fundamental (ou 1º grau)                            |  26 | 0.115 |
+	| Médio (ou 2º grau)                                  | 103 | 0.454 |
+	| Superior (ou 3º grau)                               |  70 | 0.308 |
+	| Pós-graduação (especialização, mestrado, doutorado) |  22 | 0.097 |
+	| nil                                                 |   1 | 0.004 |
+	| Total de respostas válidas                          | 227 |     1 |
+
+*** Quanto à religião
+
+	#+begin_quote
+	Hipótese: a maioria dos surdos é evangélico.
+	#+end_quote
+
+	Embora tenha sido confirmada a hipótese de pesquisa, chama a atenção o alto número de surdos autodeclarados sem religião (quase 1 a cada 5 surdos).
+	
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## religião (V009_agrp)
+	dat %>%
+	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  count( V009_agrp, sort=TRUE ) %>%
+	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	  bind_rows(
+		.
+	   ,data.frame(
+		  V009_agrp = 'Total de respostas válidas'
+		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,f=1
+		)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V009_agrp                  |   n |     f |
+	|----------------------------+-----+-------|
+	| Evangélica                 |  92 | 0.405 |
+	| Católica                   |  66 | 0.291 |
+	| Sem religião               |  40 | 0.176 |
+	| Espírita                   |   9 |  0.04 |
+	| Outra                      |   6 | 0.026 |
+	| Não informada              |   4 | 0.018 |
+	| Adventista                 |   3 | 0.013 |
+	| Testemunha de Jeová        |   3 | 0.013 |
+	| Umbanda / Candomblé        |   3 | 0.013 |
+	| Metodista                  |   1 | 0.004 |
+	| Total de respostas válidas | 227 |     1 |
+
+*** Quanto à situação de emprego
+
+	#+begin_quote
+	Hipótese: Há alta taxa de desemprego entre surdos
+	#+end_quote
+
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## trabalho (V007)
+	dat %>%
+	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  count( V007, sort = TRUE) %>%
+	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	  bind_rows(
+		.
+	   ,data.frame(
+		  V007 = 'Total de respostas válidas'
+		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,f=1
+		)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V007                                     |   n |     f |
+	|------------------------------------------+-----+-------|
+	| Sim, trabalho                            | 146 | 0.643 |
+	| Não, estou desempregado                  |  52 | 0.229 |
+	| Não, porque sou aposentado               |  17 | 0.075 |
+	| Não trabalho e recebo benefício BPC/INSS |  12 | 0.053 |
+	| Total de respostas válidas               | 227 |     1 |
+
+*** Quanto ao uso de serviços públicos de saúde (SUS)
+
+	#+begin_quote
+	Hipótese: devido à baixa escolaridade e consequentemente baixa renda, espera-se um percentual grande de usuários do serviço público de saúde.
+	#+end_quote
+
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## uso do SUS (V018)
+	dat %>%
+	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  count( V018, sort=TRUE ) %>%
+	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	  bind_rows(
+		.
+	   ,data.frame(
+		  V018 = 'Total de respostas válidas'
+		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,f=1
+		)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V018                       |   n |     f |
+	|----------------------------+-----+-------|
+	| Sim                        | 170 | 0.749 |
+	| Não                        |  57 | 0.251 |
+	| Total de respostas válidas | 227 |     1 |
+
+*** Quanto à estrutura pública adequada de comunicação paciente-médico
+
+	#+begin_quote
+	Hipótese: ausência de estrutura pública adequada de comunicação paciente-médico, principalmente pela não disponibilização de intérprete (prefeitura) ou falta de familiares/conhecidos fluentes em LIBRAS que auxiliem o paciente.
+	#+end_quote
+
+	Em relação aos surdos que usam os serviços do SUS, resume-se a seguir a avaliação da comunicação paciente-médico
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## comunicação profissionais do SUS (V019)
+	dat %>%
+	  filter( V001 <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ) %>%
+	  count( V019 ) %>%
+	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	  bind_rows(
+		.
+	   ,data.frame(
+		  V019 = 'Total de respostas válidas'
+		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ))
+		 ,f=1
+		)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V019                                                |   n |     f |
+	|-----------------------------------------------------+-----+-------|
+	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  38 | 0.224 |
+	| Ruim, não sabem LIBRAS e preciso escrever português |  26 | 0.153 |
+	| Ruim, não consigo comunicação                       |  42 | 0.247 |
+	| Boa, tem intérprete que me ajuda                    |  19 | 0.112 |
+	| Boa, porque familiar me ajuda                       |  38 | 0.224 |
+	| Boa, o profissional de saúde sabe LIBRAS            |   4 | 0.024 |
+	| nil                                                 |   3 | 0.018 |
+	| Total de respostas válidas                          | 170 |     1 |
+
+	Em relação aos surdos que usam os serviços do SUS, resume-se a seguir a avaliação da experiência com a Central de Intérprete de Libras (CIL)
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## Central de Intérprete de Libras (V020)
+	dat %>%
+	  filter( V001 <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ) %>%
+	  count( V020 ) %>%
+	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	  bind_rows(
+		.
+	   ,data.frame(
+		  V020 = 'Total de respostas válidas'
+		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ))
+		 ,f=1
+		)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V020                                       |   n |     f |
+	|--------------------------------------------+-----+-------|
+	| Sim                                        |  29 | 0.171 |
+	| Não, porque eu esqueço de pedir            |  24 | 0.141 |
+	| Não, porque não tem intérprete livre nunca |  39 | 0.229 |
+	| nil                                        |  78 | 0.459 |
+	| Total de respostas válidas                 | 170 |     1 |
+
+	
+	Em relação aos surdos que conseguiram seu aparelho auditivo pelo SUS, resume-se a seguir a avaliação da comunicação com o profissional do SUS
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## aparelho auditivo pelo SUS (V025)
+	dat %>%
+	  filter( V001 <= '2021-10-15', VALIDA == TRUE, V023 == 'Sim', V024 == 'Sim' ) %>%
+	  count( V025 ) %>%
+	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	  bind_rows(
+		.
+	   ,data.frame(
+		  V025 = 'Total de respostas válidas'
+		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE, V023 == 'Sim', V024 == 'Sim' ))
+		 ,f=1
+		)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V025                                               |  n |     f |
+	|----------------------------------------------------+----+-------|
+	| Ruim, não sabe LIBRAS e sou obrigado a oralizar    | 15 | 0.273 |
+	| Ruim, não sabe LIBRAS e preciso escrever português |  7 | 0.127 |
+	| Ruim, não consigo comunicação                      | 10 | 0.182 |
+	| Boa, tem intérprete que me ajuda                   |  2 | 0.036 |
+	| Boa, porque familiar me ajuda                      | 13 | 0.236 |
+	| Boa, o profissional de saúde sabe LIBRAS           |  4 | 0.073 |
+	| nil                                                |  4 | 0.073 |
+	| Total de respostas válidas                         | 55 |     1 |
+
+
+	Em relação aos surdos que conseguiram seu implante coclear pelo SUS, resume-se a seguir a avaliação da comunicação com o profissional do SUS
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## implante coclear pelo SUS (V028)
+	dat %>%
+	  filter( V001 <= '2021-10-15', VALIDA == TRUE, V026 == 'Sim', V027 == 'Sim' ) %>%
+	  count( V028 ) %>%
+	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	  bind_rows(
+		.
+	   ,data.frame(
+		  V028 = 'Total de respostas válidas'
+		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE, V026 == 'Sim', V027 == 'Sim' ))
+		 ,f=1
+		)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V028                                               | n |     f |
+	|----------------------------------------------------+---+-------|
+	| Ruim, não sabe LIBRAS e sou obrigado a oralizar    | 3 | 0.375 |
+	| Ruim, não sabe LIBRAS e preciso escrever português | 2 |  0.25 |
+	| Boa, porque familiar me ajuda                      | 2 |  0.25 |
+	| Boa, o profissional de saúde sabe LIBRAS           | 1 | 0.125 |
+	| Total de respostas válidas                         | 8 |     1 |
+
+*** Quanto ao uso de serviços privados de saúde
+
+	#+begin_quote
+	Hipótese: devido à baixa escolaridade e consequentemente baixa renda, espera-se um percentual pequeno de usuários do serviço privado de saúde.
+	#+end_quote
+
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## uso de serviços privados (V021)
+	dat %>%
+	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  count( V021, sort=TRUE ) %>%
+	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	  bind_rows(
+		.
+	   ,data.frame(
+		  V021 = 'Total de respostas válidas'
+		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,f=1
+		)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V021                       |   n |     f |
+	|----------------------------+-----+-------|
+	| Sim                        | 178 | 0.784 |
+	| Não                        |  49 | 0.216 |
+	| Total de respostas válidas | 227 |     1 |
+
+*** Quanto à estrutura privada adequada de comunicação paciente-médico
+
+	#+begin_quote
+	Hipótese: ausência de estrutura privada adequada de comunicação paciente-médico, principalmente pela não disponibilização de intérprete (prefeitura e plano de saúde/convênio) ou falta de familiares/conhecidos fluentes em LIBRAS que auxiliem o paciente.
+	#+end_quote
+
+	Em relação aos surdos que usam os serviços privados de saúde, resume-se a seguir a avaliação da comunicação paciente-médico
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## comunicação profissionais da rede privada (V022)
+	dat %>%
+	  filter( V001 <= '2021-10-15', VALIDA == TRUE, V021 == 'Sim' ) %>%
+	  count( V022 ) %>%
+	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
+	  bind_rows(
+		.
+	   ,data.frame(
+		  V022 = 'Total de respostas válidas'
+		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE, V021 == 'Sim' ))
+		 ,f=1
+		)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V022                                                |   n |     f |
+	|-----------------------------------------------------+-----+-------|
+	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  38 | 0.213 |
+	| Ruim, não sabem LIBRAS e preciso escrever português |  27 | 0.152 |
+	| Ruim, não consigo comunicação                       |  54 | 0.303 |
+	| Boa, tem intérprete que me ajuda                    |  15 | 0.084 |
+	| Boa, porque familiar me ajuda                       |  34 | 0.191 |
+	| Boa, o profissional de saúde sabe LIBRAS            |   2 | 0.011 |
+	| nil                                                 |   8 | 0.045 |
+	| Total de respostas válidas                          | 178 |     1 |
+
+
+** Resumo das variáveis                                            :noexport:
+
+   #+BEGIN_SRC R :exports results :results silent :eval no :session 
    ## descritivo das variáveis
 
    ## sem segmentar
@@ -1128,6 +1495,7 @@
 	  ,statistic = all_continuous() ~ c('{mean} ( {min} : {max} )')
 	  ,label = list(
 		 V004_idade ~ 'Idade'
+		,V005 ~ 'Sexo'
 		,V006 ~ 'Escolaridade'
 		,V007 ~ 'Emprego'
 		,V008 ~ 'Raça'
@@ -1152,7 +1520,6 @@
 	   )
 	 ) %>%
 	 add_n() %>%
-	 add_p() %>%
 	 bold_labels() %>%
 	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
 	 as_gt() %>%
@@ -1198,16 +1565,101 @@
 	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
 	 as_gt() %>%
 	 gt::gtsave( filename = './data/summary_by_gender.html')
+
+
+
+   ## por uso de aparelho auditivo (V023)
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 select( -c(V001, V002, V003, V004, V009, V010_rmc, V011, V012, VALIDA) ) %>%
+	 tbl_summary(
+	   by = V023
+	  ,missing_text = 'Não informado'
+	  ,statistic = all_continuous() ~ c('{mean} ( {min} : {max} )')
+	  ,label = list(
+		 V004_idade ~ 'Idade'
+		,V006 ~ 'Escolaridade'
+		,V007 ~ 'Emprego'
+		,V008 ~ 'Raça'
+		,V009_agrp ~ 'Religião'
+		,V010 ~ 'Município de residência'
+		,V013 ~ 'Diabetes'
+		,V014 ~ 'Hipertensão arterial'
+		,V015 ~ 'Auto-avaliação sobre estado de saúde'
+		,V016 ~ 'Tagabismo'
+		,V017 ~ 'Consumo de álcool'
+		,V018 ~ 'Utiliza serviços de saúde do SUS'
+		,V019 ~ 'Comunicação com profissionais no SUS'
+		,V020 ~ 'Acompanhamento do intérprete da Central de Interpretação de Libras (CIL)'
+		,V021 ~ 'Utiliza rede particular de saúde'
+		,V022 ~ 'Comunicação com profissionais na rede particular'
+		## ,V023 ~ 'Utiliza aparelho auditivo'
+		,V024 ~ 'Obteve aparelho pelo SUS'
+		,V025 ~ 'Comunicação com profissionais no SUS com quem obteve aparelho'
+		,V026 ~ 'Utiliza implante coclear'
+		,V027 ~ 'Obteve implante coclear pelo SUS'
+		,V028 ~ 'Comunicação com profissionais no SUS com quem obteve implante coclear'
+	   )
+	 ) %>%
+	 add_n() %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/summary_by_hearing_instrument.html')
+
+
+   ## por uso de implante coclear (V026)
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 select( -c(V001, V002, V003, V004, V009, V010_rmc, V011, V012, VALIDA) ) %>%
+	 tbl_summary(
+	   by = V026
+	  ,missing_text = 'Não informado'
+	  ,statistic = all_continuous() ~ c('{mean} ( {min} : {max} )')
+	  ,label = list(
+		 V004_idade ~ 'Idade'
+		,V006 ~ 'Escolaridade'
+		,V007 ~ 'Emprego'
+		,V008 ~ 'Raça'
+		,V009_agrp ~ 'Religião'
+		,V010 ~ 'Município de residência'
+		,V013 ~ 'Diabetes'
+		,V014 ~ 'Hipertensão arterial'
+		,V015 ~ 'Auto-avaliação sobre estado de saúde'
+		,V016 ~ 'Tagabismo'
+		,V017 ~ 'Consumo de álcool'
+		,V018 ~ 'Utiliza serviços de saúde do SUS'
+		,V019 ~ 'Comunicação com profissionais no SUS'
+		,V020 ~ 'Acompanhamento do intérprete da Central de Interpretação de Libras (CIL)'
+		,V021 ~ 'Utiliza rede particular de saúde'
+		,V022 ~ 'Comunicação com profissionais na rede particular'
+		,V023 ~ 'Utiliza aparelho auditivo'
+		,V024 ~ 'Obteve aparelho pelo SUS'
+		,V025 ~ 'Comunicação com profissionais no SUS com quem obteve aparelho'
+		## ,V026 ~ 'Utiliza implante coclear'
+		,V027 ~ 'Obteve implante coclear pelo SUS'
+		,V028 ~ 'Comunicação com profissionais no SUS com quem obteve implante coclear'
+	   )
+	 ) %>%
+	 add_n() %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/summary_by_cochlear_implant.html')
    #+END_SRC
 
-* Matriz de distâncias
+
+
+* Matriz de distâncias                                             :noexport:
   
   #+BEGIN_SRC R :exports none :results silent :session :eval no
   ## Download dos estabelecimentos do SUS
   ##download.file(url = 'ftp.datasus.gov.br/cnes/BASE_DE_DADOS_CNES_202107.ZIP', destfile = '/tmp/BASE_DE_DADOS_CNES_202107.ZIP', method = 'curl')
 
   unzip(
-	zipfile = '/tmp/BASE_DE_DADOS_CNES_202107.ZIP'
+	zipfile = '~/BASE_DE_DADOS_CNES_202107.ZIP'
    ,files = c(
 	  'tbEstabelecimento202107.csv'
 	 ,'tbNaturezaJuridica202107.csv'
