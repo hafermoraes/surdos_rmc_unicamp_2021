@@ -1,26 +1,32 @@
 #+startup: inlineimages align contents
 
-
 * Pendências constantes até a finalização da pesquisa
 
   - email TCLE participantes
 	
+
+* Análise estatítica
+
+  - [X] mencionar viés da nossa pesquisa e usar o argumento que se mesmo pros muito educados imagina para o publico conhecido da pesquisa
+  - [X] incluir seções no README.org com as análises simples baseadas nas hipóteses de pesquisa
+  - [0%] comparar dificuldade de contato no SUS e na rede privada com testes não-paramétricos em dois cenários
+	- [ ] dados pareados (para quem usa ambas as redes)
+	- [ ] dados não pareados (fazendo pleno uso de todas as informações disponíveis)
+  - [100%] comparar situação de emprego por
+	- [X] sexo
+	- [X] faixa etária
+	- [X] escolaridade
+	- [X] raça
+
 * Ideias de análises
 
   - matriz de distâncias
 	- scripts em python no repositório da pesquisa
-  - comparar dificuldade de contato no SUS e na rede privada com testes não-paramétricos em dois cenários
-	- dados pareados (para quem usa ambas as redes)
-	- dados não pareados (fazendo pleno uso de todas as informações disponíveis)
-  - mencionar viés da nossa pesquisa e usar o argumento que se mesmo pros muito educados imagina para o publico conhecido da pesquisa
-  - incluir seções no README.org com as análises simples baseadas nas hipóteses de pesquisa
   - microdados do censo, abrindo o perfil de sexo, religião, escolaridade, entre outros, para cada tipo de resposta à pergunta da deficiência do censo
   - resumo tabular de todas as variáves
 	- summarytools - [[https://dabblingwithdata.wordpress.com/2018/01/02/my-favourite-r-package-for-summarising-data/][neste link]]
 	- tangram (grammar of tables) - [[https://htmlpreview.github.io/?https://raw.githubusercontent.com/spgarbet/tangram-vignettes/master/example.html][neste link]]
 	- gtsummary - [[https://www.r-bloggers.com/2021/01/creating-beautiful-and-flexible-summary-statistics-tables-in-r-with-gtsummary/][neste link]] e [[https://thatdatatho.com/creating-beautiful-and-flexible-summary-statistics-tables-in-r-with-gtsummary/][melhor neste link]]
-	- 
-	- 
 
 * Lições aprendidas
 

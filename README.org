@@ -22,7 +22,7 @@
 
 #+END_SRC
 
-* Configurações                                                    :noexport:
+* Configurações
 
 ** Pacotes do GNU R necessários para as análises
 
@@ -85,23 +85,19 @@
 
    loaded via a namespace (and not attached):
 	[1] pillar_1.6.0        compiler_3.6.3      forcats_0.5.1      
-	[4] tools_3.6.3         digest_0.6.27       checkmate_2.0.0    
-	[7] lattice_0.20-41     lifecycle_1.0.0     tibble_3.1.1       
-   [10] gtable_0.3.0        pkgconfig_2.0.3     rlang_0.4.11       
-   [13] Matrix_1.2-18       rstudioapi_0.13     DBI_1.1.1.9000     
-   [16] cli_2.4.0           commonmark_1.7      xfun_0.26          
-   [19] knitr_1.32          withr_2.4.2         rappdirs_0.3.1     
-   [22] sass_0.4.0          fs_1.5.0            generics_0.1.0     
-   [25] vctrs_0.3.8         hms_1.0.0           grid_3.6.3         
-   [28] tidyselect_1.1.0    glue_1.4.2          R6_2.5.0           
-   [31] fansi_0.4.2         survival_3.2-3      farver_2.1.0       
-   [34] purrr_0.3.4         blob_1.2.1          magrittr_2.0.1     
-   [37] backports_1.2.1     ps_1.6.0            splines_3.6.3      
-   [40] htmltools_0.5.1.1   scales_1.1.1        ellipsis_0.3.2     
-   [43] broom.helpers_1.4.0 assertthat_0.2.1    gt_0.3.1           
-   [46] colorspace_2.0-0    labeling_0.4.2      utf8_1.2.1         
-   [49] stringi_1.5.3       munsell_0.5.0       broom_0.7.9        
-   [52] crayon_1.4.1
+	[4] tools_3.6.3         digest_0.6.27       lattice_0.20-41    
+	[7] lifecycle_1.0.0     tibble_3.1.1        gtable_0.3.0       
+   [10] pkgconfig_2.0.3     rlang_0.4.11        Matrix_1.2-18      
+   [13] DBI_1.1.1.9000      cli_2.4.0           xfun_0.26          
+   [16] knitr_1.32          withr_2.4.2         generics_0.1.0     
+   [19] vctrs_0.3.8         hms_1.0.0           grid_3.6.3         
+   [22] tidyselect_1.1.0    glue_1.4.2          R6_2.5.0           
+   [25] fansi_0.4.2         survival_3.2-3      purrr_0.3.4        
+   [28] blob_1.2.1          magrittr_2.0.1      splines_3.6.3      
+   [31] htmltools_0.5.1.1   scales_1.1.1        ellipsis_0.3.2     
+   [34] broom.helpers_1.4.0 assertthat_0.2.1    gt_0.3.1           
+   [37] colorspace_2.0-0    utf8_1.2.1          stringi_1.5.3      
+   [40] munsell_0.5.0       crayon_1.4.1
    #+end_example
 
    no qual as análises foram efetuadas.
@@ -866,7 +862,7 @@
    | MONTE MOR             |   2 | 0.009 |
    | COSMOPOLIS            |   1 | 0.004 |
    | RESPOSTAS             | 228 |     1 |
-
+   
    #+BEGIN_SRC R :exports none :results silent :session 
    ## Perfil dos respondentes válidos
 
@@ -1141,26 +1137,25 @@
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## sexo (V005)
 	dat %>%
-	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ) %>%
 	  count( V005, sort = TRUE) %>%
 	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	  bind_rows(
 		.
 	   ,data.frame(
 		  V005 = 'Total de respostas válidas'
-		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,n=nrow(dat %>% filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ))
 		 ,f=1
 		)
 	  )
-
 	#+END_SRC
 
 	#+RESULTS:
 	| V005                       |   n |     f |
 	|----------------------------+-----+-------|
-	| Feminino                   | 125 | 0.551 |
-	| Masculino                  | 102 | 0.449 |
-	| Total de respostas válidas | 227 |     1 |
+	| Feminino                   | 126 | 0.553 |
+	| Masculino                  | 102 | 0.447 |
+	| Total de respostas válidas | 228 |     1 |
 
 *** Quanto à escolaridade
 
@@ -1168,21 +1163,21 @@
 	Hipótese: surdos usuários de Libras possuem baixa escolaridade.
 	#+end_quote
 
-	Embora src_R[:session :results replace]{  round(100*sum( v006[1:3,3] ),1)  } {{{results(=58.8=)}}} % dos respondentes tenham escolaridade até o ensino médio, o que confirma a hipótese prévia da pesquisa, ressalta-se também o alto número de surdos com alta escolaridade (src_R[:session :results replace]{ round( 100 - 100*sum( v006[1:3,3] ), 1)} {{{results(=41.2=)}}} %).
+	Embora src_R[:session :results replace]{  round(100*sum( v006[1:3,3] ),1)  } {{{results(=58.8=)}}} % dos respondentes tenham escolaridade até o ensino médio, o que confirma a hipótese prévia da pesquisa, ressalta-se também o alto número de surdos com alta escolaridade (src_R[:session :results replace]{ round( 100*sum( v006[4:5,3] ), 1)} {{{results(=40.7=)}}} %).
 
 	Em nosso ponto de vista isto se constitui em um viés da amostra, decorrente também da elevada idade média dos respondentes (src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.2=)}}} anos), sugerindo que a amostra não conseguiu 'furar a bolha' dos surdos próximos à universidade.
 	
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## escolaridade (V006)
 	dat %>%
-	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ) %>%
 	  count( V006 ) %>%
 	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	  bind_rows(
 		.
 	   ,data.frame(
 		  V006 = 'Total de respostas válidas'
-		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,n=nrow(dat %>% filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ))
 		 ,f=1
 		)
 	  )
@@ -1210,14 +1205,14 @@
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## religião (V009_agrp)
 	dat %>%
-	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ) %>%
 	  count( V009_agrp, sort=TRUE ) %>%
 	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	  bind_rows(
 		.
 	   ,data.frame(
 		  V009_agrp = 'Total de respostas válidas'
-		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,n=nrow(dat %>% filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ))
 		 ,f=1
 		)
 	  )
@@ -1247,14 +1242,14 @@
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## trabalho (V007)
 	dat %>%
-	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ) %>%
 	  count( V007, sort = TRUE) %>%
 	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	  bind_rows(
 		.
 	   ,data.frame(
 		  V007 = 'Total de respostas válidas'
-		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,n=nrow(dat %>% filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ))
 		 ,f=1
 		)
 	  )
@@ -1269,6 +1264,145 @@
 	| Não trabalho e recebo benefício BPC/INSS |  12 | 0.053 |
 	| Total de respostas válidas               | 227 |     1 |
 
+**** segmentada por nível de escolaridade
+
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## trabalho (V007) por escolaridade (V006)
+	dat %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ) %>%
+	  mutate(
+		V006_grp = case_when(
+		  as.character(V006) %in% c(
+									'Nunca estudei'
+								   ,'Fundamental (ou 1º grau)'
+								   ,'Médio (ou 2º grau)'
+								  ) ~ 'Médio'
+		  ,TRUE ~ 'Superior'
+		)
+	   ,empr = case_when(
+		   as.character(V007) == 'Sim, trabalho' ~ 'empregado'
+		  ,as.character(V007) == 'Não, estou desempregado' ~ 'desempregado'
+		 )
+	  ) %>%
+	  count( empr, V006 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = V006
+		,names_from = empr
+		,values_from = n
+		,values_fill = 0
+	  ) %>%
+	  mutate(
+		pct_desempregado = round( 100*desempregado/(desempregado+empregado), 2)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V006                                                | desempregado | empregado | pct_desempregado |
+	|-----------------------------------------------------+--------------+-----------+------------------|
+	| Nunca estudei                                       |            1 |         0 |              100 |
+	| Fundamental (ou 1º grau)                            |            4 |         8 |            33.33 |
+	| Médio (ou 2º grau)                                  |           28 |        70 |            28.57 |
+	| Superior (ou 3º grau)                               |           15 |        50 |            23.08 |
+	| Pós-graduação (especialização, mestrado, doutorado) |            4 |        17 |            19.05 |
+
+**** segmentada por sexo
+
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## trabalho (V007) por sexo (V005)
+	dat %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ) %>%
+	  mutate(
+		empr = case_when(
+		  as.character(V007) == 'Sim, trabalho' ~ 'empregado'
+		 ,as.character(V007) == 'Não, estou desempregado' ~ 'desempregado'
+		)
+	  ) %>% 
+	  count( empr, V005 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = V005
+	   ,names_from = empr
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  mutate(
+		pct_desempregado = round( 100*desempregado/(desempregado+empregado), 2)
+	  )
+	#+END_SRC
+	
+	#+RESULTS:
+	| V005      | desempregado | empregado | pct_desempregado |
+	|-----------+--------------+-----------+------------------|
+	| Feminino  |           37 |        73 |            33.64 |
+	| Masculino |           15 |        73 |            17.05 |
+
+**** segmentada por raça
+
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## trabalho (V007) por raça (V008)
+	dat %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ) %>%
+	  mutate(
+		empr = case_when(
+		  as.character(V007) == 'Sim, trabalho' ~ 'empregado'
+		 ,as.character(V007) == 'Não, estou desempregado' ~ 'desempregado'
+		)
+	  ) %>% 
+	  count( empr, V008 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = V008
+	   ,names_from = empr
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  mutate(
+		pct_desempregado = round( 100*desempregado/(desempregado+empregado), 2)
+	  )
+	#+END_SRC
+
+	#+RESULTS:
+	| V008    | desempregado | empregado | pct_desempregado |
+	|---------+--------------+-----------+------------------|
+	| Branca  |           34 |       116 |            22.67 |
+	| Parda   |           18 |        19 |            48.65 |
+	| Preta   |            0 |         5 |                0 |
+	| Amarela |            0 |         6 |                0 |
+
+**** segmentada por faixa etária
+
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## trabalho (V007) por faixa etária (V004_idade)
+	dat %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ) %>%
+	  mutate(
+		faixa_etaria = cut( V004_idade, breaks = c(19,30,40,50,65,120), include.lowest = TRUE )
+	   ,empr = case_when(
+		   as.character(V007) == 'Sim, trabalho' ~ 'empregado'
+		  ,as.character(V007) == 'Não, estou desempregado' ~ 'desempregado'
+		 )
+	  ) %>%
+	  count( empr, faixa_etaria ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = faixa_etaria
+	   ,names_from = empr
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  mutate(
+		pct_desempregado = round( 100 * desempregado / (desempregado + empregado), 2) )
+	#+END_SRC
+
+	#+RESULTS:
+	| faixa_etaria | desempregado | empregado | pct_desempregado |
+	|--------------+--------------+-----------+------------------|
+	| [19,30]      |           18 |        30 |             37.5 |
+	| (30,40]      |           19 |        56 |            25.33 |
+	| (40,50]      |           12 |        42 |            22.22 |
+	| (50,65]      |            3 |        11 |            21.43 |
+	
 *** Quanto ao uso de serviços públicos de saúde (SUS)
 
 	#+begin_quote
@@ -1278,14 +1412,14 @@
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## uso do SUS (V018)
 	dat %>%
-	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ) %>%
 	  count( V018, sort=TRUE ) %>%
 	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	  bind_rows(
 		.
 	   ,data.frame(
 		  V018 = 'Total de respostas válidas'
-		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,n=nrow(dat %>% filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ))
 		 ,f=1
 		)
 	  )
@@ -1308,14 +1442,14 @@
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## comunicação profissionais do SUS (V019)
 	dat %>%
-	  filter( V001 <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ) %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ) %>%
 	  count( V019 ) %>%
 	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	  bind_rows(
 		.
 	   ,data.frame(
 		  V019 = 'Total de respostas válidas'
-		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ))
+		 ,n=nrow(dat %>% filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ))
 		 ,f=1
 		)
 	  )
@@ -1337,14 +1471,14 @@
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## Central de Intérprete de Libras (V020)
 	dat %>%
-	  filter( V001 <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ) %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ) %>%
 	  count( V020 ) %>%
 	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	  bind_rows(
 		.
 	   ,data.frame(
 		  V020 = 'Total de respostas válidas'
-		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ))
+		 ,n=nrow(dat %>% filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ))
 		 ,f=1
 		)
 	  )
@@ -1364,14 +1498,14 @@
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## aparelho auditivo pelo SUS (V025)
 	dat %>%
-	  filter( V001 <= '2021-10-15', VALIDA == TRUE, V023 == 'Sim', V024 == 'Sim' ) %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V023 == 'Sim', V024 == 'Sim' ) %>%
 	  count( V025 ) %>%
 	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	  bind_rows(
 		.
 	   ,data.frame(
 		  V025 = 'Total de respostas válidas'
-		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE, V023 == 'Sim', V024 == 'Sim' ))
+		 ,n=nrow(dat %>% filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V023 == 'Sim', V024 == 'Sim' ))
 		 ,f=1
 		)
 	  )
@@ -1394,14 +1528,14 @@
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## implante coclear pelo SUS (V028)
 	dat %>%
-	  filter( V001 <= '2021-10-15', VALIDA == TRUE, V026 == 'Sim', V027 == 'Sim' ) %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V026 == 'Sim', V027 == 'Sim' ) %>%
 	  count( V028 ) %>%
 	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	  bind_rows(
 		.
 	   ,data.frame(
 		  V028 = 'Total de respostas válidas'
-		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE, V026 == 'Sim', V027 == 'Sim' ))
+		 ,n=nrow(dat %>% filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V026 == 'Sim', V027 == 'Sim' ))
 		 ,f=1
 		)
 	  )
@@ -1425,14 +1559,14 @@
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## uso de serviços privados (V021)
 	dat %>%
-	  filter( V001 <= '2021-10-15', VALIDA == TRUE ) %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ) %>%
 	  count( V021, sort=TRUE ) %>%
 	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	  bind_rows(
 		.
 	   ,data.frame(
 		  V021 = 'Total de respostas válidas'
-		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE ))
+		 ,n=nrow(dat %>% filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE ))
 		 ,f=1
 		)
 	  )
@@ -1455,14 +1589,14 @@
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## comunicação profissionais da rede privada (V022)
 	dat %>%
-	  filter( V001 <= '2021-10-15', VALIDA == TRUE, V021 == 'Sim' ) %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V021 == 'Sim' ) %>%
 	  count( V022 ) %>%
 	  mutate( f = round( n/sum(n), digits = 3) ) %>% 
 	  bind_rows(
 		.
 	   ,data.frame(
 		  V022 = 'Total de respostas válidas'
-		 ,n=nrow(dat %>% filter( V001 <= '2021-10-15', VALIDA == TRUE, V021 == 'Sim' ))
+		 ,n=nrow(dat %>% filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V021 == 'Sim' ))
 		 ,f=1
 		)
 	  )
@@ -1480,8 +1614,8 @@
 	| nil                                                 |   8 | 0.045 |
 	| Total de respostas válidas                          | 178 |     1 |
 
-
-** Resumo das variáveis                                            :noexport:
+	
+** Resumo das variáveis
 
    #+BEGIN_SRC R :exports results :results silent :eval no :session 
    ## descritivo das variáveis
@@ -1652,7 +1786,7 @@
 
 
 
-* Matriz de distâncias                                             :noexport:
+* Matriz de distâncias
   
   #+BEGIN_SRC R :exports none :results silent :session :eval no
   ## Download dos estabelecimentos do SUS
