@@ -1121,7 +1121,7 @@
    - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=40.7=)}}} % com ensino superior ou pós-graduação
    - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=73.7=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
-
+	 
 ** Hipóteses da pesquisa
 
    As seguintes hipóteses foram formuladas antes do início da coleta dos dados.
@@ -1187,12 +1187,12 @@
 	| V006                                                |   n |     f |
 	|-----------------------------------------------------+-----+-------|
 	| Nunca estudei                                       |   5 | 0.022 |
-	| Fundamental (ou 1º grau)                            |  26 | 0.115 |
-	| Médio (ou 2º grau)                                  | 103 | 0.454 |
-	| Superior (ou 3º grau)                               |  70 | 0.308 |
-	| Pós-graduação (especialização, mestrado, doutorado) |  22 | 0.097 |
+	| Fundamental (ou 1º grau)                            |  26 | 0.114 |
+	| Médio (ou 2º grau)                                  | 103 | 0.452 |
+	| Superior (ou 3º grau)                               |  71 | 0.311 |
+	| Pós-graduação (especialização, mestrado, doutorado) |  22 | 0.096 |
 	| nil                                                 |   1 | 0.004 |
-	| Total de respostas válidas                          | 227 |     1 |
+	| Total de respostas válidas                          | 228 |     1 |
 
 *** Quanto à religião
 
@@ -1221,17 +1221,17 @@
 	#+RESULTS:
 	| V009_agrp                  |   n |     f |
 	|----------------------------+-----+-------|
-	| Evangélica                 |  92 | 0.405 |
-	| Católica                   |  66 | 0.291 |
-	| Sem religião               |  40 | 0.176 |
-	| Espírita                   |   9 |  0.04 |
+	| Evangélica                 |  92 | 0.404 |
+	| Católica                   |  66 | 0.289 |
+	| Sem religião               |  41 |  0.18 |
+	| Espírita                   |   9 | 0.039 |
 	| Outra                      |   6 | 0.026 |
 	| Não informada              |   4 | 0.018 |
 	| Adventista                 |   3 | 0.013 |
 	| Testemunha de Jeová        |   3 | 0.013 |
 	| Umbanda / Candomblé        |   3 | 0.013 |
 	| Metodista                  |   1 | 0.004 |
-	| Total de respostas válidas | 227 |     1 |
+	| Total de respostas válidas | 228 |     1 |
 
 *** Quanto à situação de emprego
 
@@ -1258,11 +1258,11 @@
 	#+RESULTS:
 	| V007                                     |   n |     f |
 	|------------------------------------------+-----+-------|
-	| Sim, trabalho                            | 146 | 0.643 |
-	| Não, estou desempregado                  |  52 | 0.229 |
+	| Sim, trabalho                            | 146 |  0.64 |
+	| Não, estou desempregado                  |  52 | 0.228 |
 	| Não, porque sou aposentado               |  17 | 0.075 |
-	| Não trabalho e recebo benefício BPC/INSS |  12 | 0.053 |
-	| Total de respostas válidas               | 227 |     1 |
+	| Não trabalho e recebo benefício BPC/INSS |  13 | 0.057 |
+	| Total de respostas válidas               | 228 |     1 |
 
 **** segmentada por nível de escolaridade
 
@@ -1426,11 +1426,11 @@
 	#+END_SRC
 
 	#+RESULTS:
-	| V018                       |   n |     f |
-	|----------------------------+-----+-------|
-	| Sim                        | 170 | 0.749 |
-	| Não                        |  57 | 0.251 |
-	| Total de respostas válidas | 227 |     1 |
+	| V018                       |   n |    f |
+	|----------------------------+-----+------|
+	| Sim                        | 171 | 0.75 |
+	| Não                        |  57 | 0.25 |
+	| Total de respostas válidas | 228 |    1 |
 
 *** Quanto à estrutura pública adequada de comunicação paciente-médico
 
@@ -1458,14 +1458,14 @@
 	#+RESULTS:
 	| V019                                                |   n |     f |
 	|-----------------------------------------------------+-----+-------|
-	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  38 | 0.224 |
-	| Ruim, não sabem LIBRAS e preciso escrever português |  26 | 0.153 |
-	| Ruim, não consigo comunicação                       |  42 | 0.247 |
-	| Boa, tem intérprete que me ajuda                    |  19 | 0.112 |
-	| Boa, porque familiar me ajuda                       |  38 | 0.224 |
-	| Boa, o profissional de saúde sabe LIBRAS            |   4 | 0.024 |
+	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  38 | 0.222 |
+	| Ruim, não sabem LIBRAS e preciso escrever português |  26 | 0.152 |
+	| Ruim, não consigo comunicação                       |  42 | 0.246 |
+	| Boa, tem intérprete que me ajuda                    |  20 | 0.117 |
+	| Boa, porque familiar me ajuda                       |  38 | 0.222 |
+	| Boa, o profissional de saúde sabe LIBRAS            |   4 | 0.023 |
 	| nil                                                 |   3 | 0.018 |
-	| Total de respostas válidas                          | 170 |     1 |
+	| Total de respostas válidas                          | 171 |     1 |
 
 	Em relação aos surdos que usam os serviços do SUS, resume-se a seguir a avaliação da experiência com a Central de Intérprete de Libras (CIL)
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
@@ -1487,11 +1487,11 @@
 	#+RESULTS:
 	| V020                                       |   n |     f |
 	|--------------------------------------------+-----+-------|
-	| Sim                                        |  29 | 0.171 |
-	| Não, porque eu esqueço de pedir            |  24 | 0.141 |
-	| Não, porque não tem intérprete livre nunca |  39 | 0.229 |
-	| nil                                        |  78 | 0.459 |
-	| Total de respostas válidas                 | 170 |     1 |
+	| Sim                                        |  30 | 0.175 |
+	| Não, porque eu esqueço de pedir            |  24 |  0.14 |
+	| Não, porque não tem intérprete livre nunca |  39 | 0.228 |
+	| nil                                        |  78 | 0.456 |
+	| Total de respostas válidas                 | 171 |     1 |
 
 	
 	Em relação aos surdos que conseguiram seu aparelho auditivo pelo SUS, resume-se a seguir a avaliação da comunicação com o profissional do SUS
@@ -1575,9 +1575,9 @@
 	#+RESULTS:
 	| V021                       |   n |     f |
 	|----------------------------+-----+-------|
-	| Sim                        | 178 | 0.784 |
-	| Não                        |  49 | 0.216 |
-	| Total de respostas válidas | 227 |     1 |
+	| Sim                        | 178 | 0.781 |
+	| Não                        |  50 | 0.219 |
+	| Total de respostas válidas | 228 |     1 |
 
 *** Quanto à estrutura privada adequada de comunicação paciente-médico
 
@@ -1614,8 +1614,453 @@
 	| nil                                                 |   8 | 0.045 |
 	| Total de respostas válidas                          | 178 |     1 |
 
-	
-** Resumo das variáveis
+
+* Conclusões
+
+  Observações preliminares:
+  
+  1. Tendo em vista que a amostra que embasa este estudo não foi determinada probabilisticamente a partir de um sistema de referência, o qual não existe, os achados e conclusões são restritos à própria amostra e portanto não podem ser generalizados além dela. São inválidas portanto generalizações como "a idade média dos surdos da RMC é src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.2=)}}} anos" ou "src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=73.7=)}}} % dos surdos paulistas avaliam seu estado de saúde como bom ou muito bom".
+  2. Toda e qualquer conclusão deve ser feita somente em relação aos src_R[:session :results replace ]{ nrow(dat %>% filter(VALIDA) ) } {{{results(=228=)}}} participantes.
+  3. Pesquisas online, e especialmente esta que contém vídeos, geralmente introduzem vícios sócio-econômicos nos dados. Nossa pesquisa pressupõe que os participantes tenham acesso a meios eletrônicos (como computadores e celulares) e à internet de alta velocidade (como WIFI caseira ou planos móveis de banda larga), o que invariavelmente introduz um viés na pesquisa por deixar de fora dela aqueles participantes sem acesso a tais meios.
+
+** Comparação da comunicação paciente-médico no serviço público versus serviço privado
+
+	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	## V019 (V018=='Sim') versus V022 (V021=='Sim')
+	bind_rows( 
+	  dat %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ) %>%
+	  count( V019 ) %>% # serviço público
+	  na.omit() %>%
+	  rename( resposta = 1 ) %>%
+	  mutate(
+		p = n / sum(n)
+	   ,servico = 'público'
+	   ,comunicacao = case_when(
+		  str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		 ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		)
+	   ,estrutura = case_when(
+		  str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		 ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		 ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		)
+	  ) 
+	 ,dat %>%
+	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V021 == 'Sim' ) %>%
+	  count( V022 ) %>% # serviço privado
+	  rename( resposta = 1 ) %>%
+	  na.omit() %>%
+	  mutate(
+		p = n / sum(n)
+	   ,servico = 'privado'
+	   ,comunicacao = case_when(
+		  str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		 ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		)
+	   ,estrutura = case_when(
+		  str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		 ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		 ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		)
+	  ) 
+	) %>%
+	  ggplot( aes(x = resposta, y = n, group = servico, fill = servico) ) +
+	  geom_bar(stat = 'identity', position = position_dodge()) +
+	  coord_flip() +
+	  labs(
+		title = 'Comparação Serviço Público vs Serviço Privado'
+	   ,subtitle = 'Avaliação da comunicação Paciente-Médico'
+	   ,x = ''
+	   ,y = 'número de respostas'
+	   ,caption = ''
+	   ,fill = 'Serviço'
+	  ) +
+	  theme( legend.position = 'top') +
+	  theme_bw()
+
+
+	if (FALSE){
+
+	  ## Avaliação da comunicação
+	  bind_rows( 
+		dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ) %>%
+		count( V019 ) %>% # serviço público
+		na.omit() %>%
+		rename( resposta = 1 ) %>%
+		mutate(
+		  p = n / sum(n)
+		 ,servico = 'público'
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		) 
+	   ,dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V021 == 'Sim' ) %>%
+		count( V022 ) %>% # serviço privado
+		rename( resposta = 1 ) %>%
+		na.omit() %>%
+		mutate(
+		  p = n / sum(n)
+		 ,servico = 'privado'
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		) 
+	  ) %>%
+		ggplot( aes(x = comunicacao, y = n, group = servico, fill = servico) ) +
+		geom_bar(stat = 'identity', position = position_dodge()) +
+		labs(
+		  title = 'Comparação Serviço Público vs Serviço Privado'
+		 ,subtitle = 'Avaliação da comunicação Paciente-Médico'
+		 ,x = ''
+		 ,y = 'número de respostas'
+		 ,caption = ''
+		 ,fill = 'Serviço'
+		) +
+		theme( legend.position = 'top') +
+		theme_bw()
+
+	  ## Avaliação da estrutura
+	  bind_rows( 
+		dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V018 == 'Sim' ) %>%
+		count( V019 ) %>% # serviço público
+		na.omit() %>%
+		rename( resposta = 1 ) %>%
+		mutate(
+		  p = n / sum(n)
+		 ,servico = 'público'
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		) 
+	   ,dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V021 == 'Sim' ) %>%
+		count( V022 ) %>% # serviço privado
+		rename( resposta = 1 ) %>%
+		na.omit() %>%
+		mutate(
+		  p = n / sum(n)
+		 ,servico = 'privado'
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		) 
+	  ) %>%
+		ggplot( aes(x = estrutura, y = n, group = servico, fill = servico) ) +
+		geom_bar(stat = 'identity', position = position_dodge()) +
+		labs(
+		  title = 'Comparação Serviço Público vs Serviço Privado'
+		 ,subtitle = 'Avaliação da estrutura de atendimento'
+		 ,x = ''
+		 ,y = 'número de respostas'
+		 ,caption = 'Obs.: "Boa, porque familiar me ajuda" reclassificada como "Ruim"'
+		 ,fill = 'Serviço'
+		) +
+		theme( legend.position = 'top') +
+		theme_bw()
+
+	  ## Facets
+	  bind_rows(
+		dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V019 # resposta SUS
+		 ,servico = 'público'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	   ,dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V022 # resposta rede privada
+		 ,servico = 'privado'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	  ) %>%
+		count( estrutura, servico, escolaridade) %>%
+		na.omit() %>%
+		ggplot( aes(x = estrutura, y = n, group = servico, fill = servico) ) +
+		geom_bar(stat = 'identity', position = position_dodge()) +
+		labs(
+		  title = 'Comparação Serviço Público vs Serviço Privado'
+		 ,subtitle = 'Avaliação da estrutura de atendimento'
+		 ,x = ''
+		 ,y = 'número de respostas'
+		 ,caption = 'Obs.: "Boa, porque familiar me ajuda" reclassificada como "Ruim"'
+		 ,fill = 'Serviço'
+		) +
+		facet_wrap( ~ escolaridade, scales = 'free_y') + 
+		theme( legend.position = 'top') +
+		theme_bw()
+
+	  ## Facets
+	  bind_rows(
+		dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V019 # resposta SUS
+		 ,servico = 'público'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	   ,dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V022 # resposta rede privada
+		 ,servico = 'privado'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	  ) %>%
+		count( estrutura, servico, cor) %>%
+		na.omit() %>%
+		ggplot( aes(x = estrutura, y = n, group = servico, fill = servico) ) +
+		geom_bar(stat = 'identity', position = position_dodge()) +
+		labs(
+		  title = 'Comparação Serviço Público vs Serviço Privado'
+		 ,subtitle = 'Avaliação da estrutura de atendimento'
+		 ,x = ''
+		 ,y = 'número de respostas'
+		 ,caption = 'Obs.: "Boa, porque familiar me ajuda" reclassificada como "Ruim"'
+		 ,fill = 'Serviço'
+		) +
+		facet_wrap( ~ cor, scales = 'free_y') + 
+		theme( legend.position = 'top') +
+		theme_bw()
+  
+	  ## Facets
+	  bind_rows(
+		dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V019 # resposta SUS
+		 ,servico = 'público'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	   ,dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V022 # resposta rede privada
+		 ,servico = 'privado'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	  ) %>%
+		count( estrutura, servico, sexo) %>%
+		na.omit() %>%
+		ggplot( aes(x = estrutura, y = n, group = servico, fill = servico) ) +
+		geom_bar(stat = 'identity', position = position_dodge()) +
+		labs(
+		  title = 'Comparação Serviço Público vs Serviço Privado'
+		 ,subtitle = 'Avaliação da estrutura de atendimento'
+		 ,x = ''
+		 ,y = 'número de respostas'
+		 ,caption = 'Obs.: "Boa, porque familiar me ajuda" reclassificada como "Ruim"'
+		 ,fill = 'Serviço'
+		) +
+		facet_wrap( ~ sexo, scales = 'free_y') + 
+		theme( legend.position = 'top') +
+		theme_bw()
+
+	  ## Facets
+	  bind_rows(
+		dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V019 # resposta SUS
+		 ,servico = 'público'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	   ,dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V022 # resposta rede privada
+		 ,servico = 'privado'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	  ) %>%
+		count( estrutura, servico, uso_rede) %>%
+		na.omit() %>%
+		ggplot( aes(x = estrutura, y = n, group = servico, fill = servico) ) +
+		geom_bar(stat = 'identity', position = position_dodge()) +
+		labs(
+		  title = 'Comparação Serviço Público vs Serviço Privado'
+		 ,subtitle = 'Avaliação da estrutura de atendimento'
+		 ,x = ''
+		 ,y = 'número de respostas'
+		 ,caption = 'Obs.: "Boa, porque familiar me ajuda" reclassificada como "Ruim"'
+		 ,fill = 'Serviço'
+		) +
+		facet_wrap( ~ uso_rede, scales = 'free_y') + 
+		theme( legend.position = 'top') +
+		theme_bw()
+
+  
+	}
+	#+END_SRC
+
+   
+  
+** Resumo das variáveis                                            :noexport:
 
    #+BEGIN_SRC R :exports results :results silent :eval no :session 
    ## descritivo das variáveis
@@ -1786,7 +2231,7 @@
 
 
 
-* Matriz de distâncias
+* Matriz de distâncias                                             :noexport:
   
   #+BEGIN_SRC R :exports none :results silent :session :eval no
   ## Download dos estabelecimentos do SUS
