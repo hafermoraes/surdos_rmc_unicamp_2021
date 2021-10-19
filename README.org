@@ -669,7 +669,7 @@
 	#+CAPTION: Evolução do número acumulado de respostas por dia
 	#+ATTR_ORG: :width 600
 	[[./img/evol_plot.png]]
-
+	
 *** Válidas
 	#+BEGIN_SRC R :exports none :results silent :session 
 	## evolução cumulativa do número de respostas
@@ -1625,7 +1625,7 @@
 
 ** Comparação da comunicação paciente-médico no serviço público versus serviço privado
 
-	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
+	#+BEGIN_SRC R :exports none :results silent :session 
 	## V019 (V018=='Sim') versus V022 (V021=='Sim')
 	bind_rows( 
 	  dat %>%
@@ -1673,11 +1673,11 @@
 	   ,subtitle = 'Avaliação da comunicação Paciente-Médico'
 	   ,x = ''
 	   ,y = 'número de respostas'
-	   ,caption = ''
-	   ,fill = 'Serviço'
+	   ,caption = 'Observações:\n 1. Número de respostas da rede privada\n 2. Número de respostas da rede pública'
+	   ,fill = ''
 	  ) +
-	  theme( legend.position = 'top') +
-	  theme_bw()
+	  theme_bw() + 
+	  theme( legend.position = 'top') 
 
 
 	if (FALSE){
@@ -1723,16 +1723,17 @@
 	  ) %>%
 		ggplot( aes(x = comunicacao, y = n, group = servico, fill = servico) ) +
 		geom_bar(stat = 'identity', position = position_dodge()) +
+		coord_flip() +
 		labs(
 		  title = 'Comparação Serviço Público vs Serviço Privado'
 		 ,subtitle = 'Avaliação da comunicação Paciente-Médico'
 		 ,x = ''
 		 ,y = 'número de respostas'
-		 ,caption = ''
-		 ,fill = 'Serviço'
+		 ,caption = 'Observações:\n 1. Número de respostas da rede privada\n 2. Número de respostas da rede pública'
+		 ,fill = ''
 		) +
-		theme( legend.position = 'top') +
-		theme_bw()
+		theme_bw() +
+		theme( legend.position = 'top') 
 
 	  ## Avaliação da estrutura
 	  bind_rows( 
@@ -1775,16 +1776,17 @@
 	  ) %>%
 		ggplot( aes(x = estrutura, y = n, group = servico, fill = servico) ) +
 		geom_bar(stat = 'identity', position = position_dodge()) +
+		coord_flip() + 
 		labs(
 		  title = 'Comparação Serviço Público vs Serviço Privado'
 		 ,subtitle = 'Avaliação da estrutura de atendimento'
 		 ,x = ''
 		 ,y = 'número de respostas'
-		 ,caption = 'Obs.: "Boa, porque familiar me ajuda" reclassificada como "Ruim"'
-		 ,fill = 'Serviço'
+		 ,caption = 'Observações:\n 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n 2. Número de respostas da rede privada\n 3. Número de respostas da rede pública'
+		 ,fill = ''
 		) +
-		theme( legend.position = 'top') +
-		theme_bw()
+		theme_bw() + 
+		theme( legend.position = 'top')
 
 	  ## Facets
 	  bind_rows(
@@ -1841,17 +1843,18 @@
 		na.omit() %>%
 		ggplot( aes(x = estrutura, y = n, group = servico, fill = servico) ) +
 		geom_bar(stat = 'identity', position = position_dodge()) +
+		coord_flip() + 
 		labs(
 		  title = 'Comparação Serviço Público vs Serviço Privado'
 		 ,subtitle = 'Avaliação da estrutura de atendimento'
 		 ,x = ''
 		 ,y = 'número de respostas'
-		 ,caption = 'Obs.: "Boa, porque familiar me ajuda" reclassificada como "Ruim"'
-		 ,fill = 'Serviço'
+		 ,caption = 'Observações:\n 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n 2. Número de respostas da rede privada\n 3. Número de respostas da rede pública'
+		 ,fill = ''
 		) +
-		facet_wrap( ~ escolaridade, scales = 'free_y') + 
-		theme( legend.position = 'top') +
-		theme_bw()
+		facet_wrap( ~ escolaridade, scales = 'free') + 
+		theme_bw() + 
+		theme( legend.position = 'top')
 
 	  ## Facets
 	  bind_rows(
@@ -1908,18 +1911,19 @@
 		na.omit() %>%
 		ggplot( aes(x = estrutura, y = n, group = servico, fill = servico) ) +
 		geom_bar(stat = 'identity', position = position_dodge()) +
+		coord_flip() + 
 		labs(
 		  title = 'Comparação Serviço Público vs Serviço Privado'
 		 ,subtitle = 'Avaliação da estrutura de atendimento'
 		 ,x = ''
 		 ,y = 'número de respostas'
-		 ,caption = 'Obs.: "Boa, porque familiar me ajuda" reclassificada como "Ruim"'
-		 ,fill = 'Serviço'
+		 ,caption = 'Observações:\n 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n 2. Número de respostas da rede privada\n 3. Número de respostas da rede pública'
+		 ,fill = ''
 		) +
-		facet_wrap( ~ cor, scales = 'free_y') + 
-		theme( legend.position = 'top') +
-		theme_bw()
-  
+		facet_wrap( ~ cor, scales = 'free') + 
+		theme_bw() + 
+		theme( legend.position = 'top')
+
 	  ## Facets
 	  bind_rows(
 		dat %>%
@@ -1975,17 +1979,88 @@
 		na.omit() %>%
 		ggplot( aes(x = estrutura, y = n, group = servico, fill = servico) ) +
 		geom_bar(stat = 'identity', position = position_dodge()) +
+		coord_flip() + 
 		labs(
 		  title = 'Comparação Serviço Público vs Serviço Privado'
 		 ,subtitle = 'Avaliação da estrutura de atendimento'
 		 ,x = ''
 		 ,y = 'número de respostas'
-		 ,caption = 'Obs.: "Boa, porque familiar me ajuda" reclassificada como "Ruim"'
-		 ,fill = 'Serviço'
+		 ,caption = 'Observações:\n 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n 2. Número de respostas da rede privada\n 3. Número de respostas da rede pública'
+		 ,fill = ''
 		) +
 		facet_wrap( ~ sexo, scales = 'free_y') + 
-		theme( legend.position = 'top') +
-		theme_bw()
+		theme_bw() + 
+		theme( legend.position = 'top')
+
+	  ## Facets
+	  bind_rows(
+		dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V019 # resposta SUS
+		 ,servico = 'público'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	   ,dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V022 # resposta rede privada
+		 ,servico = 'privado'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	  ) %>%
+		count( resposta, servico, sexo) %>%
+		na.omit() %>%
+		ggplot( aes(x = resposta, y = n, group = servico, fill = servico) ) +
+		geom_bar(stat = 'identity', position = position_dodge()) +
+		coord_flip() + 
+		labs(
+		  title = 'Comparação Serviço Público vs Serviço Privado'
+		 ,subtitle = 'Avaliação da comunicação paciente-médico'
+		 ,x = ''
+		 ,y = 'número de respostas'
+		 ,caption = 'Observações:\n 1. Número de respostas da rede privada\n 2. Número de respostas da rede pública'
+		 ,fill = ''
+		) +
+		facet_grid( ~ sexo, scales = 'free_y') + 
+		coord_flip() +
+		theme_bw() + 
+		theme( legend.position = 'top') 
+
 
 	  ## Facets
 	  bind_rows(
@@ -2042,24 +2117,108 @@
 		na.omit() %>%
 		ggplot( aes(x = estrutura, y = n, group = servico, fill = servico) ) +
 		geom_bar(stat = 'identity', position = position_dodge()) +
+		coord_flip() + 
 		labs(
 		  title = 'Comparação Serviço Público vs Serviço Privado'
 		 ,subtitle = 'Avaliação da estrutura de atendimento'
 		 ,x = ''
 		 ,y = 'número de respostas'
-		 ,caption = 'Obs.: "Boa, porque familiar me ajuda" reclassificada como "Ruim"'
-		 ,fill = 'Serviço'
+		 ,caption = 'Observações:\n 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n 2. Número de respostas somente da rede privada\n 3. Número de respostas somente da rede pública\n 4. Número de respostas de ambas as redes.'
+		 ,fill = ''
 		) +
-		facet_wrap( ~ uso_rede, scales = 'free_y') + 
-		theme( legend.position = 'top') +
-		theme_bw()
+		facet_wrap( ~ uso_rede, scales = 'free') + 
+		theme_bw() + 
+		theme( legend.position = 'top') 
 
-  
+	  ## Facets
+	  bind_rows(
+		dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V019 # resposta SUS
+		 ,servico = 'público'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	   ,dat %>%
+		filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE) %>%
+		transmute(
+		  resposta = V022 # resposta rede privada
+		 ,servico = 'privado'
+		 ,sexo = V005
+		 ,escolaridade = V006
+		 ,cor = V008
+		 ,uso_rede = case_when(
+			V018 == 'Sim' & V021 == 'Sim' ~ 'Ambas'
+		   ,V018 == 'Sim' & V021 == 'Não' ~ 'Somente Pública'
+		   ,V018 == 'Não' & V021 == 'Sim' ~ 'Somente Privada'
+		   ,V018 == 'Não' & V021 == 'Não' ~ 'Nenhuma'
+		  )
+		 ,comunicacao = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		 ,estrutura = case_when(
+			str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+		   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+		   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		  )
+		)
+	  ) %>%
+		count( comunicacao, servico, uso_rede) %>%
+		na.omit() %>%
+		ggplot( aes(x = comunicacao, y = n, group = servico, fill = servico) ) +
+		geom_bar(stat = 'identity', position = position_dodge()) +
+		coord_flip() + 
+		labs(
+		  title = 'Comparação Serviço Público vs Serviço Privado'
+		 ,subtitle = 'Avaliação da comunicação paciente-médico'
+		 ,x = ''
+		 ,y = 'número de respostas'
+		 ,caption = 'Observações:\n 1. Número de respostas somente da rede privada\n 2. Número de respostas somente da rede pública\n 3. Número de respostas de ambas as redes.'
+		 ,fill = ''
+		) +
+		facet_wrap( ~ uso_rede, scales = 'free') + 
+		theme_bw() + 
+		theme( legend.position = 'top') 
+
+
 	}
 	#+END_SRC
 
    
   
+** Análise de correspondência
+   
+   #+BEGIN_SRC R :exports none :results silent :session 
+
+   #+END_SRC
+
+*** Escolaridade vs Estado de Saúde
+*** Religião vs Estado de Saúde
+*** Trabalho vs Estado de Saúde
+*** Cor/Raça vs Estado de Saúde
+*** Cidade vs Estado de Saúde
+*** Diabetes-Hipertensao vs Estado de Saúde
+*** Fuma-Bebe vs Estado de Saúde
+*** Faixa etária vs Estado de Saúde
+
 ** Resumo das variáveis                                            :noexport:
 
    #+BEGIN_SRC R :exports results :results silent :eval no :session 
