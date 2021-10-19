@@ -538,6 +538,29 @@
    ## dat %>% select( V002, V003, V004_idade, V010_rmc, V010, VALIDA) %>% View
    ## dat %>% select( V002, V003, V004_idade, V010_rmc, V010, VALIDA) %>% filter( is.na(VALIDA) ) %>% View
 
+   ## zap 19.10.2021 validação da logica
+
+   ## dat %>%
+   ##   filter( !V003 == 'Não' & is.na(VALIDA) ) %>%
+   ##   select( V002, V003, V004, V004_idade, V010, VALIDA) %>%
+   ##   View
+
+   ## dat %>%
+   ##   filter( V003 == 'Sim' & !is.na(V002) & is.na(VALIDA) ) %>%
+   ##   select( V002, V003, V004, V004_idade, V010, VALIDA) %>%
+   ##   View
+
+   ## dat %>%
+   ##   filter( (!V003 == 'Sim' | is.na(V002) ) & V010_rmc == TRUE & V004_idade >= 18) %>%
+   ##   select( V002, V003, V004, V004_idade, V010, V019, V022, VALIDA) %>%
+   ##   View
+
+   ## dat %>%
+   ##   filter( (!V003 == 'Sim' | is.na(V002) ) & V010_rmc == TRUE & V004_idade >= 18) %>%
+   ##   select( V002, V003, V004_idade, V010, V019, V022) %>%
+   ##   View
+
+
    ## dat %>% filter( is.na(V002), !is.na(VALIDA) ) %>% select( V002, V003, V004_idade, V010_rmc, V010, VALIDA) %>% View
 
    write_csv2(
