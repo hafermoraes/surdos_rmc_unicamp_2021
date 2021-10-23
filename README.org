@@ -25,7 +25,7 @@
 * Configurações
 
 ** Pacotes do GNU R necessários para as análises
-
+   
    Os seguintes pacotes do GNU R são necessários para executar as análises estatísticas presentes nas seções seguintes.
 
    #+BEGIN_SRC R :exports code :results silent :session 
@@ -37,6 +37,9 @@
    library(xtable)     # xtable
    library(haven)      # write_sav
    library(gtsummary)  # tbl_summary
+   library(scales)     # scale_fill_manual
+   library(FactoMineR) # CA
+   library(factoextra) # fviz_ca_biplot
    #+END_SRC
 
 ** Ambiente de computação
@@ -50,7 +53,7 @@
 
    #+RESULTS:
    :   Operating System: Linux Mint 20.2
-   :             Kernel: Linux 5.4.0-88-generic
+   :             Kernel: Linux 5.4.0-89-generic
    :       Architecture: x86-64
    
    e do software estatístico primário 
@@ -80,24 +83,28 @@
    [1] stats     graphics  grDevices utils     datasets  methods   base     
 
    other attached packages:
-   [1] gtsummary_1.4.2 haven_2.4.0     xtable_1.8-4    stringr_1.4.0  
-   [5] tidyr_1.1.2     dplyr_1.0.3     readr_1.4.0     ggplot2_3.3.3  
+	[1] factoextra_1.0.7 FactoMineR_2.3   scales_1.1.1     gtsummary_1.4.2 
+	[5] haven_2.4.0      xtable_1.8-4     stringr_1.4.0    tidyr_1.1.2     
+	[9] dplyr_1.0.3      readr_1.4.0      ggplot2_3.3.3   
 
    loaded via a namespace (and not attached):
-	[1] pillar_1.6.0        compiler_3.6.3      forcats_0.5.1      
-	[4] tools_3.6.3         digest_0.6.27       lattice_0.20-41    
-	[7] lifecycle_1.0.0     tibble_3.1.1        gtable_0.3.0       
-   [10] pkgconfig_2.0.3     rlang_0.4.11        Matrix_1.2-18      
-   [13] DBI_1.1.1.9000      cli_2.4.0           xfun_0.26          
-   [16] knitr_1.32          withr_2.4.2         generics_0.1.0     
-   [19] vctrs_0.3.8         hms_1.0.0           grid_3.6.3         
-   [22] tidyselect_1.1.0    glue_1.4.2          R6_2.5.0           
-   [25] fansi_0.4.2         survival_3.2-3      purrr_0.3.4        
-   [28] blob_1.2.1          magrittr_2.0.1      splines_3.6.3      
-   [31] htmltools_0.5.1.1   scales_1.1.1        ellipsis_0.3.2     
-   [34] broom.helpers_1.4.0 assertthat_0.2.1    gt_0.3.1           
-   [37] colorspace_2.0-0    utf8_1.2.1          stringi_1.5.3      
-   [40] munsell_0.5.0       crayon_1.4.1
+	[1] Rcpp_1.0.6           pillar_1.6.0         compiler_3.6.3      
+	[4] forcats_0.5.1        tools_3.6.3          digest_0.6.27       
+	[7] lattice_0.20-41      lifecycle_1.0.0      tibble_3.1.1        
+   [10] gtable_0.3.0         pkgconfig_2.0.3      rlang_0.4.11        
+   [13] Matrix_1.2-18        rstudioapi_0.13      DBI_1.1.1.9000      
+   [16] cli_2.4.0            ggrepel_0.8.2        xfun_0.26           
+   [19] cluster_2.1.0        knitr_1.32           withr_2.4.2         
+   [22] generics_0.1.0       vctrs_0.3.8          hms_1.0.0           
+   [25] flashClust_1.01-2    scatterplot3d_0.3-41 grid_3.6.3          
+   [28] tidyselect_1.1.0     glue_1.4.2           R6_2.5.0            
+   [31] fansi_0.4.2          survival_3.2-3       purrr_0.3.4         
+   [34] blob_1.2.1           magrittr_2.0.1       ps_1.6.0            
+   [37] MASS_7.3-51.6        leaps_3.1            splines_3.6.3       
+   [40] htmltools_0.5.1.1    ellipsis_0.3.2       broom.helpers_1.4.0 
+   [43] assertthat_0.2.1     gt_0.3.1             colorspace_2.0-0    
+   [46] utf8_1.2.1           stringi_1.5.3        munsell_0.5.0       
+   [49] crayon_1.4.1
    #+end_example
 
    no qual as análises foram efetuadas.
@@ -183,17 +190,23 @@
    names(raw) <- headers$codes
 
    ## tabela tratada
-   dat <- raw %>%
+   dat <- raw %>% 
 	 mutate(
 	   ## CEP
 	   V012 = str_trim( gsub('[[:blank:]]+','', gsub('[[:punct:]]+',' ',V012) ) )
 	 ) %>%
 	 transmute(
 	   ## Data e hora de preenchimento do questionário
-	   V001 = strptime( V001, format = '%d/%m/%Y %H:%M:%S' )
+	   V001 # = strptime( V001, format = '%d/%m/%Y %H:%M:%S' )
 	   ## consentimento livre e esclarecido
 	  ,V002
 	   ## Você se comunica por LIBRAS, tem 18 anos ou mais e mora em alguma das cidades do mapa?
+	   ## correção pontual em 21.10.2021
+	  ,V003 = case_when(
+		 V001 == '06/10/2021 22:23:42' & is.na(V003)     ~ 'A - Sim' # TCLE e questionário respondidos, publico alvo vazio
+		,V001 == '06/10/2021 20:49:53' & is.na(V003)     ~ 'A - Sim' # TCLE e questionário respondidos, publico alvo vazio
+		,TRUE ~ as.character(V003)
+	   )
 	  ,V003 = factor(
 		 str_sub( string = V003, start = 5 )
 		,levels = str_sub(
@@ -206,12 +219,28 @@
 	   )
 	   ## Qual é a sua data de nascimento?
 	  ,V004 = case_when(
-		 V004 == '05/08/0081' ~ '05/08/1981'  # correção de data
+		 V004 == '05/08/0081' ~ '05/08/1981'  # correções manuais das datas
+		,V004 == '27/04/2022' ~ '27/04/1974'
+		,V001 == '22/08/2021 15:32:40' & V004 == '19/03/2016' ~ '19/03/1971' 
+		,V001 == '01/09/2021 11:01:57' & V004 == '11/02/2021' ~ '11/02/1993'
+		,V001 == '06/10/2021 18:42:31' & V004 == '20/06/2021' ~ '20/06/1988'
+		,V001 == '06/10/2021 18:54:12' & V004 == '27/02/2021' ~ '27/02/1995'
+		,V001 == '06/10/2021 19:11:48' & V004 == '08/04/2021' ~ '08/04/1969'
+		,V001 == '07/10/2021 23:41:07' & V004 == '26/11/2021' ~ '26/11/1981'
+		 ## correções em 21.10.2021
+		,V001 == '17/08/2021 23:35:59' & is.na(V004)          ~ '08/04/1985'
+		,V001 == '18/08/2021 21:46:24' & is.na(V004)          ~ '24/02/1986'
+		,V001 == '21/08/2021 12:28:37' & is.na(V004)          ~ '31/08/1969'
+		,V001 == '06/10/2021 20:01:34' & is.na(V004)          ~ '18/06/1971'
+		,V001 == '13/10/2021 23:32:18' & is.na(V004)          ~ '12/01/1975'
+		,V001 == '22/09/2021 16:55:45' & is.na(V004)          ~ '01/01/2025' # excluir da pesquisa, por isso a data futura
 		,TRUE ~ as.character(V004)
 	   )
 	  ,V004 = strptime( V004, format = '%d/%m/%Y' )
 	   ## idade na data de preenchimento do questionário
-	  ,V004_idade = as.numeric( round( ( V001 - V004 ) / 365.25, 0 ) )
+	  ,V004_idade = as.numeric(
+		 round( ( strptime( V001, format = '%d/%m/%Y %H:%M:%S' ) - V004 ) / 365.25, 0 )
+	   )
 	   ## Qual é o seu sexo?
 	  ,V005 = factor(
 		 str_sub( string = V005, start = 5 )
@@ -294,6 +323,13 @@
 	  ,V010 = gsub( '\\.' ,' ' , V010)
 	  ,V010 = gsub( "'"   ,' ' , V010)
 	  ,V010 = gsub( ' SP' ,''  , V010)
+	   ## correções em 21.10.2021
+	  ,V010 = case_when(
+		 V001 == '26/08/2021 14:23:32' & is.na(V010)          ~ 'CAMPINAS'
+		,V001 == '22/08/2021 15:32:40' & is.na(V010)          ~ 'AMERICANA'
+		,V001 == '09/10/2021 21:46:04' & is.na(V010)          ~ 'CAMPINAS'
+		,TRUE                                 ~ as.character(V010)
+	   )
 	  ,V010 = case_when(
 		 V010 == 'CAMPINA'                    ~ 'CAMPINAS'
 		,V010 == 'CAMPINAA'                   ~ 'CAMPINAS'
@@ -314,6 +350,7 @@
 		 ## Cidade NA mas CEP iniciando com 13 pertencem à RMC
 		 is.na(V010) & str_sub( V012 ,1,2 ) == 13  ~ TRUE  
 		,V010 %in% rmc$municipio                   ~ TRUE
+		,TRUE ~ FALSE
 	   )
 	   ## Qual bairro você mora?
 	  ,V011
@@ -523,35 +560,59 @@
 	   ## flag de respostas válidas
 	  ,VALIDA = FALSE
 	  ,VALIDA = case_when(
+		 ## --- Filtro antigo
+		 ##
 		 ## Resposta válida: TCLE ok, público alvo ok, idade >= 18 (ou vazia), cidade da RMC (ou vazia)
-		 !is.na(V002) & V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
+		 ## !is.na(V002) & V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
 		 ## Resposta válida: TCLE ok, público alvo não ok, mas idade >= 18 e cidade da RMC
-		,!is.na(V002) & ( V003 != 'Sim' | is.na(V003) ) & ( V004_idade >= 18   ) & ( V010_rmc == TRUE               ) ~ TRUE
+		 ## ,!is.na(V002) & ( V003 != 'Sim' | is.na(V003) ) & ( V004_idade >= 18   ) & ( V010_rmc == TRUE               ) ~ TRUE
 		 ## Resposta inválida: TCLE ok, público alvo não ok e idade não preenchida (tanto faz se cidade é da RMC ou vazia)
-		,!is.na(V002) & ( V003 != 'Sim' | is.na(V003) ) & is.na(V004_idade)                                           ~ FALSE
+		 ## ,!is.na(V002) & ( V003 != 'Sim' | is.na(V003) ) & is.na(V004_idade)                                           ~ FALSE
 		 ## Resposta válida: TCLE não ok, público alvo OK, idade >= 18 (ou vazia) e cidade da RMC (ou vazia)
-		,is.na(V002)  & V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
+		 ## ,is.na(V002)  & V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
 		 ## Resposta válida: TCLE não ok, público alvo não ok, mas idade >= 18 e cidade da RMC
-		,is.na(V002)  & ( V003 != 'Sim' | is.na(V003) ) & ( V004_idade >= 18 ) & ( V010_rmc == TRUE )                 ~ TRUE
+		 ## ,is.na(V002)  & ( V003 != 'Sim' | is.na(V003) ) & ( V004_idade >= 18 ) & ( V010_rmc == TRUE )                 ~ TRUE
+		 ## Resposta inválida: sem preenchimento de TCLE, Público alvo, Nascimento e Cidade
+		 ## ,is.na(V002) & is.na(V003) & is.na(V004) & is.na(V010)                                                        ~ FALSE 
+		 ##
+		 ##  --- Filtro revisto (21.10.2021)
+		 ## Resposta válida: Tanto faz TCLE, público alvo 'Sim', idade >= 18 ou vazia, cidade da RMC  ou vazia
+		 V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
+		 ## Resposta inválida: Tanto faz TCLE, público alvo 'Não', ignora o resto ...
+		,V003 == 'Não' ~ FALSE
+		 ## Resposta válida: Tanto faz TCLE, público alvo vazio, mas idade >= 18, cidade da RMC e comunicação paciente-médico não nulo para SUS e rede privada
+		,is.na(V003) & V004_idade >= 18 & V010_rmc == TRUE & ( (V018 == 'Sim' & !is.na(V019)) | (V021 == 'Sim' & !is.na(V022)) ) ~ TRUE
+		 ## Resposta inválida: sem preenchimento de TCLE, Público alvo, Nascimento e Cidade
+		,is.na(V002) & is.na(V003) & is.na(V004) & is.na(V010)                                                        ~ FALSE 
 		,TRUE ~ FALSE
 	   )
+	 ) %>%
+	 mutate(
+	   ## Data e hora de preenchimento do questionário: YYYY-MM-DD HH:MM:SS
+	   V001 = strptime( V001, format = '%d/%m/%Y %H:%M:%S' )
 	 )
 
    ## validação da lógica...
-   ## dat %>% filter( VALIDA == TRUE ) %>% View
-   ## dat %>% filter( is.na(V002) ) %>% View
-   ## dat %>% select( V002, V003, V004_idade, V010_rmc, V010, V019, V022, VALIDA) %>% View
-   ## dat %>% select( V002, V003, V004_idade, V010_rmc, V010, VALIDA) %>% filter( is.na(VALIDA) ) %>% View
+   ## dat %>% count( VALIDA )
 
-   ## zap 19.10.2021 validação da logica
-
-   ## dat %>% filter( !is.na(V002) & V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) )  ) %>%
-   ## dat %>% filter( !is.na(V002) & ( V003 != 'Sim' | is.na(V003) ) & ( V004_idade >= 18                     ) & ( V010_rmc == TRUE               )  ) %>%
-   ## dat %>% filter( !is.na(V002) & ( V003 != 'Sim' | is.na(V003) ) & is.na(V004_idade) ) %>% 
-   ## dat %>% filter( is.na(V002)  & V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ) %>%
-   ## dat %>% filter( is.na(V002)  & ( V003 != 'Sim' | is.na(V003) ) & ( V004_idade >= 18 ) & ( V010_rmc == TRUE ) ) %>%
-   ##   select( V002, V003, V004, V004_idade, V010, VALIDA) %>%
-   ##   View
+   dat %>%
+	 transmute(V001 = format( V001, '%d/%m/%Y %H:%M:%S')
+			  ,VALIDA
+			  ,TCLE = V002
+			  ,publico_alvo = V003
+			  ,idade = V004_idade
+			  ,RMC = V010_rmc
+			  ,Cidade = V010
+			  ,usa_SUS = V018
+			  ,Comunica_SUS = V019
+			  ,rede_privada = V021
+			  ,Comunica_rede_privada = V022
+			   ) %>%
+	 arrange( VALIDA, desc( publico_alvo ), RMC ) %>% 
+	 write_csv2(
+	   .
+	  ,file = './validacoes/filtro_revisto_2.csv'
+	 )
 
    write_csv2(
 	 dat
@@ -806,15 +867,15 @@
    #+RESULTS:
    | V010                      |   n |     f |
    |---------------------------+-----+-------|
-   | CAMPINAS                  | 129 | 0.494 |
+   | CAMPINAS                  | 131 | 0.502 |
    | HORTOLANDIA               |  41 | 0.157 |
    | SUMARE                    |  24 | 0.092 |
    | PAULINIA                  |   9 | 0.034 |
    | VALINHOS                  |   9 | 0.034 |
-   | nil                       |   7 | 0.027 |
-   | AMERICANA                 |   6 | 0.023 |
+   | AMERICANA                 |   7 | 0.027 |
    | AMPARO                    |   4 | 0.015 |
    | JAGUARIUNA                |   4 | 0.015 |
+   | nil                       |   4 | 0.015 |
    | INDAIATUBA                |   3 | 0.011 |
    | NOVA ODESSA               |   3 | 0.011 |
    | SANTA BARBARA D OESTE     |   3 | 0.011 |
@@ -838,7 +899,7 @@
    | SAO VICENTE               |   1 | 0.004 |
    | RESPOSTAS                 | 261 |     1 |
 
-   Destes, src_R[:session :results replace ]{ nrow(dat %>% filter( VALIDA == TRUE ))} {{{results(=228=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
+   Destes, src_R[:session :results replace ]{ nrow(dat %>% filter( VALIDA == TRUE ))} {{{results(=225=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -850,7 +911,7 @@
 	   .
 	  ,data.frame(
 		 V010 = 'RESPOSTAS'
-		,n = nrow( dat %>% filter(!is.na(VALIDA)) )
+		,n = nrow( dat %>% filter(VALIDA == TRUE) )
 		,f=1
 	   )
 	 )
@@ -859,21 +920,21 @@
    #+RESULTS:
    | V010                  |   n |     f |
    |-----------------------+-----+-------|
-   | CAMPINAS              | 121 | 0.531 |
-   | HORTOLANDIA           |  39 | 0.171 |
-   | SUMARE                |  23 | 0.101 |
-   | VALINHOS              |   9 | 0.039 |
-   | PAULINIA              |   8 | 0.035 |
-   | AMERICANA             |   6 | 0.026 |
+   | CAMPINAS              | 119 | 0.529 |
+   | HORTOLANDIA           |  37 | 0.164 |
+   | SUMARE                |  24 | 0.107 |
+   | VALINHOS              |   9 |  0.04 |
+   | AMERICANA             |   7 | 0.031 |
+   | PAULINIA              |   7 | 0.031 |
+   | AMPARO                |   4 | 0.018 |
    | JAGUARIUNA            |   4 | 0.018 |
-   | nil                   |   4 | 0.018 |
-   | AMPARO                |   3 | 0.013 |
+   | INDAIATUBA            |   3 | 0.013 |
    | NOVA ODESSA           |   3 | 0.013 |
    | SANTA BARBARA D OESTE |   3 | 0.013 |
-   | INDAIATUBA            |   2 | 0.009 |
    | MONTE MOR             |   2 | 0.009 |
+   | nil                   |   2 | 0.009 |
    | COSMOPOLIS            |   1 | 0.004 |
-   | RESPOSTAS             | 261 |     1 |
+   | RESPOSTAS             | 225 |     1 |
    
    #+BEGIN_SRC R :exports none :results silent :session 
    ## Perfil dos respondentes válidos
@@ -917,6 +978,7 @@
 	   mutate( p = round( n/sum(n), 3) ) %>%
 	   ggplot( aes( y = p, x = reorder(q, -p) ) ) +
 	   geom_bar(stat = 'identity', fill = fill.color) +
+	   coord_flip() +
 	   ylim( y.lim ) +
 	   geom_text(aes(label=n), vjust = -1, color=fill.color, size=3.5) +
 	   theme_classic()
@@ -1124,14 +1186,14 @@
    }
    #+END_SRC
 
-   Embora tenham consentido ao TCLE e confirmado residir na RMC, src_R[:session :results replace ]{ nrow(v010) } {{{results(=4=)}}} respondentes não informaram o município no qual moram; destes, src_R[:session :results replace ]{ v010 %>% filter( !is.na(V012) ) %>% nrow } {{{results(=2=)}}} informaram o CEP, do qual é possível confirmar que de fato residem na RMC. Consideramos todos eles como respostas válidas à pesquisa.
+   Embora tenham consentido ao TCLE e confirmado residir na RMC, src_R[:session :results replace ]{ nrow(v010) } {{{results(=2=)}}} respondentes não informaram o município no qual moram; destes, src_R[:session :results replace ]{ v010 %>% filter( !is.na(V012) ) %>% nrow } {{{results(=0=)}}} informaram o CEP, do qual é possível confirmar que de fato residem na RMC. Consideramos todos eles como respostas válidas à pesquisa.
 
    Perfil dos participantes:
 
-   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.2=)}}} anos
-   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=55.3=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
-   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=40.3=)}}} % com ensino superior ou pós-graduação
-   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=73.2=)}}} % avaliam seu estado de saúde como bom ou muito bom
+   - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.9=)}}} anos
+   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=54.7=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=39.6=)}}} % com ensino superior ou pós-graduação
+   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=75.1=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
 	 
 ** Hipóteses da pesquisa
@@ -1165,9 +1227,10 @@
 	#+RESULTS:
 	| V005                       |   n |     f |
 	|----------------------------+-----+-------|
-	| Feminino                   | 126 | 0.553 |
-	| Masculino                  | 102 | 0.447 |
-	| Total de respostas válidas | 228 |     1 |
+	| Feminino                   | 123 | 0.547 |
+	| Masculino                  | 100 | 0.444 |
+	| nil                        |   2 | 0.009 |
+	| Total de respostas válidas | 225 |     1 |
 
 *** Quanto à escolaridade
 
@@ -1175,9 +1238,9 @@
 	Hipótese: surdos usuários de Libras possuem baixa escolaridade.
 	#+end_quote
 
-	Embora src_R[:session :results replace]{  round(100*sum( v006[1:3,3] ),1)  } {{{results(=59.2=)}}} % dos respondentes tenham escolaridade até o ensino médio, o que confirma a hipótese prévia da pesquisa, ressalta-se também o alto número de surdos com alta escolaridade (src_R[:session :results replace]{ round( 100*sum( v006[4:5,3] ), 1)} {{{results(=40.3=)}}} %).
+	Embora src_R[:session :results replace]{  round(100*sum( v006[1:3,3] ),1)  } {{{results(=59.6=)}}} % dos respondentes tenham escolaridade até o ensino médio, o que confirma a hipótese prévia da pesquisa, ressalta-se também o alto número de surdos com alta escolaridade (src_R[:session :results replace]{ round( 100*sum( v006[4:5,3] ), 1)} {{{results(=39.6=)}}} %).
 
-	Em nosso ponto de vista isto se constitui em um viés da amostra, decorrente também da elevada idade média dos respondentes (src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.2=)}}} anos), sugerindo que a amostra não conseguiu 'furar a bolha' dos surdos próximos à universidade.
+	Em nosso ponto de vista isto se constitui em um viés da amostra, decorrente também da elevada idade média dos respondentes (src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.9=)}}} anos), sugerindo que a amostra não conseguiu 'furar a bolha' dos surdos próximos à universidade.
 	
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## escolaridade (V006)
@@ -1198,13 +1261,13 @@
 	#+RESULTS:
 	| V006                                                |   n |     f |
 	|-----------------------------------------------------+-----+-------|
-	| Nunca estudei                                       |   5 | 0.022 |
-	| Fundamental (ou 1º grau)                            |  26 | 0.114 |
-	| Médio (ou 2º grau)                                  | 104 | 0.456 |
-	| Superior (ou 3º grau)                               |  71 | 0.311 |
-	| Pós-graduação (especialização, mestrado, doutorado) |  21 | 0.092 |
-	| nil                                                 |   1 | 0.004 |
-	| Total de respostas válidas                          | 228 |     1 |
+	| Nunca estudei                                       |   4 | 0.018 |
+	| Fundamental (ou 1º grau)                            |  26 | 0.116 |
+	| Médio (ou 2º grau)                                  | 104 | 0.462 |
+	| Superior (ou 3º grau)                               |  69 | 0.307 |
+	| Pós-graduação (especialização, mestrado, doutorado) |  20 | 0.089 |
+	| nil                                                 |   2 | 0.009 |
+	| Total de respostas válidas                          | 225 |     1 |
 
 *** Quanto à religião
 
@@ -1233,17 +1296,17 @@
 	#+RESULTS:
 	| V009_agrp                  |   n |     f |
 	|----------------------------+-----+-------|
-	| Evangélica                 |  92 | 0.404 |
-	| Católica                   |  66 | 0.289 |
-	| Sem religião               |  41 |  0.18 |
-	| Espírita                   |   9 | 0.039 |
-	| Outra                      |   6 | 0.026 |
+	| Evangélica                 |  93 | 0.413 |
+	| Católica                   |  65 | 0.289 |
+	| Sem religião               |  39 | 0.173 |
+	| Espírita                   |   8 | 0.036 |
+	| Outra                      |   6 | 0.027 |
 	| Não informada              |   4 | 0.018 |
 	| Adventista                 |   3 | 0.013 |
 	| Testemunha de Jeová        |   3 | 0.013 |
 	| Umbanda / Candomblé        |   3 | 0.013 |
 	| Metodista                  |   1 | 0.004 |
-	| Total de respostas válidas | 228 |     1 |
+	| Total de respostas válidas | 225 |     1 |
 
 *** Quanto à situação de emprego
 
@@ -1270,13 +1333,16 @@
 	#+RESULTS:
 	| V007                                     |   n |     f |
 	|------------------------------------------+-----+-------|
-	| Sim, trabalho                            | 145 | 0.636 |
-	| Não, estou desempregado                  |  52 | 0.228 |
-	| Não, porque sou aposentado               |  17 | 0.075 |
-	| Não trabalho e recebo benefício BPC/INSS |  14 | 0.061 |
-	| Total de respostas válidas               | 228 |     1 |
+	| Sim, trabalho                            | 148 | 0.658 |
+	| Não, estou desempregado                  |  50 | 0.222 |
+	| Não, porque sou aposentado               |  14 | 0.062 |
+	| Não trabalho e recebo benefício BPC/INSS |  13 | 0.058 |
+	| Total de respostas válidas               | 225 |     1 |
 
 **** segmentada por nível de escolaridade
+  :PROPERTIES:
+  :CUSTOM_ID: sec:desemp_escolaridade
+  :END:  
 
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## trabalho (V007) por escolaridade (V006)
@@ -1314,11 +1380,14 @@
 	|-----------------------------------------------------+--------------+-----------+------------------|
 	| Nunca estudei                                       |            1 |         0 |              100 |
 	| Fundamental (ou 1º grau)                            |            4 |         8 |            33.33 |
-	| Médio (ou 2º grau)                                  |           28 |        71 |            28.28 |
+	| Médio (ou 2º grau)                                  |           27 |        73 |               27 |
 	| Superior (ou 3º grau)                               |           15 |        49 |            23.44 |
-	| Pós-graduação (especialização, mestrado, doutorado) |            4 |        16 |               20 |
+	| Pós-graduação (especialização, mestrado, doutorado) |            3 |        16 |            15.79 |
 
 **** segmentada por sexo
+  :PROPERTIES:
+  :CUSTOM_ID: sec:desemp_sexo
+  :END:  
 
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## trabalho (V007) por sexo (V005)
@@ -1346,10 +1415,13 @@
 	#+RESULTS:
 	| V005      | desempregado | empregado | pct_desempregado |
 	|-----------+--------------+-----------+------------------|
-	| Feminino  |           37 |        72 |            33.94 |
-	| Masculino |           15 |        73 |            17.05 |
+	| Feminino  |           35 |        74 |            32.11 |
+	| Masculino |           15 |        72 |            17.24 |
 
 **** segmentada por raça
+  :PROPERTIES:
+  :CUSTOM_ID: sec:desemp_raca
+  :END:  
 
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## trabalho (V007) por raça (V008)
@@ -1377,12 +1449,15 @@
 	#+RESULTS:
 	| V008    | desempregado | empregado | pct_desempregado |
 	|---------+--------------+-----------+------------------|
-	| Branca  |           34 |       115 |            22.82 |
-	| Parda   |           18 |        19 |            48.65 |
+	| Branca  |           33 |       117 |               22 |
+	| Parda   |           17 |        20 |            45.95 |
 	| Preta   |            0 |         5 |                0 |
 	| Amarela |            0 |         6 |                0 |
 
 **** segmentada por faixa etária
+  :PROPERTIES:
+  :CUSTOM_ID: sec:desemp_idade
+  :END:  
 
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
 	## trabalho (V007) por faixa etária (V004_idade)
@@ -1410,10 +1485,10 @@
 	#+RESULTS:
 	| faixa_etaria | desempregado | empregado | pct_desempregado |
 	|--------------+--------------+-----------+------------------|
-	| [19,30]      |           18 |        30 |             37.5 |
-	| (30,40]      |           19 |        56 |            25.33 |
-	| (40,50]      |           12 |        43 |            21.82 |
-	| (50,65]      |            3 |        11 |            21.43 |
+	| [19,30]      |           18 |        31 |            36.73 |
+	| (30,40]      |           17 |        57 |            22.97 |
+	| (40,50]      |           12 |        45 |            21.05 |
+	| (50,65]      |            3 |        12 |               20 |
 	
 *** Quanto ao uso de serviços públicos de saúde (SUS)
 
@@ -1440,9 +1515,9 @@
 	#+RESULTS:
 	| V018                       |   n |     f |
 	|----------------------------+-----+-------|
-	| Sim                        | 170 | 0.746 |
-	| Não                        |  58 | 0.254 |
-	| Total de respostas válidas | 228 |     1 |
+	| Sim                        | 168 | 0.747 |
+	| Não                        |  57 | 0.253 |
+	| Total de respostas válidas | 225 |     1 |
 
 *** Quanto à estrutura pública adequada de comunicação paciente-médico
 
@@ -1470,14 +1545,14 @@
 	#+RESULTS:
 	| V019                                                |   n |     f |
 	|-----------------------------------------------------+-----+-------|
-	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  37 | 0.218 |
-	| Ruim, não sabem LIBRAS e preciso escrever português |  26 | 0.153 |
-	| Ruim, não consigo comunicação                       |  42 | 0.247 |
-	| Boa, tem intérprete que me ajuda                    |  20 | 0.118 |
-	| Boa, porque familiar me ajuda                       |  38 | 0.224 |
+	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  37 |  0.22 |
+	| Ruim, não sabem LIBRAS e preciso escrever português |  25 | 0.149 |
+	| Ruim, não consigo comunicação                       |  43 | 0.256 |
+	| Boa, tem intérprete que me ajuda                    |  20 | 0.119 |
+	| Boa, porque familiar me ajuda                       |  38 | 0.226 |
 	| Boa, o profissional de saúde sabe LIBRAS            |   4 | 0.024 |
-	| nil                                                 |   3 | 0.018 |
-	| Total de respostas válidas                          | 170 |     1 |
+	| nil                                                 |   1 | 0.006 |
+	| Total de respostas válidas                          | 168 |     1 |
 
 	Em relação aos surdos que usam os serviços do SUS, resume-se a seguir a avaliação da experiência com a Central de Intérprete de Libras (CIL)
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
@@ -1499,11 +1574,11 @@
 	#+RESULTS:
 	| V020                                       |   n |     f |
 	|--------------------------------------------+-----+-------|
-	| Sim                                        |  30 | 0.176 |
-	| Não, porque eu esqueço de pedir            |  24 | 0.141 |
-	| Não, porque não tem intérprete livre nunca |  39 | 0.229 |
-	| nil                                        |  77 | 0.453 |
-	| Total de respostas válidas                 | 170 |     1 |
+	| Sim                                        |  29 | 0.173 |
+	| Não, porque eu esqueço de pedir            |  24 | 0.143 |
+	| Não, porque não tem intérprete livre nunca |  41 | 0.244 |
+	| nil                                        |  74 |  0.44 |
+	| Total de respostas válidas                 | 168 |     1 |
 
 	
 	Em relação aos surdos que conseguiram seu aparelho auditivo pelo SUS, resume-se a seguir a avaliação da comunicação com o profissional do SUS
@@ -1526,14 +1601,14 @@
 	#+RESULTS:
 	| V025                                               |  n |     f |
 	|----------------------------------------------------+----+-------|
-	| Ruim, não sabe LIBRAS e sou obrigado a oralizar    | 15 | 0.278 |
-	| Ruim, não sabe LIBRAS e preciso escrever português |  7 |  0.13 |
-	| Ruim, não consigo comunicação                      | 10 | 0.185 |
-	| Boa, tem intérprete que me ajuda                   |  2 | 0.037 |
-	| Boa, porque familiar me ajuda                      | 13 | 0.241 |
-	| Boa, o profissional de saúde sabe LIBRAS           |  4 | 0.074 |
-	| nil                                                |  3 | 0.056 |
-	| Total de respostas válidas                         | 54 |     1 |
+	| Ruim, não sabe LIBRAS e sou obrigado a oralizar    | 15 | 0.273 |
+	| Ruim, não sabe LIBRAS e preciso escrever português |  7 | 0.127 |
+	| Ruim, não consigo comunicação                      | 11 |   0.2 |
+	| Boa, tem intérprete que me ajuda                   |  2 | 0.036 |
+	| Boa, porque familiar me ajuda                      | 13 | 0.236 |
+	| Boa, o profissional de saúde sabe LIBRAS           |  4 | 0.073 |
+	| nil                                                |  3 | 0.055 |
+	| Total de respostas válidas                         | 55 |     1 |
 
 
 	Em relação aos surdos que conseguiram seu implante coclear pelo SUS, resume-se a seguir a avaliação da comunicação com o profissional do SUS
@@ -1587,9 +1662,9 @@
 	#+RESULTS:
 	| V021                       |   n |     f |
 	|----------------------------+-----+-------|
-	| Sim                        | 178 | 0.781 |
-	| Não                        |  50 | 0.219 |
-	| Total de respostas válidas | 228 |     1 |
+	| Sim                        | 178 | 0.791 |
+	| Não                        |  47 | 0.209 |
+	| Total de respostas válidas | 225 |     1 |
 
 *** Quanto à estrutura privada adequada de comunicação paciente-médico
 
@@ -1617,32 +1692,22 @@
 	#+RESULTS:
 	| V022                                                |   n |     f |
 	|-----------------------------------------------------+-----+-------|
-	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  38 | 0.213 |
+	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  39 | 0.219 |
 	| Ruim, não sabem LIBRAS e preciso escrever português |  27 | 0.152 |
-	| Ruim, não consigo comunicação                       |  54 | 0.303 |
-	| Boa, tem intérprete que me ajuda                    |  16 |  0.09 |
-	| Boa, porque familiar me ajuda                       |  34 | 0.191 |
+	| Ruim, não consigo comunicação                       |  57 |  0.32 |
+	| Boa, tem intérprete que me ajuda                    |  17 | 0.096 |
+	| Boa, porque familiar me ajuda                       |  33 | 0.185 |
 	| Boa, o profissional de saúde sabe LIBRAS            |   2 | 0.011 |
-	| nil                                                 |   7 | 0.039 |
+	| nil                                                 |   3 | 0.017 |
 	| Total de respostas válidas                          | 178 |     1 |
 
 
-* Conclusões
-
-  Observações preliminares:
-  
-  1. Tendo em vista que a amostra que embasa este estudo não foi determinada probabilisticamente a partir de um sistema de referência, o qual não existe, os achados e conclusões são restritos à própria amostra e portanto não podem ser generalizados além dela. São inválidas portanto generalizações como "a idade média dos surdos da RMC é src_R[:session :results replace ]{ round( v004,1) } {{{results(=39.2=)}}} anos" ou "src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=73.2=)}}} % dos surdos paulistas avaliam seu estado de saúde como bom ou muito bom".
-  2. Toda e qualquer conclusão deve ser feita somente em relação aos src_R[:session :results replace ]{ nrow(dat %>% filter(VALIDA) ) } {{{results(=228=)}}} participantes.
-  3. Pesquisas online, e especialmente esta que contém vídeos, geralmente introduzem vícios sócio-econômicos nos dados. Nossa pesquisa pressupõe que os participantes tenham acesso a meios eletrônicos (como computadores e celulares) e à internet de alta velocidade (como WIFI caseira ou planos móveis de banda larga), o que invariavelmente introduz um viés na pesquisa por deixar de fora dela aqueles participantes sem acesso a tais meios.
-
-** Comparação da comunicação paciente-médico no serviço público versus serviço privado
+** Comparação do serviço público versus serviço privado
 
 	#+BEGIN_SRC R :exports none :results silent :session 
 	## cores das barras (rede pública e rede privada) nos gráficos
 	hex_publ <- '#7062d3'
 	hex_priv <- '#1e1850'
-
-
 	## V019 (V018=='Sim') versus V022 (V021=='Sim')
 	tbl <- bind_rows(
 	  dat %>%
@@ -1694,13 +1759,12 @@
 		)
 	  )
 	)
-
 	n_publ <- tbl %>% filter( servico == 'público' ) %>% nrow
 	n_priv <- tbl %>% filter( servico == 'privado' ) %>% nrow
 
 	tbl_subset <- tbl %>% count( resposta, servico ) %>% rename( xlabel = 1) %>% na.omit()
 	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
-	tbl_subset %>%
+	plot <- tbl_subset %>%
 	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
 	  geom_bar(stat = 'identity', position = position_dodge()) +
 	  scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
@@ -1717,224 +1781,705 @@
 	   ,fill = ''
 	  ) +
 	  theme_bw() + 
+	  theme( legend.position = 'top')
+	ggsave( plot, filename = './img/comunicacao.png', width=8, height=4)
+
+
+
+	## Avaliação da comunicação
+	tbl_subset <- tbl %>% count( comunicacao, servico ) %>% rename( xlabel = 1) %>% na.omit()
+	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
+	plot <- tbl_subset %>%
+	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
+	  geom_bar(stat = 'identity', position = position_dodge()) +
+	  scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
+	  coord_flip() +
+	  labs(
+		title = 'Comparação Serviço Público vs Serviço Privado'
+	   ,subtitle = 'Avaliação da comunicação Paciente-Médico'
+	   ,x = ''
+	   ,y = 'número de respostas'
+	   ,caption = paste0('Observações:\n'
+						,' 1. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
+						,' 2. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
+						 )
+	   ,fill = ''
+	  ) +
+	  theme_bw() +
 	  theme( legend.position = 'top') 
+	ggsave( plot, filename = './img/comunicacao_agrp.png', width=5, height=4)
+
+	## Avaliação da estrutura
+	tbl_subset <- tbl %>% count( estrutura, servico ) %>% rename( xlabel = 1) %>% na.omit()
+	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
+	plot <- tbl_subset %>%
+	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
+	  geom_bar(stat = 'identity', position = position_dodge()) +
+	  scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
+	  coord_flip() + 
+	  labs(
+		title = 'Comparação Serviço Público vs Serviço Privado'
+	   ,subtitle = 'Avaliação da estrutura de atendimento'
+	   ,x = ''
+	   ,y = 'número de respostas'
+	   ,caption = paste0('Observações:\n'
+						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
+						,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
+						,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
+						 )
+	   ,fill = ''
+	  ) +
+	  theme_bw() + 
+	  theme( legend.position = 'top')
+	ggsave( plot, filename = './img/estrutura_agrp.png', width=5, height=4)
+
+	## Facets (estrutura/ Escolaridade)
+	tbl_subset <- tbl %>% count( estrutura, servico, escolaridade ) %>% rename( xlabel = 1) %>% na.omit()
+	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
+	plot <- tbl_subset %>%
+	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
+	  geom_bar(stat = 'identity', position = position_dodge()) +
+	  scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
+	  coord_flip() + 
+	  labs(
+		title = 'Comparação Serviço Público vs Serviço Privado'
+	   ,subtitle = 'Avaliação da estrutura de atendimento'
+	   ,x = ''
+	   ,y = 'número de respostas'
+	   ,caption = paste0('Observações:\n'
+						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
+						,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
+						,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
+						 )
+	   ,fill = ''
+	  ) +
+	  facet_wrap( ~ escolaridade, scales = 'free') + 
+	  theme_bw() + 
+	  theme( legend.position = 'top')
+	ggsave( plot, filename = './img/estrutura_escolaridade_agrp.png', width=11, height=5)
+
+	## Facets (estrutura/ Cor-Raça)
+	tbl_subset <- tbl %>% count( estrutura, servico, cor ) %>% rename( xlabel = 1) %>% na.omit()
+	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
+	plot <- tbl_subset %>%
+	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
+	  geom_bar(stat = 'identity', position = position_dodge()) +
+	  scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
+	  coord_flip() + 
+	  labs(
+		title = 'Comparação Serviço Público vs Serviço Privado'
+	   ,subtitle = 'Avaliação da estrutura de atendimento'
+	   ,x = ''
+	   ,y = 'número de respostas'
+	   ,caption = paste0('Observações:\n'
+						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
+						,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
+						,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
+						 )
+	   ,fill = ''
+	  ) +
+	  facet_wrap( ~ cor, scales = 'free') + 
+	  theme_bw() + 
+	  theme( legend.position = 'top')
+	ggsave( plot, filename = './img/estrutura_cor_agrp.png', width=8, height=5)
+
+	## Facets (estrutura/ sexo)
+	tbl_subset <- tbl %>% count( estrutura, servico, sexo ) %>% rename( xlabel = 1) %>% na.omit()
+	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
+	plot <- tbl_subset %>%
+	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
+	  geom_bar(stat = 'identity', position = position_dodge()) +
+	  scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
+	  coord_flip() + 
+	  labs(
+		title = 'Comparação Serviço Público vs Serviço Privado'
+	   ,subtitle = 'Avaliação da estrutura de atendimento'
+	   ,x = ''
+	   ,y = 'número de respostas'
+	   ,caption = paste0('Observações:\n'
+						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
+						,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
+						,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
+						 )
+	   ,fill = ''
+	  ) +
+	  facet_wrap( ~ sexo, scales = 'free') + 
+	  theme_bw() + 
+	  theme( legend.position = 'top')
+	ggsave( plot, filename = './img/estrutura_sexo_agrp.png', width=8, height=5)
+
+	## Facets (resposta/ sexo)
+	tbl_subset <- tbl %>% count( resposta, servico, sexo ) %>% rename( xlabel = 1) %>% na.omit()
+	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
+	plot <- tbl_subset %>%
+	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
+	  geom_bar(stat = 'identity', position = position_dodge()) +
+	  scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
+	  coord_flip() + 
+	  labs(
+		title = 'Comparação Serviço Público vs Serviço Privado'
+	   ,subtitle = 'Avaliação da comunicação paciente-médico'
+	   ,x = ''
+	   ,y = 'número de respostas'
+	   ,caption = paste0('Observações:\n'
+						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
+						,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
+						,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
+						 )
+	   ,fill = ''
+	  ) +
+	  facet_grid( ~ sexo, scales = 'free_y') + 
+	  coord_flip() +
+	  theme_bw() + 
+	  theme( legend.position = 'top') 
+	ggsave( plot, filename = './img/comunicacao_sexo_agrp.png', width=8, height=5)
 
 
-	if (FALSE){
+	## Facets (estrutura/ uso-rede)
+	tbl_subset <- tbl %>% count( estrutura, servico, uso_rede ) %>% rename( xlabel = 1) %>% na.omit()
+	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
+	plot <- tbl_subset %>%
+	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
+	  geom_bar(stat = 'identity', position = position_dodge()) +
+	  scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
+	  coord_flip() + 
+	  labs(
+		title = 'Comparação Serviço Público vs Serviço Privado'
+	   ,subtitle = 'Avaliação da estrutura de atendimento'
+	   ,x = ''
+	   ,y = 'número de respostas'
+	   ,caption = paste0('Observações:\n'
+						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
+						,' 2. N = ', (tbl %>% filter( uso_rede == 'Ambas') %>% nrow)/2 ,' usuários de ambas as redes\n'
+						,' 3. N = ', tbl %>% filter( uso_rede == 'Somente Pública') %>% nrow ,' usuários somente da rede pública\n'
+						,' 4. N = ', tbl %>% filter( uso_rede == 'Somente Privada') %>% nrow ,' usuários somente da rede privada\n'
+						 )
+	   ,fill = ''
+	  ) +
+	  facet_wrap( ~ uso_rede, scales = 'free') + 
+	  theme_bw() + 
+	  theme( legend.position = 'top') 
+	ggsave( plot, filename = './img/estrutura_rede_agrp.png', width=8, height=5)
 
-	  ## Avaliação da comunicação
-	  tbl_subset <- tbl %>% count( comunicacao, servico ) %>% rename( xlabel = 1) %>% na.omit()
-	  cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
-	  tbl_subset %>%
-		ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
-		geom_bar(stat = 'identity', position = position_dodge()) +
-		scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
-		coord_flip() +
-		labs(
-		  title = 'Comparação Serviço Público vs Serviço Privado'
-		 ,subtitle = 'Avaliação da comunicação Paciente-Médico'
-		 ,x = ''
-		 ,y = 'número de respostas'
-		 ,caption = paste0('Observações:\n'
-						  ,' 1. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
-						  ,' 2. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
-						   )
-		 ,fill = ''
-		) +
-		theme_bw() +
-		theme( legend.position = 'top') 
-
-	  ## Avaliação da estrutura
-	  tbl_subset <- tbl %>% count( estrutura, servico ) %>% rename( xlabel = 1) %>% na.omit()
-	  cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
-	  tbl_subset %>%
-		ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
-		geom_bar(stat = 'identity', position = position_dodge()) +
-		scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
-		coord_flip() + 
-		labs(
-		  title = 'Comparação Serviço Público vs Serviço Privado'
-		 ,subtitle = 'Avaliação da estrutura de atendimento'
-		 ,x = ''
-		 ,y = 'número de respostas'
-		 ,caption = paste0('Observações:\n'
-						  ,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
-						  ,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
-						  ,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
-						   )
-		 ,fill = ''
-		) +
-		theme_bw() + 
-		theme( legend.position = 'top')
-
-	  ## Facets (estrutura/ Escolaridade)
-	  tbl_subset <- tbl %>% count( estrutura, servico, escolaridade ) %>% rename( xlabel = 1) %>% na.omit()
-	  cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
-	  tbl_subset %>%
-		ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
-		geom_bar(stat = 'identity', position = position_dodge()) +
-		scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
-		coord_flip() + 
-		labs(
-		  title = 'Comparação Serviço Público vs Serviço Privado'
-		 ,subtitle = 'Avaliação da estrutura de atendimento'
-		 ,x = ''
-		 ,y = 'número de respostas'
-		 ,caption = paste0('Observações:\n'
-						  ,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
-						  ,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
-						  ,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
-						   )
-		 ,fill = ''
-		) +
-		facet_wrap( ~ escolaridade, scales = 'free') + 
-		theme_bw() + 
-		theme( legend.position = 'top')
-
-	  ## Facets (estrutura/ Cor-Raça)
-	  tbl_subset <- tbl %>% count( estrutura, servico, cor ) %>% rename( xlabel = 1) %>% na.omit()
-	  cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
-	  tbl_subset %>%
-		ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
-		geom_bar(stat = 'identity', position = position_dodge()) +
-		scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
-		coord_flip() + 
-		labs(
-		  title = 'Comparação Serviço Público vs Serviço Privado'
-		 ,subtitle = 'Avaliação da estrutura de atendimento'
-		 ,x = ''
-		 ,y = 'número de respostas'
-		 ,caption = paste0('Observações:\n'
-						  ,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
-						  ,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
-						  ,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
-						   )
-		 ,fill = ''
-		) +
-		facet_wrap( ~ cor, scales = 'free') + 
-		theme_bw() + 
-		theme( legend.position = 'top')
-
-	  ## Facets (estrutura/ sexo)
-	  tbl_subset <- tbl %>% count( estrutura, servico, sexo ) %>% rename( xlabel = 1) %>% na.omit()
-	  cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
-	  tbl_subset %>%
-		ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
-		geom_bar(stat = 'identity', position = position_dodge()) +
-		scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
-		coord_flip() + 
-		labs(
-		  title = 'Comparação Serviço Público vs Serviço Privado'
-		 ,subtitle = 'Avaliação da estrutura de atendimento'
-		 ,x = ''
-		 ,y = 'número de respostas'
-		 ,caption = paste0('Observações:\n'
-						  ,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
-						  ,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
-						  ,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
-						   )
-		 ,fill = ''
-		) +
-		facet_wrap( ~ sexo, scales = 'free') + 
-		theme_bw() + 
-		theme( legend.position = 'top')
-
-	  ## Facets (resposta/ sexo)
-	  tbl_subset <- tbl %>% count( resposta, servico, sexo ) %>% rename( xlabel = 1) %>% na.omit()
-	  cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
-	  tbl_subset %>%
-		ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
-		geom_bar(stat = 'identity', position = position_dodge()) +
-		scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
-		coord_flip() + 
-		labs(
-		  title = 'Comparação Serviço Público vs Serviço Privado'
-		 ,subtitle = 'Avaliação da comunicação paciente-médico'
-		 ,x = ''
-		 ,y = 'número de respostas'
-		 ,caption = paste0('Observações:\n'
-						  ,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
-						  ,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
-						  ,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
-						   )
-		 ,fill = ''
-		) +
-		facet_grid( ~ sexo, scales = 'free_y') + 
-		coord_flip() +
-		theme_bw() + 
-		theme( legend.position = 'top') 
-
-
-	  ## Facets (estrutura/ uso-rede)
-	  tbl_subset <- tbl %>% count( estrutura, servico, uso_rede ) %>% rename( xlabel = 1) %>% na.omit()
-	  cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
-	  tbl_subset %>%
-		ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
-		geom_bar(stat = 'identity', position = position_dodge()) +
-		scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
-		coord_flip() + 
-		labs(
-		  title = 'Comparação Serviço Público vs Serviço Privado'
-		 ,subtitle = 'Avaliação da estrutura de atendimento'
-		 ,x = ''
-		 ,y = 'número de respostas'
-		 ,caption = paste0('Observações:\n'
-						  ,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
-						  ,' 2. N = ', (tbl %>% filter( uso_rede == 'Ambas') %>% nrow)/2 ,' usuários de ambas as redes\n'
-						  ,' 3. N = ', tbl %>% filter( uso_rede == 'Somente Pública') %>% nrow ,' usuários somente da rede pública\n'
-						  ,' 4. N = ', tbl %>% filter( uso_rede == 'Somente Privada') %>% nrow ,' usuários somente da rede privada\n'
-						   )
-		 ,fill = ''
-		) +
-		facet_wrap( ~ uso_rede, scales = 'free') + 
-		theme_bw() + 
-		theme( legend.position = 'top') 
-
-	  ## Facets (comunicacao / uso-rede)
-	  tbl_subset <- tbl %>% count( comunicacao, servico, uso_rede ) %>% rename( xlabel = 1) %>% na.omit()
-	  cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
-	  tbl_subset %>%
-		ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
-		geom_bar(stat = 'identity', position = position_dodge()) +
-		scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
-		coord_flip() + 
-		labs(
-		  title = 'Comparação Serviço Público vs Serviço Privado'
-		 ,subtitle = 'Avaliação da comunicação paciente-médico'
-		 ,x = ''
-		 ,y = 'número de respostas'
-		 ,caption = paste0('Observações:\n'
-						  ,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
-						  ,' 2. N = ', (tbl %>% filter( uso_rede == 'Ambas') %>% nrow)/2 ,' usuários de ambas as redes\n'
-						  ,' 3. N = ', tbl %>% filter( uso_rede == 'Somente Pública') %>% nrow ,' usuários somente da rede pública\n'
-						  ,' 4. N = ', tbl %>% filter( uso_rede == 'Somente Privada') %>% nrow ,' usuários somente da rede privada\n'
-						   )
-		 ,fill = ''
-		) +
-		facet_wrap( ~ uso_rede, scales = 'free') + 
-		theme_bw() + 
-		theme( legend.position = 'top') 
-
-
-	}
+	## Facets (comunicacao / uso-rede)
+	tbl_subset <- tbl %>% count( comunicacao, servico, uso_rede ) %>% rename( xlabel = 1) %>% na.omit()
+	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
+	plot <- tbl_subset %>%
+	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
+	  geom_bar(stat = 'identity', position = position_dodge()) +
+	  scale_fill_manual( values = c(hex_priv,hex_publ) ) + 
+	  coord_flip() + 
+	  labs(
+		title = 'Comparação Serviço Público vs Serviço Privado'
+	   ,subtitle = 'Avaliação da comunicação paciente-médico'
+	   ,x = ''
+	   ,y = 'número de respostas'
+	   ,caption = paste0('Observações:\n'
+						,' 1. N = ', (tbl %>% filter( uso_rede == 'Ambas') %>% nrow)/2 ,' usuários de ambas as redes\n'
+						,' 2. N = ', tbl %>% filter( uso_rede == 'Somente Pública') %>% nrow ,' usuários somente da rede pública\n'
+						,' 3. N = ', tbl %>% filter( uso_rede == 'Somente Privada') %>% nrow ,' usuários somente da rede privada\n'
+						 )
+	   ,fill = ''
+	  ) +
+	  facet_wrap( ~ uso_rede, scales = 'free') + 
+	  theme_bw() + 
+	  theme( legend.position = 'top') 
+	ggsave( plot, filename = './img/comunicacao_rede_agrp.png', width=8, height=5)
 	#+END_SRC
 
-   
+*** Quanto à comunicação paciente-médico
+  :PROPERTIES:
+  :CUSTOM_ID: sec:comp_comunic
+  :END:  
+	
+**** Avaliação detalhada
+
+	 #+CAPTION: Avaliação detalhada da comunicação paciente-médico
+	 #+ATTR_ORG: :width 600
+	 [[./img/comunicacao.png]]
   
+**** Avaliação resumida
+
+	 #+CAPTION: Avaliação resumida da comunicação paciente-médico
+	 #+ATTR_ORG: :width 600
+	 [[./img/comunicacao_agrp.png]]
+
+**** Segmentada por sexo
+
+	 #+CAPTION: Avaliação resumida da comunicação paciente-médico e segmentada por sexo
+	 #+ATTR_ORG: :width 600
+	 [[./img/comunicacao_sexo_agrp.png]]
+
+**** Segmentada por uso de rede
+
+	 #+CAPTION: Avaliação resumida da comunicação paciente-médico e segmentada por uso de rede
+	 #+ATTR_ORG: :width 600
+	 [[./img/comunicacao_rede_agrp.png]]
+	 
+	 
+*** Quanto à estrutura de atendimento ao surdo usuário de Libras
+  :PROPERTIES:
+  :CUSTOM_ID: sec:comp_estrut
+  :END:  
+
+**** Avaliação geral da estrutura 
+
+	 #+CAPTION: Avaliação geral da estrutura de atendimento ao surdo usuário de Libras
+	 #+ATTR_ORG: :width 600
+	 [[./img/estrutura_agrp.png]]
+
+	
+**** Segmentada por sexo
+
+	 #+CAPTION: Avaliação da estrutura de atendimento ao usuário de Libras segmentada por sexo 
+	 #+ATTR_ORG: :width 600
+	 [[./img/estrutura_sexo_agrp.png]]
+ 
+
+**** Segmentada por escolaridade
+
+	 #+CAPTION: Avaliação da estrutura de atendimento ao usuário de Libras segmentada por escolaridade
+	 #+ATTR_ORG: :width 600
+	 [[./img/estrutura_escolaridade_agrp.png]]
+	 
+**** Segmentada por cor/raça
+
+	 #+CAPTION: Avaliação da estrutura de atendimento ao usuário de Libras segmentada por cor/raça 
+	 #+ATTR_ORG: :width 600
+	 [[./img/estrutura_cor_agrp.png]]
+
+**** Segmentada por uso de rede
+
+	 #+CAPTION: Avaliação da estrutura de atendimento ao usuário de Libras segmentada por uso de rede
+	 #+ATTR_ORG: :width 600
+	 [[./img/estrutura_rede_agrp.png]]
+
+
 ** Análise de correspondência
    
 *** Escolaridade vs Estado de Saúde
+
+	#+BEGIN_SRC R :exports none :results silent :session 
+	## http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
+	ca.dat <- dat %>%
+	  filter( VALIDA == TRUE ) %>%
+	  count( V006, V015 ) %>% # Escolaridade (V006) vs Estado de saúde (V015)
+	  rename( row = 1, col = 2 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = row
+	   ,names_from = col
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  as.data.frame()
+
+	row.names(ca.dat) <- ca.dat$row
+	ca.dat$row <- NULL
+
+	ca.pvalue <- chisq.test(ca.dat)$p.value
+
+	res.ca <- CA( ca.dat, graph = FALSE)
+	## summary(res.ca)
+
+	plot.ca <- fviz_ca_biplot(
+	  res.ca
+	 ,map = 'rowprincipal'
+	 ,arrows = c(TRUE,TRUE)
+	 ,repel = TRUE
+	)
+	ggsave( plot.ca, filename = './img/ca_biplot_V006_V015.png', width = 7, height = 6 )
+	#+END_SRC
+
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.742724=)}}}.
+	
+	#+CAPTION: Análise de correspondência - Escolaridade vs Autoavaliação do estado de saúde
+	#+ATTR_ORG: :width 600
+	[[./img/ca_biplot_V006_V015.png]]
+	
 *** Religião vs Estado de Saúde
+
+	#+BEGIN_SRC R :exports none :results silent :session 
+	## http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
+	ca.dat <- dat %>%
+	  filter( VALIDA == TRUE ) %>%
+	  count( V009_agrp, V015 ) %>% # Religião (V009_agrp) vs Estado de saúde (V015)
+	  rename( row = 1, col = 2 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = row
+	   ,names_from = col
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  as.data.frame()
+
+	row.names(ca.dat) <- ca.dat$row
+	ca.dat$row <- NULL
+
+	ca.pvalue <- chisq.test(ca.dat)$p.value
+
+	res.ca <- CA( ca.dat, graph = FALSE)
+	## summary(res.ca)
+
+	plot.ca <- fviz_ca_biplot(
+	  res.ca
+	 ,map = 'rowprincipal'
+	 ,arrows = c(TRUE,TRUE)
+	 ,repel = TRUE
+	)
+	ggsave( plot.ca, filename = './img/ca_biplot_V009_V015.png', width = 7, height = 6 )
+	#+END_SRC
+
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.125609=)}}}.
+	
+	#+CAPTION: Análise de correspondência - Religião vs Autoavaliação do estado de saúde
+	#+ATTR_ORG: :width 600
+	[[./img/ca_biplot_V009_V015.png]]
+	
 *** Trabalho vs Estado de Saúde
+
+	#+BEGIN_SRC R :exports none :results silent :session 
+	## http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
+	ca.dat <- dat %>%
+	  filter( VALIDA == TRUE ) %>%
+	  count( V007, V015 ) %>% # Trabalho (V007) vs Estado de saúde (V015)
+	  rename( row = 1, col = 2 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = row
+	   ,names_from = col
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  as.data.frame()
+
+	row.names(ca.dat) <- ca.dat$row
+	ca.dat$row <- NULL
+
+	ca.pvalue <- chisq.test(ca.dat)$p.value
+
+	res.ca <- CA( ca.dat, graph = FALSE)
+	## summary(res.ca)
+
+	plot.ca <- fviz_ca_biplot(
+	  res.ca
+	 ,map = 'rowprincipal'
+	 ,arrows = c(TRUE,TRUE)
+	 ,repel = TRUE
+	)
+	ggsave( plot.ca, filename = './img/ca_biplot_V007_V015.png', width = 7, height = 6 )
+	#+END_SRC
+
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.0476=)}}}.
+	
+	#+CAPTION: Análise de correspondência - Trabalho vs Autoavaliação do estado de saúde
+	#+ATTR_ORG: :width 600
+	[[./img/ca_biplot_V007_V015.png]]
+	
 *** Cor/Raça vs Estado de Saúde
+	#+BEGIN_SRC R :exports none :results silent :session 
+	## http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
+	ca.dat <- dat %>%
+	  filter( VALIDA == TRUE ) %>%
+	  count( V008, V015 ) %>% # Cor/Raça (V008) vs Estado de saúde (V015)
+	  rename( row = 1, col = 2 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = row
+	   ,names_from = col
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  as.data.frame()
+
+	row.names(ca.dat) <- ca.dat$row
+	ca.dat$row <- NULL
+
+	ca.pvalue <- chisq.test(ca.dat)$p.value
+
+	res.ca <- CA( ca.dat, graph = FALSE)
+	## summary(res.ca)
+
+	plot.ca <- fviz_ca_biplot(
+	  res.ca
+	 ,map = 'rowprincipal'
+	 ,arrows = c(TRUE,TRUE)
+	 ,repel = TRUE
+	)
+	ggsave( plot.ca, filename = './img/ca_biplot_V008_V015.png', width = 7, height = 6 )
+	#+END_SRC
+
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.397374=)}}}.
+	
+	#+CAPTION: Análise de correspondência - Cor/Raça vs Autoavaliação do estado de saúde
+	#+ATTR_ORG: :width 600
+	[[./img/ca_biplot_V008_V015.png]]
+
 *** Cidade vs Estado de Saúde
-*** Diabetes-Hipertensao vs Estado de Saúde
-*** Fuma-Bebe vs Estado de Saúde
+	#+BEGIN_SRC R :exports none :results silent :session 
+	## http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
+	ca.dat <- dat %>%
+	  filter( VALIDA == TRUE ) %>%
+	  count( V010, V015 ) %>% # Cidade (V010) vs Estado de saúde (V015)
+	  rename( row = 1, col = 2 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = row
+	   ,names_from = col
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  as.data.frame()
+
+	row.names(ca.dat) <- ca.dat$row
+	ca.dat$row <- NULL
+
+	ca.pvalue <- chisq.test(ca.dat)$p.value
+
+	res.ca <- CA( ca.dat, graph = FALSE)
+	## summary(res.ca)
+
+	plot.ca <- fviz_ca_biplot(
+	  res.ca
+	 ,map = 'rowprincipal'
+	 ,arrows = c(TRUE,TRUE)
+	 ,repel = TRUE
+	)
+	ggsave( plot.ca, filename = './img/ca_biplot_V010_V015.png', width = 7, height = 6 )
+	#+END_SRC
+
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.488594=)}}}.
+	
+	#+CAPTION: Análise de correspondência - Cidade vs Autoavaliação do estado de saúde
+	#+ATTR_ORG: :width 600
+	[[./img/ca_biplot_V010_V015.png]]
+
+*** Diabetes vs Estado de Saúde
+	#+BEGIN_SRC R :exports none :results silent :session 
+	## http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
+	ca.dat <- dat %>%
+	  filter( VALIDA == TRUE ) %>%
+	  count( V013, V015 ) %>% # Diabetes (V013) vs Estado de saúde (V015)
+	  rename( row = 1, col = 2 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = row
+	   ,names_from = col
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  as.data.frame()
+
+	row.names(ca.dat) <- ca.dat$row
+	ca.dat$row <- NULL
+
+	ca.pvalue <- chisq.test(ca.dat)$p.value
+
+	res.ca <- CA( ca.dat, graph = FALSE)
+	## summary(res.ca)
+
+	plot.ca <- fviz_ca_biplot(
+	  res.ca
+	 ,map = 'rowprincipal'
+	 ,arrows = c(TRUE,TRUE)
+	 ,repel = TRUE
+	)
+	ggsave( plot.ca, filename = './img/ca_biplot_V013_V015.png', width = 7, height = 6 )
+	#+END_SRC
+
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.103977=)}}}.
+	
+	#+CAPTION: Análise de correspondência - Diabetes vs Autoavaliação do estado de saúde
+	#+ATTR_ORG: :width 600
+	[[./img/ca_biplot_V013_V015.png]]
+
+*** Hipertensão vs Estado de Saúde
+	#+BEGIN_SRC R :exports none :results silent :session 
+	## http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
+	ca.dat <- dat %>%
+	  filter( VALIDA == TRUE ) %>%
+	  count( V014, V015 ) %>% # Hipertensão (V014) vs Estado de saúde (V015)
+	  rename( row = 1, col = 2 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = row
+	   ,names_from = col
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  as.data.frame()
+
+	row.names(ca.dat) <- ca.dat$row
+	ca.dat$row <- NULL
+
+	ca.pvalue <- chisq.test(ca.dat)$p.value
+
+	res.ca <- CA( ca.dat, graph = FALSE)
+	## summary(res.ca)
+
+	plot.ca <- fviz_ca_biplot(
+	  res.ca
+	 ,map = 'rowprincipal'
+	 ,arrows = c(TRUE,TRUE)
+	 ,repel = TRUE
+	)
+	ggsave( plot.ca, filename = './img/ca_biplot_V014_V015.png', width = 7, height = 6 )
+	#+END_SRC
+
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.00047=)}}}.
+	
+	#+CAPTION: Análise de correspondência - Hipertensão vs Autoavaliação do estado de saúde
+	#+ATTR_ORG: :width 600
+	[[./img/ca_biplot_V014_V015.png]]
+
+*** Tabagismo vs Estado de Saúde
+	#+BEGIN_SRC R :exports none :results silent :session 
+	## http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
+	ca.dat <- dat %>%
+	  filter( VALIDA == TRUE ) %>%
+	  count( V016, V015 ) %>% # Tabagismo (V016) vs Estado de saúde (V015)
+	  rename( row = 1, col = 2 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = row
+	   ,names_from = col
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  as.data.frame()
+
+	row.names(ca.dat) <- ca.dat$row
+	ca.dat$row <- NULL
+
+	ca.pvalue <- chisq.test(ca.dat)$p.value
+
+	res.ca <- CA( ca.dat, graph = FALSE)
+	## summary(res.ca)
+
+	plot.ca <- fviz_ca_biplot(
+	  res.ca
+	 ,map = 'rowprincipal'
+	 ,arrows = c(TRUE,TRUE)
+	 ,repel = TRUE
+	)
+	ggsave( plot.ca, filename = './img/ca_biplot_V016_V015.png', width = 7, height = 6 )
+	#+END_SRC
+
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.735779=)}}}.
+	
+	#+CAPTION: Análise de correspondência - Tabagismo vs Autoavaliação do estado de saúde
+	#+ATTR_ORG: :width 600
+	[[./img/ca_biplot_V016_V015.png]]
+
+# *** Consumo de álcool vs Estado de Saúde
+# 	#+BEGIN_SRC R :exports none :results silent :session 
+# 	## http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
+# 	ca.dat <- dat %>%
+# 	  filter( VALIDA == TRUE ) %>%
+# 	  count( V017, V015 ) %>% # Consumo de álcool (V017) vs Estado de saúde (V015)
+# 	  rename( row = 1, col = 2 ) %>%
+# 	  na.omit() %>%
+# 	  pivot_wider(
+# 		id_cols = row
+# 	   ,names_from = col
+# 	   ,values_from = n
+# 	   ,values_fill = 0
+# 	  ) %>%
+# 	  as.data.frame()
+
+# 	row.names(ca.dat) <- ca.dat$row
+# 	ca.dat$row <- NULL
+
+# 	ca.pvalue <- chisq.test(ca.dat)$p.value
+
+# 	res.ca <- CA( ca.dat, graph = FALSE)
+# 	## summary(res.ca)
+
+# 	plot.ca <- fviz_ca_biplot(
+# 	  res.ca
+# 	 ,map = 'rowprincipal'
+# 	 ,arrows = c(TRUE,TRUE)
+# 	 ,repel = TRUE
+# 	)
+# 	ggsave( plot.ca, filename = './img/ca_biplot_V017_V015.png', width = 7, height = 6 )
+# 	#+END_SRC
+
+# 	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.802072=)}}}.
+	
+# 	#+CAPTION: Análise de correspondência - Consumo de álcool vs Autoavaliação do estado de saúde
+# 	#+ATTR_ORG: :width 600
+# 	[[./img/ca_biplot_V017_V015.png]]
+
 *** Faixa etária vs Estado de Saúde
+	#+BEGIN_SRC R :exports none :results silent :session 
+	## http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/113-ca-correspondence-analysis-in-r-essentials/
+	ca.dat <- dat %>%
+	  filter( VALIDA == TRUE ) %>%
+	  mutate(
+		faixa_etaria = cut( V004_idade, breaks = c(19,30,40,50,65,120), include.lowest = TRUE )
+	  ) %>%
+	  count( faixa_etaria, V015 ) %>% # Faixa etária vs Estado de saúde (V015)
+	  rename( row = 1, col = 2 ) %>%
+	  na.omit() %>%
+	  pivot_wider(
+		id_cols = row
+	   ,names_from = col
+	   ,values_from = n
+	   ,values_fill = 0
+	  ) %>%
+	  as.data.frame()
+
+	row.names(ca.dat) <- ca.dat$row
+	ca.dat$row <- NULL
+
+	ca.pvalue <- chisq.test(ca.dat)$p.value
+
+	res.ca <- CA( ca.dat, graph = FALSE)
+	## summary(res.ca)
+
+	plot.ca <- fviz_ca_biplot(
+	  res.ca
+	 ,map = 'rowprincipal'
+	 ,arrows = c(TRUE,TRUE)
+	 ,repel = TRUE
+	)
+	ggsave( plot.ca, filename = './img/ca_biplot_fxetaria_V015.png', width = 7, height = 6 )
+	#+END_SRC
+
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.725998=)}}}.
+	
+	#+CAPTION: Análise de correspondência - Faixa etária vs Autoavaliação do estado de saúde
+	#+ATTR_ORG: :width 600
+	[[./img/ca_biplot_fxetaria_V015.png]]
+
+
+	 
+* Conclusões
+
+ 1. Tendo em vista que a amostra que embasa este estudo não foi determinada probabilisticamente a partir de um sistema de referência, o qual não existe, os achados e conclusões são restritos à própria amostra e portanto não podem ser generalizados além dela. São inválidas portanto generalizações como "a idade média dos surdos da RMC é src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.9=)}}} anos" ou "src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=75.1=)}}} % dos surdos paulistas avaliam seu estado de saúde como bom ou muito bom".
+
+ 2. Toda e qualquer conclusão deve ser feita somente em relação aos src_R[:session :results replace ]{ nrow(dat %>% filter(VALIDA) ) } {{{results(=225=)}}} participantes.
+
+ 3. O desemprego observado na amostra é superior à inflação oficial brasileira, independente do ponto de vista utlizado para analisar os dados. Além disso, nota-se que
+
+	1. o desemprego entre mulheres é o dobro do que entre os homens (vide [[#sec:desemp_sexo]])
+	2. o desemprego diminui à medida que a escolaridade aumenta (vide [[#sec:desemp_escolaridade]])
+	3. o desemprego entre pardos é mais que o dobro do que entre brancos (vide [[#sec:desemp_raca]])
+	4. o desemprego diminui à medida que a idade aumenta (vide [[#sec:desemp_idade]])
+
+ 4. Pesquisas online, e especialmente esta que contém vídeos, geralmente introduzem vícios sócio-econômicos nos dados. Nossa pesquisa pressupõe que os participantes tenham acesso a meios eletrônicos (como computadores e celulares) e à internet de alta velocidade (como WIFI caseira ou planos móveis de banda larga), o que invariavelmente introduz um viés na pesquisa por deixar de fora dela aqueles participantes sem acesso a tais meios.
+
+ 5. A percepção dos participantes em relação à comunicação paciente-médico é ruim, independente dos fatores sob comparação (sexo, escolaridade, cor/raça) e da rede utilizada, seja ela privada ou pública (vide seção [[#sec:comp_comunic]] e suas subseções).
+
+ 6. Quando analisamos a estrutura do atendimento ao paciente surdo, precisamos reclassificar uma das respostas como ruim, a dizer: "Boa, porque familiar me ajuda". Embora a comunicação seja possível nessa situação, o simples fato de um familiar precisar acompanhar o surdo em sua consulta demonstra que a estrutura de atendimento a ele é ruim (vide seção [[#sec:comp_estrut]] e suas subseções).
+
+ 7. A atenção ótima ao paciente surdo, que ocorre quando o próprio profissional de saúde sabe Libras, foi o item mais raro e evidencia a dificuldade da população surda ter um atendimento no qual sua esfera privada é respeitada e no qual ele pode receber uma anamnésia de alta qualidade.
+	 
 
 ** Resumo das variáveis                                            :noexport:
 
-   #+BEGIN_SRC R :exports results :results silent :eval no :session 
+   #+BEGIN_SRC R :exports results :results silent :eval yes :session 
    ## descritivo das variáveis
 
    ## sem segmentar
@@ -2101,7 +2646,7 @@
 	 gt::gtsave( filename = './data/summary_by_cochlear_implant.html')
    #+END_SRC
 
-
+   
 
 * Matriz de distâncias                                             :noexport:
   
