@@ -190,7 +190,7 @@
    names(raw) <- headers$codes
 
    ## tabela tratada
-   dat <- raw %>% 
+   dat <- raw %>%
 	 mutate(
 	   ## CEP
 	   V012 = str_trim( gsub('[[:blank:]]+','', gsub('[[:punct:]]+',' ',V012) ) )
@@ -201,12 +201,12 @@
 	   ## consentimento livre e esclarecido
 	  ,V002
 	   ## Você se comunica por LIBRAS, tem 18 anos ou mais e mora em alguma das cidades do mapa?
-	   ## correção pontual em 21.10.2021
-	  ,V003 = case_when(
-		 V001 == '06/10/2021 22:23:42' & is.na(V003)     ~ 'A - Sim' # TCLE e questionário respondidos, publico alvo vazio
-		,V001 == '06/10/2021 20:49:53' & is.na(V003)     ~ 'A - Sim' # TCLE e questionário respondidos, publico alvo vazio
-		,TRUE ~ as.character(V003)
-	   )
+	   ## correção pontual não será mais feita...
+	   ## ,V003 = case_when(
+	   ##    V001 == '06/10/2021 22:23:42' & is.na(V003)     ~ 'A - Sim' # TCLE e questionário respondidos, publico alvo vazio
+	   ##   ,V001 == '06/10/2021 20:49:53' & is.na(V003)     ~ 'A - Sim' # TCLE e questionário respondidos, publico alvo vazio
+	   ##   ,TRUE ~ as.character(V003)
+	   ##  )
 	  ,V003 = factor(
 		 str_sub( string = V003, start = 5 )
 		,levels = str_sub(
@@ -233,7 +233,6 @@
 		,V001 == '21/08/2021 12:28:37' & is.na(V004)          ~ '31/08/1969'
 		,V001 == '06/10/2021 20:01:34' & is.na(V004)          ~ '18/06/1971'
 		,V001 == '13/10/2021 23:32:18' & is.na(V004)          ~ '12/01/1975'
-		,V001 == '22/09/2021 16:55:45' & is.na(V004)          ~ '01/01/2025' # excluir da pesquisa, por isso a data futura
 		,TRUE ~ as.character(V004)
 	   )
 	  ,V004 = strptime( V004, format = '%d/%m/%Y' )
@@ -312,7 +311,7 @@
 		,grepl('jeov',V009,ignore.case=TRUE)  ~ 'Testemunha de Jeová'
 		,grepl('etodist',V009,ignore.case=TRUE)  ~ 'Metodista'
 		,V009 == 'Não tenho religião' ~ 'Sem religião'
-		 ,is.na(V009) ~ 'Não informada'
+		,is.na(V009) ~ 'Não informada'
 		,TRUE ~ 'Outra'
 	   )
 	   ## Qual cidade você mora?
@@ -560,7 +559,7 @@
 	   ## flag de respostas válidas
 	  ,VALIDA = FALSE
 	  ,VALIDA = case_when(
-		 ## --- Filtro antigo
+		 ## --- Filtro antigo, imputando conteúdo às respostas vazias de TCLE, público alvo...
 		 ##
 		 ## Resposta válida: TCLE ok, público alvo ok, idade >= 18 (ou vazia), cidade da RMC (ou vazia)
 		 ## !is.na(V002) & V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
@@ -575,16 +574,42 @@
 		 ## Resposta inválida: sem preenchimento de TCLE, Público alvo, Nascimento e Cidade
 		 ## ,is.na(V002) & is.na(V003) & is.na(V004) & is.na(V010)                                                        ~ FALSE 
 		 ##
-		 ##  --- Filtro revisto (21.10.2021)
+		 ##  --- Filtro revisto (21.10.2021), ainda imputanto conteúdo às respostas vazias de TCLE e público alvo
 		 ## Resposta válida: Tanto faz TCLE, público alvo 'Sim', idade >= 18 ou vazia, cidade da RMC  ou vazia
-		 V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
+		 ## V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
 		 ## Resposta inválida: Tanto faz TCLE, público alvo 'Não', ignora o resto ...
-		,V003 == 'Não' ~ FALSE
+		 ## ,V003 == 'Não' ~ FALSE
 		 ## Resposta válida: Tanto faz TCLE, público alvo vazio, mas idade >= 18, cidade da RMC e comunicação paciente-médico não nulo para SUS e rede privada
-		,is.na(V003) & V004_idade >= 18 & V010_rmc == TRUE & ( (V018 == 'Sim' & !is.na(V019)) | (V021 == 'Sim' & !is.na(V022)) ) ~ TRUE
+		 ## ,is.na(V003) & V004_idade >= 18 & V010_rmc == TRUE & ( (V018 == 'Sim' & !is.na(V019)) | (V021 == 'Sim' & !is.na(V022)) ) ~ TRUE
 		 ## Resposta inválida: sem preenchimento de TCLE, Público alvo, Nascimento e Cidade
-		,is.na(V002) & is.na(V003) & is.na(V004) & is.na(V010)                                                        ~ FALSE 
+		 ## ,is.na(V002) & is.na(V003) & is.na(V004) & is.na(V010)                                                        ~ FALSE 
+		 ## ,TRUE ~ FALSE
+		 ##
+		 ##  --- Filtro revisto (24.10.2021): somente TCLE e Público alvo definem a inclusão do participante!
+		 ## Resposta válida: TCLE preenchido, público alvo 'Sim', idade >= 18 ou vazia, cidade da RMC  ou vazia
+		 !is.na(V002) & V003 == 'Sim' & ( V004_idade >= 18 | is.na(V004_idade) ) & ( V010_rmc == TRUE | is.na(V010) ) ~ TRUE
+		 ## Resposta inválida: ignora o resto ...
 		,TRUE ~ FALSE
+	   )
+	 ) %>%
+	 mutate( # casos duplicados na base (são marcados como VALIDA == FALSE). Desconsiderados os casos mais antigos
+	   VALIDA = case_when(
+		 V001 == '06/10/2021 22:23:42' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba  1
+		,V001 == '06/10/2021 22:32:09' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba  1
+		,V001 == '06/10/2021 19:06:50' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba  2
+		,V001 == '28/09/2021 19:31:39' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba  3
+		,V001 == '26/08/2021 22:30:38' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba  4
+		,V001 == '29/08/2021 05:10:31' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba  5
+		,V001 == '27/09/2021 14:16:00' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba  6
+		,V001 == '17/08/2021 16:53:13' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba  7
+		,V001 == '23/08/2021 22:10:43' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba  8
+		,V001 == '18/08/2021 10:50:45' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba  9
+		,V001 == '26/08/2021 10:56:52' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba 10
+		,V001 == '06/10/2021 20:14:11' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba 11
+		,V001 == '06/10/2021 19:12:40' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba 12, resposta mais recente e menos completa
+		,V001 == '18/08/2021 21:21:58' ~ FALSE  # validacoes/respostas_duplicadas.xlsx, aba 13
+		,V001 == '22/09/2021 16:55:45' ~ FALSE  # participante não pertence ao público alvo
+		,TRUE ~ VALIDA
 	   )
 	 ) %>%
 	 mutate(
@@ -595,7 +620,7 @@
    ## validação da lógica...
    ## dat %>% count( VALIDA )
 
-   dat %>%
+   vallog <- dat %>%
 	 transmute(V001 = format( V001, '%d/%m/%Y %H:%M:%S')
 			  ,VALIDA
 			  ,TCLE = V002
@@ -607,7 +632,21 @@
 			  ,Comunica_SUS = V019
 			  ,rede_privada = V021
 			  ,Comunica_rede_privada = V022
-			   ) %>%
+			   )
+
+   ## em 24.10.2021 são 199 respostas válidas
+   ## 203 - 6 (fora da RMC e/ou idade <= 18) - 9 (duplicados)
+   ## vallog %>%
+   ##   filter( !is.na(TCLE) & publico_alvo=='Sim' ) %>%
+   ##   arrange( VALIDA, desc( publico_alvo ), RMC ) %>% View
+
+   ## em 24.10.2021
+   ## 24 registros sem TCLE
+   ## vallog %>%
+   ##   filter( is.na(TCLE) & publico_alvo == 'Sim' & RMC == TRUE ) %>% View
+
+
+   vallog %>%
 	 arrange( VALIDA, desc( publico_alvo ), RMC ) %>% 
 	 write_csv2(
 	   .
@@ -899,7 +938,7 @@
    | SAO VICENTE               |   1 | 0.004 |
    | RESPOSTAS                 | 261 |     1 |
 
-   Destes, src_R[:session :results replace ]{ nrow(dat %>% filter( VALIDA == TRUE ))} {{{results(=225=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
+   Destes, src_R[:session :results replace ]{ nrow(dat %>% filter( VALIDA == TRUE ))} {{{results(=188=)}}}  participantes pertencem ao público alvo da pesquisa, provenientes das seguintes cidades
 
    #+BEGIN_SRC R :exports results :results table :colnames yes :session 
    ## cidade
@@ -920,21 +959,20 @@
    #+RESULTS:
    | V010                  |   n |     f |
    |-----------------------+-----+-------|
-   | CAMPINAS              | 119 | 0.529 |
-   | HORTOLANDIA           |  37 | 0.164 |
-   | SUMARE                |  24 | 0.107 |
-   | VALINHOS              |   9 |  0.04 |
-   | AMERICANA             |   7 | 0.031 |
-   | PAULINIA              |   7 | 0.031 |
-   | AMPARO                |   4 | 0.018 |
-   | JAGUARIUNA            |   4 | 0.018 |
-   | INDAIATUBA            |   3 | 0.013 |
-   | NOVA ODESSA           |   3 | 0.013 |
-   | SANTA BARBARA D OESTE |   3 | 0.013 |
-   | MONTE MOR             |   2 | 0.009 |
-   | nil                   |   2 | 0.009 |
-   | COSMOPOLIS            |   1 | 0.004 |
-   | RESPOSTAS             | 225 |     1 |
+   | CAMPINAS              | 102 | 0.543 |
+   | HORTOLANDIA           |  30 |  0.16 |
+   | SUMARE                |  20 | 0.106 |
+   | VALINHOS              |   9 | 0.048 |
+   | AMERICANA             |   7 | 0.037 |
+   | PAULINIA              |   6 | 0.032 |
+   | INDAIATUBA            |   3 | 0.016 |
+   | NOVA ODESSA           |   3 | 0.016 |
+   | AMPARO                |   2 | 0.011 |
+   | JAGUARIUNA            |   2 | 0.011 |
+   | SANTA BARBARA D OESTE |   2 | 0.011 |
+   | COSMOPOLIS            |   1 | 0.005 |
+   | nil                   |   1 | 0.005 |
+   | RESPOSTAS             | 188 |     1 |
    
    #+BEGIN_SRC R :exports none :results silent :session 
    ## Perfil dos respondentes válidos
@@ -1186,14 +1224,14 @@
    }
    #+END_SRC
 
-   Embora tenham consentido ao TCLE e confirmado residir na RMC, src_R[:session :results replace ]{ nrow(v010) } {{{results(=2=)}}} respondentes não informaram o município no qual moram; destes, src_R[:session :results replace ]{ v010 %>% filter( !is.na(V012) ) %>% nrow } {{{results(=0=)}}} informaram o CEP, do qual é possível confirmar que de fato residem na RMC. Consideramos todos eles como respostas válidas à pesquisa.
+   Embora tenham consentido ao TCLE e confirmado residir na RMC, src_R[:session :results replace ]{ nrow(v010) } {{{results(=1=)}}} respondentes não informaram o município no qual moram; destes, src_R[:session :results replace ]{ v010 %>% filter( !is.na(V012) ) %>% nrow } {{{results(=0=)}}} informaram o CEP, do qual é possível confirmar que de fato residem na RMC. Consideramos todos eles como respostas válidas à pesquisa.
 
    Perfil dos participantes:
 
    - idade média de src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.9=)}}} anos
-   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=54.7=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
-   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=39.6=)}}} % com ensino superior ou pós-graduação
-   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=75.1=)}}} % avaliam seu estado de saúde como bom ou muito bom
+   - src_R[:session :results replace ]{ round( v005[1,3]*100,1) } {{{results(=56.4=)}}} % do sexo src_R[:session :results replace ]{ v005[1,1] } {{{results(=Feminino=)}}}
+   - src_R[:session :results replace ]{ 100*sum( v006[ c(4,5), 'p'] ) } {{{results(=38.8=)}}} % com ensino superior ou pós-graduação
+   - src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=74.4=)}}} % avaliam seu estado de saúde como bom ou muito bom
 
 	 
 ** Hipóteses da pesquisa
@@ -1227,10 +1265,9 @@
 	#+RESULTS:
 	| V005                       |   n |     f |
 	|----------------------------+-----+-------|
-	| Feminino                   | 123 | 0.547 |
-	| Masculino                  | 100 | 0.444 |
-	| nil                        |   2 | 0.009 |
-	| Total de respostas válidas | 225 |     1 |
+	| Feminino                   | 106 | 0.564 |
+	| Masculino                  |  82 | 0.436 |
+	| Total de respostas válidas | 188 |     1 |
 
 *** Quanto à escolaridade
 
@@ -1238,7 +1275,7 @@
 	Hipótese: surdos usuários de Libras possuem baixa escolaridade.
 	#+end_quote
 
-	Embora src_R[:session :results replace]{  round(100*sum( v006[1:3,3] ),1)  } {{{results(=59.6=)}}} % dos respondentes tenham escolaridade até o ensino médio, o que confirma a hipótese prévia da pesquisa, ressalta-se também o alto número de surdos com alta escolaridade (src_R[:session :results replace]{ round( 100*sum( v006[4:5,3] ), 1)} {{{results(=39.6=)}}} %).
+	Embora src_R[:session :results replace]{  round(100*sum( v006[1:3,3] ),1)  } {{{results(=61.1=)}}} % dos respondentes tenham escolaridade até o ensino médio, o que confirma a hipótese prévia da pesquisa, ressalta-se também o alto número de surdos com alta escolaridade (src_R[:session :results replace]{ round( 100*sum( v006[4:5,3] ), 1)} {{{results(=38.8=)}}} %).
 
 	Em nosso ponto de vista isto se constitui em um viés da amostra, decorrente também da elevada idade média dos respondentes (src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.9=)}}} anos), sugerindo que a amostra não conseguiu 'furar a bolha' dos surdos próximos à universidade.
 	
@@ -1261,13 +1298,12 @@
 	#+RESULTS:
 	| V006                                                |   n |     f |
 	|-----------------------------------------------------+-----+-------|
-	| Nunca estudei                                       |   4 | 0.018 |
-	| Fundamental (ou 1º grau)                            |  26 | 0.116 |
-	| Médio (ou 2º grau)                                  | 104 | 0.462 |
-	| Superior (ou 3º grau)                               |  69 | 0.307 |
-	| Pós-graduação (especialização, mestrado, doutorado) |  20 | 0.089 |
-	| nil                                                 |   2 | 0.009 |
-	| Total de respostas válidas                          | 225 |     1 |
+	| Nunca estudei                                       |   4 | 0.021 |
+	| Fundamental (ou 1º grau)                            |  23 | 0.122 |
+	| Médio (ou 2º grau)                                  |  88 | 0.468 |
+	| Superior (ou 3º grau)                               |  56 | 0.298 |
+	| Pós-graduação (especialização, mestrado, doutorado) |  17 |  0.09 |
+	| Total de respostas válidas                          | 188 |     1 |
 
 *** Quanto à religião
 
@@ -1296,17 +1332,17 @@
 	#+RESULTS:
 	| V009_agrp                  |   n |     f |
 	|----------------------------+-----+-------|
-	| Evangélica                 |  93 | 0.413 |
-	| Católica                   |  65 | 0.289 |
-	| Sem religião               |  39 | 0.173 |
-	| Espírita                   |   8 | 0.036 |
-	| Outra                      |   6 | 0.027 |
-	| Não informada              |   4 | 0.018 |
-	| Adventista                 |   3 | 0.013 |
-	| Testemunha de Jeová        |   3 | 0.013 |
-	| Umbanda / Candomblé        |   3 | 0.013 |
-	| Metodista                  |   1 | 0.004 |
-	| Total de respostas válidas | 225 |     1 |
+	| Evangélica                 |  79 |  0.42 |
+	| Católica                   |  56 | 0.298 |
+	| Sem religião               |  29 | 0.154 |
+	| Espírita                   |   7 | 0.037 |
+	| Outra                      |   6 | 0.032 |
+	| Adventista                 |   3 | 0.016 |
+	| Umbanda / Candomblé        |   3 | 0.016 |
+	| Não informada              |   2 | 0.011 |
+	| Testemunha de Jeová        |   2 | 0.011 |
+	| Metodista                  |   1 | 0.005 |
+	| Total de respostas válidas | 188 |     1 |
 
 *** Quanto à situação de emprego
 
@@ -1333,11 +1369,11 @@
 	#+RESULTS:
 	| V007                                     |   n |     f |
 	|------------------------------------------+-----+-------|
-	| Sim, trabalho                            | 148 | 0.658 |
-	| Não, estou desempregado                  |  50 | 0.222 |
-	| Não, porque sou aposentado               |  14 | 0.062 |
-	| Não trabalho e recebo benefício BPC/INSS |  13 | 0.058 |
-	| Total de respostas válidas               | 225 |     1 |
+	| Sim, trabalho                            | 122 | 0.649 |
+	| Não, estou desempregado                  |  43 | 0.229 |
+	| Não, porque sou aposentado               |  13 | 0.069 |
+	| Não trabalho e recebo benefício BPC/INSS |  10 | 0.053 |
+	| Total de respostas válidas               | 188 |     1 |
 
 **** segmentada por nível de escolaridade
   :PROPERTIES:
@@ -1379,10 +1415,10 @@
 	| V006                                                | desempregado | empregado | pct_desempregado |
 	|-----------------------------------------------------+--------------+-----------+------------------|
 	| Nunca estudei                                       |            1 |         0 |              100 |
-	| Fundamental (ou 1º grau)                            |            4 |         8 |            33.33 |
-	| Médio (ou 2º grau)                                  |           27 |        73 |               27 |
-	| Superior (ou 3º grau)                               |           15 |        49 |            23.44 |
-	| Pós-graduação (especialização, mestrado, doutorado) |            3 |        16 |            15.79 |
+	| Fundamental (ou 1º grau)                            |            4 |         7 |            36.36 |
+	| Médio (ou 2º grau)                                  |           22 |        63 |            25.88 |
+	| Superior (ou 3º grau)                               |           13 |        39 |               25 |
+	| Pós-graduação (especialização, mestrado, doutorado) |            3 |        13 |            18.75 |
 
 **** segmentada por sexo
   :PROPERTIES:
@@ -1415,8 +1451,8 @@
 	#+RESULTS:
 	| V005      | desempregado | empregado | pct_desempregado |
 	|-----------+--------------+-----------+------------------|
-	| Feminino  |           35 |        74 |            32.11 |
-	| Masculino |           15 |        72 |            17.24 |
+	| Feminino  |           32 |        63 |            33.68 |
+	| Masculino |           11 |        59 |            15.71 |
 
 **** segmentada por raça
   :PROPERTIES:
@@ -1449,10 +1485,10 @@
 	#+RESULTS:
 	| V008    | desempregado | empregado | pct_desempregado |
 	|---------+--------------+-----------+------------------|
-	| Branca  |           33 |       117 |               22 |
-	| Parda   |           17 |        20 |            45.95 |
-	| Preta   |            0 |         5 |                0 |
-	| Amarela |            0 |         6 |                0 |
+	| Branca  |           30 |        96 |            23.81 |
+	| Parda   |           13 |        17 |            43.33 |
+	| Preta   |            0 |         4 |                0 |
+	| Amarela |            0 |         5 |                0 |
 
 **** segmentada por faixa etária
   :PROPERTIES:
@@ -1485,10 +1521,10 @@
 	#+RESULTS:
 	| faixa_etaria | desempregado | empregado | pct_desempregado |
 	|--------------+--------------+-----------+------------------|
-	| [19,30]      |           18 |        31 |            36.73 |
-	| (30,40]      |           17 |        57 |            22.97 |
-	| (40,50]      |           12 |        45 |            21.05 |
-	| (50,65]      |            3 |        12 |               20 |
+	| [19,30]      |           15 |        29 |            34.09 |
+	| (30,40]      |           15 |        47 |            24.19 |
+	| (40,50]      |           10 |        36 |            21.74 |
+	| (50,65]      |            3 |        10 |            23.08 |
 	
 *** Quanto ao uso de serviços públicos de saúde (SUS)
 
@@ -1515,9 +1551,9 @@
 	#+RESULTS:
 	| V018                       |   n |     f |
 	|----------------------------+-----+-------|
-	| Sim                        | 168 | 0.747 |
-	| Não                        |  57 | 0.253 |
-	| Total de respostas válidas | 225 |     1 |
+	| Sim                        | 140 | 0.745 |
+	| Não                        |  48 | 0.255 |
+	| Total de respostas válidas | 188 |     1 |
 
 *** Quanto à estrutura pública adequada de comunicação paciente-médico
 
@@ -1545,14 +1581,13 @@
 	#+RESULTS:
 	| V019                                                |   n |     f |
 	|-----------------------------------------------------+-----+-------|
-	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  37 |  0.22 |
-	| Ruim, não sabem LIBRAS e preciso escrever português |  25 | 0.149 |
-	| Ruim, não consigo comunicação                       |  43 | 0.256 |
-	| Boa, tem intérprete que me ajuda                    |  20 | 0.119 |
-	| Boa, porque familiar me ajuda                       |  38 | 0.226 |
-	| Boa, o profissional de saúde sabe LIBRAS            |   4 | 0.024 |
-	| nil                                                 |   1 | 0.006 |
-	| Total de respostas válidas                          | 168 |     1 |
+	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  34 | 0.243 |
+	| Ruim, não sabem LIBRAS e preciso escrever português |  21 |  0.15 |
+	| Ruim, não consigo comunicação                       |  39 | 0.279 |
+	| Boa, tem intérprete que me ajuda                    |  14 |   0.1 |
+	| Boa, porque familiar me ajuda                       |  30 | 0.214 |
+	| Boa, o profissional de saúde sabe LIBRAS            |   2 | 0.014 |
+	| Total de respostas válidas                          | 140 |     1 |
 
 	Em relação aos surdos que usam os serviços do SUS, resume-se a seguir a avaliação da experiência com a Central de Intérprete de Libras (CIL)
 	#+BEGIN_SRC R :exports results :results table :colnames yes :session 
@@ -1574,11 +1609,11 @@
 	#+RESULTS:
 	| V020                                       |   n |     f |
 	|--------------------------------------------+-----+-------|
-	| Sim                                        |  29 | 0.173 |
-	| Não, porque eu esqueço de pedir            |  24 | 0.143 |
-	| Não, porque não tem intérprete livre nunca |  41 | 0.244 |
-	| nil                                        |  74 |  0.44 |
-	| Total de respostas válidas                 | 168 |     1 |
+	| Sim                                        |  22 | 0.157 |
+	| Não, porque eu esqueço de pedir            |  22 | 0.157 |
+	| Não, porque não tem intérprete livre nunca |  38 | 0.271 |
+	| nil                                        |  58 | 0.414 |
+	| Total de respostas válidas                 | 140 |     1 |
 
 	
 	Em relação aos surdos que conseguiram seu aparelho auditivo pelo SUS, resume-se a seguir a avaliação da comunicação com o profissional do SUS
@@ -1601,14 +1636,14 @@
 	#+RESULTS:
 	| V025                                               |  n |     f |
 	|----------------------------------------------------+----+-------|
-	| Ruim, não sabe LIBRAS e sou obrigado a oralizar    | 15 | 0.273 |
-	| Ruim, não sabe LIBRAS e preciso escrever português |  7 | 0.127 |
-	| Ruim, não consigo comunicação                      | 11 |   0.2 |
-	| Boa, tem intérprete que me ajuda                   |  2 | 0.036 |
-	| Boa, porque familiar me ajuda                      | 13 | 0.236 |
-	| Boa, o profissional de saúde sabe LIBRAS           |  4 | 0.073 |
-	| nil                                                |  3 | 0.055 |
-	| Total de respostas válidas                         | 55 |     1 |
+	| Ruim, não sabe LIBRAS e sou obrigado a oralizar    | 14 | 0.326 |
+	| Ruim, não sabe LIBRAS e preciso escrever português |  5 | 0.116 |
+	| Ruim, não consigo comunicação                      |  9 | 0.209 |
+	| Boa, tem intérprete que me ajuda                   |  2 | 0.047 |
+	| Boa, porque familiar me ajuda                      | 10 | 0.233 |
+	| Boa, o profissional de saúde sabe LIBRAS           |  2 | 0.047 |
+	| nil                                                |  1 | 0.023 |
+	| Total de respostas válidas                         | 43 |     1 |
 
 
 	Em relação aos surdos que conseguiram seu implante coclear pelo SUS, resume-se a seguir a avaliação da comunicação com o profissional do SUS
@@ -1631,11 +1666,11 @@
 	#+RESULTS:
 	| V028                                               | n |     f |
 	|----------------------------------------------------+---+-------|
-	| Ruim, não sabe LIBRAS e sou obrigado a oralizar    | 3 | 0.375 |
-	| Ruim, não sabe LIBRAS e preciso escrever português | 2 |  0.25 |
-	| Boa, porque familiar me ajuda                      | 2 |  0.25 |
-	| Boa, o profissional de saúde sabe LIBRAS           | 1 | 0.125 |
-	| Total de respostas válidas                         | 8 |     1 |
+	| Ruim, não sabe LIBRAS e sou obrigado a oralizar    | 3 | 0.429 |
+	| Ruim, não sabe LIBRAS e preciso escrever português | 1 | 0.143 |
+	| Boa, porque familiar me ajuda                      | 2 | 0.286 |
+	| Boa, o profissional de saúde sabe LIBRAS           | 1 | 0.143 |
+	| Total de respostas válidas                         | 7 |     1 |
 
 *** Quanto ao uso de serviços privados de saúde
 
@@ -1662,9 +1697,9 @@
 	#+RESULTS:
 	| V021                       |   n |     f |
 	|----------------------------+-----+-------|
-	| Sim                        | 178 | 0.791 |
-	| Não                        |  47 | 0.209 |
-	| Total de respostas válidas | 225 |     1 |
+	| Sim                        | 151 | 0.803 |
+	| Não                        |  37 | 0.197 |
+	| Total de respostas válidas | 188 |     1 |
 
 *** Quanto à estrutura privada adequada de comunicação paciente-médico
 
@@ -1692,14 +1727,14 @@
 	#+RESULTS:
 	| V022                                                |   n |     f |
 	|-----------------------------------------------------+-----+-------|
-	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  39 | 0.219 |
-	| Ruim, não sabem LIBRAS e preciso escrever português |  27 | 0.152 |
-	| Ruim, não consigo comunicação                       |  57 |  0.32 |
-	| Boa, tem intérprete que me ajuda                    |  17 | 0.096 |
-	| Boa, porque familiar me ajuda                       |  33 | 0.185 |
-	| Boa, o profissional de saúde sabe LIBRAS            |   2 | 0.011 |
-	| nil                                                 |   3 | 0.017 |
-	| Total de respostas válidas                          | 178 |     1 |
+	| Ruim, não sabem LIBRAS e sou obrigado a oralizar    |  35 | 0.232 |
+	| Ruim, não sabem LIBRAS e preciso escrever português |  23 | 0.152 |
+	| Ruim, não consigo comunicação                       |  48 | 0.318 |
+	| Boa, tem intérprete que me ajuda                    |  14 | 0.093 |
+	| Boa, porque familiar me ajuda                       |  28 | 0.185 |
+	| Boa, o profissional de saúde sabe LIBRAS            |   2 | 0.013 |
+	| nil                                                 |   1 | 0.007 |
+	| Total de respostas válidas                          | 151 |     1 |
 
 
 ** Comparação do serviço público versus serviço privado
@@ -1733,6 +1768,10 @@
 		 ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
 		 ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
 		)
+	   ,acessibilidade = case_when(
+		 ,resposta == 'Boa, o profissional de saúde sabe LIBRAS' ~ 'Sim'
+		 ,TRUE ~ 'Não'
+		)
 	  )
 	 ,dat %>%
 	  filter( as.Date(V001) <= '2021-10-15', VALIDA == TRUE, V021 == 'Sim') %>%
@@ -1756,6 +1795,10 @@
 		  str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
 		 ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
 		 ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+		)
+	   ,acessibilidade = case_when(
+		 ,resposta == 'Boa, o profissional de saúde sabe LIBRAS' ~ 'Sim'
+		 ,TRUE ~ 'Não'
 		)
 	  )
 	)
@@ -1819,7 +1862,7 @@
 	  coord_flip() + 
 	  labs(
 		title = 'Comparação Serviço Público vs Serviço Privado'
-	   ,subtitle = 'Avaliação da estrutura de atendimento'
+	   ,subtitle = 'Acessibilidade do atendimento para pessoa surda' # 'Avaliação da estrutura de atendimento'
 	   ,x = ''
 	   ,y = 'número de respostas'
 	   ,caption = paste0('Observações:\n'
@@ -1843,7 +1886,7 @@
 	  coord_flip() + 
 	  labs(
 		title = 'Comparação Serviço Público vs Serviço Privado'
-	   ,subtitle = 'Avaliação da estrutura de atendimento'
+	   ,subtitle = 'Acessibilidade do atendimento para pessoa surda' # 'Avaliação da estrutura de atendimento'
 	   ,x = ''
 	   ,y = 'número de respostas'
 	   ,caption = paste0('Observações:\n'
@@ -1868,7 +1911,7 @@
 	  coord_flip() + 
 	  labs(
 		title = 'Comparação Serviço Público vs Serviço Privado'
-	   ,subtitle = 'Avaliação da estrutura de atendimento'
+	   ,subtitle = 'Acessibilidade do atendimento para pessoa surda' # 'Avaliação da estrutura de atendimento'
 	   ,x = ''
 	   ,y = 'número de respostas'
 	   ,caption = paste0('Observações:\n'
@@ -1893,7 +1936,7 @@
 	  coord_flip() + 
 	  labs(
 		title = 'Comparação Serviço Público vs Serviço Privado'
-	   ,subtitle = 'Avaliação da estrutura de atendimento'
+	   ,subtitle = 'Acessibilidade do atendimento para pessoa surda' # 'Avaliação da estrutura de atendimento'
 	   ,x = ''
 	   ,y = 'número de respostas'
 	   ,caption = paste0('Observações:\n'
@@ -1945,7 +1988,7 @@
 	  coord_flip() + 
 	  labs(
 		title = 'Comparação Serviço Público vs Serviço Privado'
-	   ,subtitle = 'Avaliação da estrutura de atendimento'
+	   ,subtitle = 'Acessibilidade do atendimento para pessoa surda' # 'Avaliação da estrutura de atendimento'
 	   ,x = ''
 	   ,y = 'número de respostas'
 	   ,caption = paste0('Observações:\n'
@@ -2091,7 +2134,7 @@
 	ggsave( plot.ca, filename = './img/ca_biplot_V006_V015.png', width = 7, height = 6 )
 	#+END_SRC
 
-	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.742724=)}}}.
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.555703=)}}}.
 	
 	#+CAPTION: Análise de correspondência - Escolaridade vs Autoavaliação do estado de saúde
 	#+ATTR_ORG: :width 600
@@ -2131,7 +2174,7 @@
 	ggsave( plot.ca, filename = './img/ca_biplot_V009_V015.png', width = 7, height = 6 )
 	#+END_SRC
 
-	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.125609=)}}}.
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.133178=)}}}.
 	
 	#+CAPTION: Análise de correspondência - Religião vs Autoavaliação do estado de saúde
 	#+ATTR_ORG: :width 600
@@ -2171,7 +2214,7 @@
 	ggsave( plot.ca, filename = './img/ca_biplot_V007_V015.png', width = 7, height = 6 )
 	#+END_SRC
 
-	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.0476=)}}}.
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.079579=)}}}.
 	
 	#+CAPTION: Análise de correspondência - Trabalho vs Autoavaliação do estado de saúde
 	#+ATTR_ORG: :width 600
@@ -2210,7 +2253,7 @@
 	ggsave( plot.ca, filename = './img/ca_biplot_V008_V015.png', width = 7, height = 6 )
 	#+END_SRC
 
-	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.397374=)}}}.
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.687884=)}}}.
 	
 	#+CAPTION: Análise de correspondência - Cor/Raça vs Autoavaliação do estado de saúde
 	#+ATTR_ORG: :width 600
@@ -2249,7 +2292,7 @@
 	ggsave( plot.ca, filename = './img/ca_biplot_V010_V015.png', width = 7, height = 6 )
 	#+END_SRC
 
-	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.488594=)}}}.
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.946396=)}}}.
 	
 	#+CAPTION: Análise de correspondência - Cidade vs Autoavaliação do estado de saúde
 	#+ATTR_ORG: :width 600
@@ -2288,7 +2331,7 @@
 	ggsave( plot.ca, filename = './img/ca_biplot_V013_V015.png', width = 7, height = 6 )
 	#+END_SRC
 
-	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.103977=)}}}.
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.086958=)}}}.
 	
 	#+CAPTION: Análise de correspondência - Diabetes vs Autoavaliação do estado de saúde
 	#+ATTR_ORG: :width 600
@@ -2327,7 +2370,7 @@
 	ggsave( plot.ca, filename = './img/ca_biplot_V014_V015.png', width = 7, height = 6 )
 	#+END_SRC
 
-	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.00047=)}}}.
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.003653=)}}}.
 	
 	#+CAPTION: Análise de correspondência - Hipertensão vs Autoavaliação do estado de saúde
 	#+ATTR_ORG: :width 600
@@ -2366,7 +2409,7 @@
 	ggsave( plot.ca, filename = './img/ca_biplot_V016_V015.png', width = 7, height = 6 )
 	#+END_SRC
 
-	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.735779=)}}}.
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.838445=)}}}.
 	
 	#+CAPTION: Análise de correspondência - Tabagismo vs Autoavaliação do estado de saúde
 	#+ATTR_ORG: :width 600
@@ -2447,7 +2490,7 @@
 	ggsave( plot.ca, filename = './img/ca_biplot_fxetaria_V015.png', width = 7, height = 6 )
 	#+END_SRC
 
-	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.725998=)}}}.
+	p-valor do teste qui-quadrado para independência entre as variáveis: src_R[:session :results replace ]{ round( ca.pvalue, 6) } {{{results(=0.602179=)}}}.
 	
 	#+CAPTION: Análise de correspondência - Faixa etária vs Autoavaliação do estado de saúde
 	#+ATTR_ORG: :width 600
@@ -2457,9 +2500,9 @@
 	 
 * Conclusões
 
- 1. Tendo em vista que a amostra que embasa este estudo não foi determinada probabilisticamente a partir de um sistema de referência, o qual não existe, os achados e conclusões são restritos à própria amostra e portanto não podem ser generalizados além dela. São inválidas portanto generalizações como "a idade média dos surdos da RMC é src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.9=)}}} anos" ou "src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=75.1=)}}} % dos surdos paulistas avaliam seu estado de saúde como bom ou muito bom".
+ 1. Tendo em vista que a amostra que embasa este estudo não foi determinada probabilisticamente a partir de um sistema de referência, o qual não existe, os achados e conclusões são restritos à própria amostra e portanto não podem ser generalizados além dela. São inválidas portanto generalizações como "a idade média dos surdos da RMC é src_R[:session :results replace ]{ round( v004,1) } {{{results(=38.9=)}}} anos" ou "src_R[:session :results replace ]{ 100*sum( v015[ c(1,2), 'p'] ) } {{{results(=74.4=)}}} % dos surdos paulistas avaliam seu estado de saúde como bom ou muito bom".
 
- 2. Toda e qualquer conclusão deve ser feita somente em relação aos src_R[:session :results replace ]{ nrow(dat %>% filter(VALIDA) ) } {{{results(=225=)}}} participantes.
+ 2. Toda e qualquer conclusão deve ser feita somente em relação aos src_R[:session :results replace ]{ nrow(dat %>% filter(VALIDA) ) } {{{results(=188=)}}} participantes.
 
  3. O desemprego observado na amostra é superior à inflação oficial brasileira, independente do ponto de vista utlizado para analisar os dados. Além disso, nota-se que
 
