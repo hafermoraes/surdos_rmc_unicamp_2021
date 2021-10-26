@@ -88,23 +88,30 @@
 	[9] dplyr_1.0.3      readr_1.4.0      ggplot2_3.3.3   
 
    loaded via a namespace (and not attached):
-	[1] Rcpp_1.0.6           pillar_1.6.0         compiler_3.6.3      
-	[4] forcats_0.5.1        tools_3.6.3          digest_0.6.27       
-	[7] lattice_0.20-41      lifecycle_1.0.0      tibble_3.1.1        
-   [10] gtable_0.3.0         pkgconfig_2.0.3      rlang_0.4.11        
-   [13] Matrix_1.2-18        rstudioapi_0.13      DBI_1.1.1.9000      
-   [16] cli_2.4.0            ggrepel_0.8.2        xfun_0.26           
-   [19] cluster_2.1.0        knitr_1.32           withr_2.4.2         
-   [22] generics_0.1.0       vctrs_0.3.8          hms_1.0.0           
-   [25] flashClust_1.01-2    scatterplot3d_0.3-41 grid_3.6.3          
-   [28] tidyselect_1.1.0     glue_1.4.2           R6_2.5.0            
-   [31] fansi_0.4.2          survival_3.2-3       purrr_0.3.4         
-   [34] blob_1.2.1           magrittr_2.0.1       ps_1.6.0            
-   [37] MASS_7.3-51.6        leaps_3.1            splines_3.6.3       
-   [40] htmltools_0.5.1.1    ellipsis_0.3.2       broom.helpers_1.4.0 
-   [43] assertthat_0.2.1     gt_0.3.1             colorspace_2.0-0    
-   [46] utf8_1.2.1           stringi_1.5.3        munsell_0.5.0       
-   [49] crayon_1.4.1
+	[1] ggrepel_0.8.2        Rcpp_1.0.6           lattice_0.20-41     
+	[4] ps_1.6.0             assertthat_0.2.1     digest_0.6.27       
+	[7] utf8_1.2.1           cellranger_1.1.0     R6_2.5.0            
+   [10] backports_1.2.1      pillar_1.6.0         rlang_0.4.11        
+   [13] curl_4.3             readxl_1.3.1         rstudioapi_0.13     
+   [16] data.table_1.14.0    car_3.0-8            blob_1.2.1          
+   [19] Matrix_1.2-18        checkmate_2.0.0      labeling_0.4.2      
+   [22] splines_3.6.3        foreign_0.8-76       munsell_0.5.0       
+   [25] broom_0.7.9          compiler_3.6.3       xfun_0.26           
+   [28] pkgconfig_2.0.3      htmltools_0.5.1.1    flashClust_1.01-2   
+   [31] tidyselect_1.1.0     tibble_3.1.1         rio_0.5.16          
+   [34] fansi_0.4.2          crayon_1.4.1         withr_2.4.2         
+   [37] ggpubr_0.3.0         rappdirs_0.3.1       commonmark_1.7      
+   [40] MASS_7.3-51.6        leaps_3.1            grid_3.6.3          
+   [43] gtable_0.3.0         lifecycle_1.0.0      DBI_1.1.1.9000      
+   [46] magrittr_2.0.1       zip_2.1.1            carData_3.0-3       
+   [49] cli_2.4.0            stringi_1.5.3        farver_2.1.0        
+   [52] ggsignif_0.6.0       fs_1.5.0             broom.helpers_1.4.0 
+   [55] scatterplot3d_0.3-41 ellipsis_0.3.2       generics_0.1.0      
+   [58] vctrs_0.3.8          openxlsx_4.1.5       tools_3.6.3         
+   [61] forcats_0.5.1        glue_1.4.2           purrr_0.3.4         
+   [64] hms_1.0.0            abind_1.4-5          survival_3.2-3      
+   [67] colorspace_2.0-0     cluster_2.1.0        gt_0.3.1            
+   [70] rstatix_0.6.0        knitr_1.32           sass_0.4.0
    #+end_example
 
    no qual as análises foram efetuadas.
@@ -1763,13 +1770,13 @@
 		  str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
 		 ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
 		)
-	   ,estrutura = case_when(
-		  str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
-		 ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
-		 ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
-		)
+	   ## ,estrutura = case_when(
+	   ##    str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+	   ##   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+	   ##   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+	   ##  )
 	   ,acessibilidade = case_when(
-		 ,resposta == 'Boa, o profissional de saúde sabe LIBRAS' ~ 'Sim'
+		  resposta == 'Boa, o profissional de saúde sabe LIBRAS' ~ 'Sim'
 		 ,TRUE ~ 'Não'
 		)
 	  )
@@ -1791,13 +1798,13 @@
 		  str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
 		 ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
 		)
-	   ,estrutura = case_when(
-		  str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
-		 ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
-		 ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
-		)
+	   ## ,estrutura = case_when(
+	   ##    str_sub( resposta, start=1, end=3) == 'Rui' ~ 'Ruim'
+	   ##   ,resposta == 'Boa, porque familiar me ajuda' ~ 'Ruim'
+	   ##   ,str_sub( resposta, start=1, end=3) == 'Boa' ~ 'Boa'
+	   ##  )
 	   ,acessibilidade = case_when(
-		 ,resposta == 'Boa, o profissional de saúde sabe LIBRAS' ~ 'Sim'
+		  resposta == 'Boa, o profissional de saúde sabe LIBRAS' ~ 'Sim'
 		 ,TRUE ~ 'Não'
 		)
 	  )
@@ -1852,8 +1859,8 @@
 	  theme( legend.position = 'top') 
 	ggsave( plot, filename = './img/comunicacao_agrp.png', width=5, height=4)
 
-	## Avaliação da estrutura
-	tbl_subset <- tbl %>% count( estrutura, servico ) %>% rename( xlabel = 1) %>% na.omit()
+	## Avaliação da acessibilidade
+	tbl_subset <- tbl %>% count( acessibilidade, servico ) %>% rename( xlabel = 1) %>% na.omit()
 	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
 	plot <- tbl_subset %>%
 	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
@@ -1866,7 +1873,7 @@
 	   ,x = ''
 	   ,y = 'número de respostas'
 	   ,caption = paste0('Observações:\n'
-						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
+						,' 1. Somente a opção de resposta "Boa, o profissional de saúde sabe LIBRAS" é classificada como "Sim"\n'
 						,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
 						,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
 						 )
@@ -1874,10 +1881,10 @@
 	  ) +
 	  theme_bw() + 
 	  theme( legend.position = 'top')
-	ggsave( plot, filename = './img/estrutura_agrp.png', width=5, height=4)
+	ggsave( plot, filename = './img/acessibilidade_agrp.png', width=6, height=4)
 
-	## Facets (estrutura/ Escolaridade)
-	tbl_subset <- tbl %>% count( estrutura, servico, escolaridade ) %>% rename( xlabel = 1) %>% na.omit()
+	## Facets (acessibilidade/ Escolaridade)
+	tbl_subset <- tbl %>% count( acessibilidade, servico, escolaridade ) %>% rename( xlabel = 1) %>% na.omit()
 	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
 	plot <- tbl_subset %>%
 	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
@@ -1890,7 +1897,7 @@
 	   ,x = ''
 	   ,y = 'número de respostas'
 	   ,caption = paste0('Observações:\n'
-						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
+						,' 1. Somente a opção de resposta "Boa, o profissional de saúde sabe LIBRAS" é classificada como "Sim"\n'
 						,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
 						,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
 						 )
@@ -1899,10 +1906,10 @@
 	  facet_wrap( ~ escolaridade, scales = 'free') + 
 	  theme_bw() + 
 	  theme( legend.position = 'top')
-	ggsave( plot, filename = './img/estrutura_escolaridade_agrp.png', width=11, height=5)
+	ggsave( plot, filename = './img/acessibilidade_escolaridade_agrp.png', width=11, height=5)
 
-	## Facets (estrutura/ Cor-Raça)
-	tbl_subset <- tbl %>% count( estrutura, servico, cor ) %>% rename( xlabel = 1) %>% na.omit()
+	## Facets (acessibilidade/ Cor-Raça)
+	tbl_subset <- tbl %>% count( acessibilidade, servico, cor ) %>% rename( xlabel = 1) %>% na.omit()
 	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
 	plot <- tbl_subset %>%
 	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
@@ -1915,7 +1922,7 @@
 	   ,x = ''
 	   ,y = 'número de respostas'
 	   ,caption = paste0('Observações:\n'
-						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
+						,' 1. Somente a opção de resposta "Boa, o profissional de saúde sabe LIBRAS" é classificada como "Sim"\n'
 						,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
 						,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
 						 )
@@ -1924,10 +1931,10 @@
 	  facet_wrap( ~ cor, scales = 'free') + 
 	  theme_bw() + 
 	  theme( legend.position = 'top')
-	ggsave( plot, filename = './img/estrutura_cor_agrp.png', width=8, height=5)
+	ggsave( plot, filename = './img/acessibilidade_cor_agrp.png', width=8, height=5)
 
-	## Facets (estrutura/ sexo)
-	tbl_subset <- tbl %>% count( estrutura, servico, sexo ) %>% rename( xlabel = 1) %>% na.omit()
+	## Facets (acessibilidade/ sexo)
+	tbl_subset <- tbl %>% count( acessibilidade, servico, sexo ) %>% rename( xlabel = 1) %>% na.omit()
 	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
 	plot <- tbl_subset %>%
 	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
@@ -1940,7 +1947,7 @@
 	   ,x = ''
 	   ,y = 'número de respostas'
 	   ,caption = paste0('Observações:\n'
-						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
+						,' 1. Somente a opção de resposta "Boa, o profissional de saúde sabe LIBRAS" é classificada como "Sim"\n'
 						,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
 						,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
 						 )
@@ -1949,7 +1956,7 @@
 	  facet_wrap( ~ sexo, scales = 'free') + 
 	  theme_bw() + 
 	  theme( legend.position = 'top')
-	ggsave( plot, filename = './img/estrutura_sexo_agrp.png', width=8, height=5)
+	ggsave( plot, filename = './img/acessibilidade_sexo_agrp.png', width=8, height=5)
 
 	## Facets (resposta/ sexo)
 	tbl_subset <- tbl %>% count( resposta, servico, sexo ) %>% rename( xlabel = 1) %>% na.omit()
@@ -1965,9 +1972,8 @@
 	   ,x = ''
 	   ,y = 'número de respostas'
 	   ,caption = paste0('Observações:\n'
-						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
-						,' 2. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
-						,' 3. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
+						,' 1. N = ', cap[ cap$servico == 'privado', 'n'] ,' respostas válidas dos ', n_priv, ' autodeclarados usuários da rede privada\n'
+						,' 2. N = ', cap[ cap$servico == 'público', 'n'] ,' respostas válidas dos ', n_publ, ' autodeclarados usuários do SUS'
 						 )
 	   ,fill = ''
 	  ) +
@@ -1978,8 +1984,8 @@
 	ggsave( plot, filename = './img/comunicacao_sexo_agrp.png', width=8, height=5)
 
 
-	## Facets (estrutura/ uso-rede)
-	tbl_subset <- tbl %>% count( estrutura, servico, uso_rede ) %>% rename( xlabel = 1) %>% na.omit()
+	## Facets (acessibilidade/ uso-rede)
+	tbl_subset <- tbl %>% count( acessibilidade, servico, uso_rede ) %>% rename( xlabel = 1) %>% na.omit()
 	cap <- tbl_subset %>% group_by( servico ) %>% summarise( n = sum(n) ) %>% as.data.frame()
 	plot <- tbl_subset %>%
 	  ggplot( aes(x = xlabel, y = n, group = servico, fill = servico) ) +
@@ -1992,7 +1998,7 @@
 	   ,x = ''
 	   ,y = 'número de respostas'
 	   ,caption = paste0('Observações:\n'
-						,' 1. Opção de resposta "Boa, porque familiar me ajuda" reclassificada como "Ruim"\n'
+						,' 1. Somente a opção de resposta "Boa, o profissional de saúde sabe LIBRAS" é classificada como "Sim"\n'
 						,' 2. N = ', (tbl %>% filter( uso_rede == 'Ambas') %>% nrow)/2 ,' usuários de ambas as redes\n'
 						,' 3. N = ', tbl %>% filter( uso_rede == 'Somente Pública') %>% nrow ,' usuários somente da rede pública\n'
 						,' 4. N = ', tbl %>% filter( uso_rede == 'Somente Privada') %>% nrow ,' usuários somente da rede privada\n'
@@ -2002,7 +2008,7 @@
 	  facet_wrap( ~ uso_rede, scales = 'free') + 
 	  theme_bw() + 
 	  theme( legend.position = 'top') 
-	ggsave( plot, filename = './img/estrutura_rede_agrp.png', width=8, height=5)
+	ggsave( plot, filename = './img/acessibilidade_rede_agrp.png', width=8, height=5)
 
 	## Facets (comunicacao / uso-rede)
 	tbl_subset <- tbl %>% count( comunicacao, servico, uso_rede ) %>% rename( xlabel = 1) %>% na.omit()
@@ -2060,42 +2066,42 @@
 	 [[./img/comunicacao_rede_agrp.png]]
 	 
 	 
-*** Quanto à estrutura de atendimento ao surdo usuário de Libras
+*** Quanto à acessibilidade de atendimento ao surdo usuário de Libras
   :PROPERTIES:
   :CUSTOM_ID: sec:comp_estrut
   :END:  
 
-**** Avaliação geral da estrutura 
+**** Avaliação geral da acessibilidade 
 
-	 #+CAPTION: Avaliação geral da estrutura de atendimento ao surdo usuário de Libras
+	 #+CAPTION: Avaliação geral da acessibilidade de atendimento ao surdo usuário de Libras
 	 #+ATTR_ORG: :width 600
-	 [[./img/estrutura_agrp.png]]
+	 [[./img/acessibilidade_agrp.png]]
 
 	
 **** Segmentada por sexo
 
-	 #+CAPTION: Avaliação da estrutura de atendimento ao usuário de Libras segmentada por sexo 
+	 #+CAPTION: Avaliação da acessibilidade de atendimento ao usuário de Libras segmentada por sexo 
 	 #+ATTR_ORG: :width 600
-	 [[./img/estrutura_sexo_agrp.png]]
+	 [[./img/acessibilidade_sexo_agrp.png]]
  
 
 **** Segmentada por escolaridade
 
-	 #+CAPTION: Avaliação da estrutura de atendimento ao usuário de Libras segmentada por escolaridade
+	 #+CAPTION: Avaliação da acessibilidade de atendimento ao usuário de Libras segmentada por escolaridade
 	 #+ATTR_ORG: :width 600
-	 [[./img/estrutura_escolaridade_agrp.png]]
+	 [[./img/acessibilidade_escolaridade_agrp.png]]
 	 
 **** Segmentada por cor/raça
 
-	 #+CAPTION: Avaliação da estrutura de atendimento ao usuário de Libras segmentada por cor/raça 
+	 #+CAPTION: Avaliação da acessibilidade de atendimento ao usuário de Libras segmentada por cor/raça 
 	 #+ATTR_ORG: :width 600
-	 [[./img/estrutura_cor_agrp.png]]
+	 [[./img/acessibilidade_cor_agrp.png]]
 
 **** Segmentada por uso de rede
 
-	 #+CAPTION: Avaliação da estrutura de atendimento ao usuário de Libras segmentada por uso de rede
+	 #+CAPTION: Avaliação da acessibilidade de atendimento ao usuário de Libras segmentada por uso de rede
 	 #+ATTR_ORG: :width 600
-	 [[./img/estrutura_rede_agrp.png]]
+	 [[./img/acessibilidade_rede_agrp.png]]
 
 
 ** Análise de correspondência
@@ -2515,7 +2521,7 @@
 
  5. A percepção dos participantes em relação à comunicação paciente-médico é ruim, independente dos fatores sob comparação (sexo, escolaridade, cor/raça) e da rede utilizada, seja ela privada ou pública (vide seção [[#sec:comp_comunic]] e suas subseções).
 
- 6. Quando analisamos a estrutura do atendimento ao paciente surdo, precisamos reclassificar uma das respostas como ruim, a dizer: "Boa, porque familiar me ajuda". Embora a comunicação seja possível nessa situação, o simples fato de um familiar precisar acompanhar o surdo em sua consulta demonstra que a estrutura de atendimento a ele é ruim (vide seção [[#sec:comp_estrut]] e suas subseções).
+ 6. Quando analisamos a acessibilidade do atendimento ao paciente surdo, classificamos somente uma das respostas como "Sim", a dizer: "Boa, o profissional de saúde sabe LIBRAS".
 
  7. A atenção ótima ao paciente surdo, que ocorre quando o próprio profissional de saúde sabe Libras, foi o item mais raro e evidencia a dificuldade da população surda ter um atendimento no qual sua esfera privada é respeitada e no qual ele pode receber uma anamnésia de alta qualidade.
 	 
@@ -2687,6 +2693,272 @@
 	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
 	 as_gt() %>%
 	 gt::gtsave( filename = './data/summary_by_cochlear_implant.html')
+
+
+   ## tabelas de contingência
+   ##
+   ## escolaridade vs
+   ##   tabagismo
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 mutate(
+	   V016_agrp = case_when(
+		 V016 == 'Não' ~ 'Não'
+		 ,TRUE ~ 'Sim'
+	   )
+	 ) %>%
+	 tbl_cross(
+	   row = V006
+	  ,col = V016_agrp
+	  ,percent = 'row'
+	  ,label = list(
+		 V016_agrp ~ 'Tabagismo'
+		,V006 ~ 'Escolaridade'
+		)
+	 ) %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/cross_escolaridade_tabagismo.html')
+
+   ## escolaridade vs
+   ##   diabetes
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 mutate(
+	   V013 = str_sub( V013, start=1, end=3)
+	 ) %>%
+	 tbl_cross(
+	   row = V006
+	  ,col = V013
+	  ,percent = 'row'
+	  ,label = list(
+		 V013 ~ 'Diabetes'
+		,V006 ~ 'Escolaridade'
+		)
+	 ) %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/cross_escolaridade_diabetes.html')
+
+   ## escolaridade vs
+   ##   hipertensão
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 mutate(
+	   V014 = str_sub( V014, start=1, end=3)
+	 ) %>%
+	 tbl_cross(
+	   row = V006
+	  ,col = V014
+	  ,percent = 'row'
+	  ,label = list(
+		 V014 ~ 'Hipertensão arterial'
+		,V006 ~ 'Escolaridade'
+		)
+	 ) %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/cross_escolaridade_hipertensao.html')
+
+   ## escolaridade vs
+   ##   consumo de álcool
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 mutate(
+	   V017 = str_sub( V017, start=1, end=3)
+	 ) %>%
+	 tbl_cross(
+	   row = V006
+	  ,col = V017
+	  ,percent = 'row'
+	  ,label = list(
+		 V017 ~ 'Consumo de álcool'
+		,V006 ~ 'Escolaridade'
+		)
+	 ) %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/cross_escolaridade_consumo_alcool.html')
+
+
+   ## escolaridade vs
+   ##   auto-avaliação do estado de saúde
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 mutate(
+	   V006 = case_when(
+		 V006 == 'Superior (ou 3º grau)' ~ 'Superior'
+		,V006 == 'Pós-graduação (especialização, mestrado, doutorado)' ~ 'Superior'
+		,TRUE ~ 'Ensino médio ou inferior'
+	   )
+	  ,V007 = case_when(
+		 !(V007 %in% c('Sim, trabalho', 'Não, estou desempregado')) ~ 'Outros'
+		,TRUE ~ as.character(V007)
+	   )
+	 ) %>%
+	 filter( V007 != 'Outros' ) %>%
+	 tbl_cross(
+	   row = V015
+	  ,col = V006
+	  ,percent = 'row'
+	  ,label = list(
+		 V015 ~ 'Auto-avaliação do estado de saúde'
+		,V006 ~ 'Escolaridade'
+		)
+	 ) %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/cross_escolaridade_estado_saude.html')
+
+
+
+   ## desemprego vs
+   ##   tabagismo
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 mutate(
+	   V016_agrp = case_when(
+		 V016 == 'Não' ~ 'Não'
+		 ,TRUE ~ 'Sim'
+	   )
+	  ,V007 = case_when(
+		 !(V007 %in% c('Sim, trabalho', 'Não, estou desempregado')) ~ 'Outros'
+		,TRUE ~ as.character(V007)
+	   )
+	 ) %>%
+	 filter( V007 != 'Outros' ) %>%
+	 tbl_cross(
+	   row = V007
+	  ,col = V016_agrp
+	  ,percent = 'row'
+	  ,label = list(
+		 V016_agrp ~ 'Tabagismo'
+		,V007 ~ 'Emprego'
+		)
+	 ) %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/cross_emprego_tabagismo.html')
+
+   ## desemprego vs
+   ##   diabetes
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 mutate(
+	   V013 = str_sub( V013, start=1, end=3)
+	  ,V007 = case_when(
+		 !(V007 %in% c('Sim, trabalho', 'Não, estou desempregado')) ~ 'Outros'
+		,TRUE ~ as.character(V007)
+	   )
+	 ) %>%
+	 filter( V007 != 'Outros' ) %>%
+	 tbl_cross(
+	   row = V007
+	  ,col = V013
+	  ,percent = 'row'
+	  ,label = list(
+		 V013 ~ 'Diabetes'
+		,V007 ~ 'Emprego'
+		)
+	 ) %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/cross_emprego_diabetes.html')
+
+   ## desemprego vs
+   ##   hipertensão
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 mutate(
+	   V014 = str_sub( V014, start=1, end=3)
+	  ,V007 = case_when(
+		 !(V007 %in% c('Sim, trabalho', 'Não, estou desempregado')) ~ 'Outros'
+		,TRUE ~ as.character(V007)
+	   )
+	 ) %>%
+	 filter( V007 != 'Outros' ) %>%
+	 tbl_cross(
+	   row = V007
+	  ,col = V014
+	  ,percent = 'row'
+	  ,label = list(
+		 V014 ~ 'Hipertensão arterial'
+		,V007 ~ 'Emprego'
+		)
+	 ) %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/cross_emprego_hipertensao.html')
+
+   ## desemprego vs
+   ##   consumo de álcool
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 mutate(
+	   V017 = str_sub( V017, start=1, end=3)
+	  ,V007 = case_when(
+		 !(V007 %in% c('Sim, trabalho', 'Não, estou desempregado')) ~ 'Outros'
+		,TRUE ~ as.character(V007)
+	   )
+	 ) %>%
+	 filter( V007 != 'Outros' ) %>%
+	 tbl_cross(
+	   row = V007
+	  ,col = V017
+	  ,percent = 'row'
+	  ,label = list(
+		 V017 ~ 'Consumo de álcool'
+		,V007 ~ 'Emprego'
+		)
+	 ) %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/cross_emprego_consumo_alcool.html')
+
+
+   ## desemprego vs
+   ##   auto-avaliação do estado de saúde
+   dat %>%
+	 filter( VALIDA == TRUE ) %>%
+	 mutate(
+	   V007 = case_when(
+		 !(V007 %in% c('Sim, trabalho', 'Não, estou desempregado')) ~ 'Outros'
+		,TRUE ~ as.character(V007)
+	   )
+	 ) %>%
+	 filter( V007 != 'Outros' ) %>%
+	 tbl_cross(
+	   row = V015
+	  ,col = V007
+	  ,percent = 'row'
+	  ,label = list(
+		 V015 ~ 'Auto-avaliação do estado de saúde'
+		,V007 ~ 'Emprego'
+		)
+	 ) %>%
+	 add_p() %>%
+	 bold_labels() %>%
+	 modify_header(label ~ "**Variáveis pesquisadas**") %>%
+	 as_gt() %>%
+	 gt::gtsave( filename = './data/cross_emprego_estado_saude.html')
    #+END_SRC
 
    
