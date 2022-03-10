@@ -1,0 +1,99 @@
+
+Censo Populacional 2010: https://www.ibge.gov.br/estatisticas/sociais/populacao/9662-censo-demografico-2010.html?=&t=o-que-e
+
+Fonte dos microdados: https://www.ibge.gov.br/estatisticas/sociais/populacao/9662-censo-demografico-2010.html?=&t=microdados
+
+#+begin_src sh :results  silent
+cat ./censo2010_microdados/Amostra_Pessoas_35_outras.txt | \
+	cut -b 1-2,3-7,8-20,21-28,29-44,51-53,58,62-64,68,71 | \
+		gawk -v FIELDWIDTHS='2 5 13 8 16 2 1 1 3 1 1' -v OFS='|' '{ $1=$1 ""; print }' | \
+		awk -F "|" ' { if ($6 == 22) { print } }' > ./rmc
+# V0001  1-2    (2)  unidade da federação
+# V0002  3-7    (5)  código municipio
+# V0011  8-20   (13) área de ponderação
+# V0300 21-28   (8)  área de ponderação
+# V0010 29-44   (16) peso amostral
+# V1004 51-52   (2)  código da região metropolitana
+# V1006 53-53   (1)  situação do domicílio
+# V0601 58-58   (1)  sexo
+# V6030 62-64   (3)  idade calculada em anos
+# V0606 68-68   (1)  cor ou raça
+# V0615 71-71   (1)  dificuldade permanente de ouvir
+
+#+end_src
+
+#+begin_src R 
+## https://rpubs.com/ghnaves/microdados
+## https://rpubs.com/rikferreira/microdados-censo-2010
+library(tidyverse)
+library(survey)
+
+rmc <- read.table(
+  file = './rmc'
+ ,header=FALSE
+ ,sep = '|'
+ ,colClasses = 'character'
+)
+
+names(rmc) <- c('v0001',
+                'v0002',
+                'v0011',
+                'v0300',
+                'v0010',
+                'v1004',
+                'v1006',
+                'v0601',
+                'v6030',
+                'v0606',
+                'v0615'
+                )
+
+rmc <- rmc %>%
+  mutate(
+    v0010 = as.numeric(
+      paste0(
+        substr(v0010, start=1, stop=3)
+       ,'.'
+       ,substr(v0010, start=4, stop=length(v0010))
+      )
+    )
+    ,v1006 = as.factor(v1006)
+    ,v0601 = as.factor(v0601)
+    ,v6030 = as.factor(v6030)
+    ,v0606 = as.factor(v0606)
+    ,muita_dificuldade_ouvir = as.factor(ifelse( as.numeric(v0615) <=2, 'sim','nao') )
+    ,v0615 = as.factor(v0615)
+  )
+
+str(rmc)
+
+rmc <- rmc %>%
+  group_by(v0011) %>%
+  mutate( qtdPessoas = n() ) %>%
+  ungroup
+
+str(rmc)
+
+
+design <- svydesign(
+  ids = ~v0300,
+  strata = ~v0011,
+  fpc = ~qtdPessoas,
+  weights = ~v0010,
+  data = rmc
+)
+
+svytotal(~v1006, design)
+svymean(~v1006, design)
+
+svytotal(~v0601, design)
+svymean(~v0601, design)
+
+svytotal(~v6030, design)
+
+svytotal(~v0615, design)
+svymean(~v0615, design)
+
+svytotal(~muita_dificuldade_ouvir, design)
+svymean(~muita_dificuldade_ouvir, design)
+#+end_src
